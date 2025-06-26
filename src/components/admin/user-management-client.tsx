@@ -1,0 +1,205 @@
+"use client";
+
+import type { User, Course } from "@/lib/types";
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { suggestTrainingAssignments } from "@/ai/flows/suggest-training-assignments";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, Wand2 } from "lucide-react";
+import { ScrollArea } from "../ui/scroll-area";
+
+interface UserManagementClientProps {
+  users: User[];
+  courses: Course[];
+}
+
+export function UserManagementClient({ users, courses }: UserManagementClientProps) {
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <>
+      <div className="rounded-lg border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Completed</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell className="font-medium">{user.name}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>
+                  <Badge variant={user.role === 'Admin' ? 'default' : 'secondary'}>
+                    {user.role}
+                  </Badge>
+                </TableCell>
+                <TableCell>{user.completedTraining.length} courses</TableCell>
+                <TableCell className="text-right">
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" onClick={() => {
+                        setSelectedUser(user);
+                        setIsModalOpen(true);
+                    }}>
+                        <Wand2 className="mr-2 h-4 w-4" />
+                        Suggest Training
+                    </Button>
+                  </DialogTrigger>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+      <SuggestTrainingModal
+        user={selectedUser}
+        courses={courses}
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+      />
+    </>
+  );
+}
+
+
+interface SuggestTrainingModalProps {
+    user: User | null;
+    courses: Course[];
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
+}
+
+function SuggestTrainingModal({ user, courses, isOpen, setIsOpen }: SuggestTrainingModalProps) {
+    const { toast } = useToast();
+    const [isLoading, setIsLoading] = useState(false);
+    const [suggestions, setSuggestions] = useState<Course[]>([]);
+
+    const handleGetSuggestions = async () => {
+        if (!user) return;
+        setIsLoading(true);
+        setSuggestions([]);
+
+        try {
+            const result = await suggestTrainingAssignments({
+                userRole: user.role,
+                completedTraining: user.completedTraining,
+                availableTraining: courses.map(c => ({
+                    id: c.id,
+                    title: c.title,
+                    description: c.description,
+                    tags: c.tags || []
+                })),
+            });
+            
+            const suggestedCourses = courses.filter(c => result.suggestedTrainingIds.includes(c.id));
+            setSuggestions(suggestedCourses);
+
+            toast({
+                title: "Suggestions generated!",
+                description: `Found ${suggestedCourses.length} relevant courses for ${user.name}.`,
+            });
+
+        } catch (error) {
+            console.error("AI suggestion failed:", error);
+            toast({
+                variant: "destructive",
+                title: "An error occurred",
+                description: "Failed to generate AI suggestions. Please try again.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    // Reset state when modal is closed
+    const onOpenChange = (open: boolean) => {
+        if (!open) {
+            setSuggestions([]);
+            setIsLoading(false);
+        }
+        setIsOpen(open);
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-[625px]">
+                <DialogHeader>
+                    <DialogTitle>AI Training Suggestions</DialogTitle>
+                    <DialogDescription>
+                        Generate relevant training assignments for {user?.name} based on their role and completed work.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    {!suggestions.length && !isLoading && (
+                        <div className="flex flex-col items-center justify-center text-center gap-4 p-8 border-2 border-dashed rounded-lg">
+                            <Wand2 className="h-12 w-12 text-muted-foreground" />
+                            <p className="text-muted-foreground">Click the button below to generate AI-powered suggestions.</p>
+                             <Button onClick={handleGetSuggestions}>
+                                <Wand2 className="mr-2 h-4 w-4" />
+                                Get AI Suggestions
+                            </Button>
+                        </div>
+                    )}
+                    {isLoading && (
+                        <div className="flex items-center justify-center p-8">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            <p className="ml-4">Generating suggestions...</p>
+                        </div>
+                    )}
+                    {suggestions.length > 0 && (
+                        <div>
+                            <h3 className="font-semibold mb-2">Suggested Courses for {user?.name}:</h3>
+                             <ScrollArea className="h-72 w-full rounded-md border p-2">
+                                <div className="space-y-2">
+                                    {suggestions.map(course => (
+                                        <div key={course.id} className="p-2 border rounded-md flex justify-between items-center">
+                                            <div>
+                                                <p className="font-medium">{course.title}</p>
+                                                <p className="text-sm text-muted-foreground">{course.description.substring(0,60)}...</p>
+                                            </div>
+                                            <Button size="sm" variant="ghost">Assign</Button>
+                                        </div>
+                                    ))}
+                                </div>
+                             </ScrollArea>
+                        </div>
+                    )}
+                </div>
+                <DialogFooter>
+                    {suggestions.length > 0 && !isLoading && (
+                        <Button onClick={handleGetSuggestions} variant="outline" size="sm">
+                            <Wand2 className="mr-2 h-4 w-4" />
+                            Regenerate
+                        </Button>
+                    )}
+                     <Button variant="secondary" onClick={() => setIsOpen(false)}>Close</Button>
+                     <Button>Assign Selected</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
