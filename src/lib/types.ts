@@ -6,6 +6,8 @@ export interface Course {
   videoUrl: string;
   tags?: string[];
   quiz: Quiz;
+  accessRoles?: UserRole[];
+  accessAreas?: string[];
 }
 
 export interface Quiz {
@@ -18,11 +20,13 @@ export interface Question {
   correctAnswer: string;
 }
 
+export type UserRole = 'Admin' | 'Diretor' | 'Gerente' | 'Coordenador' | 'Supervisor' | 'Analista' | 'Assistente';
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'Admin' | 'Diretor' | 'Gerente' | 'Coordenador' | 'Supervisor' | 'Usuário';
+  role: UserRole;
   supervisor?: string;
   coordenador?: string;
   gerente?: string;

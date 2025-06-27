@@ -74,6 +74,7 @@ export function UserManagementClient({ users, courses }: UserManagementClientPro
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm" onClick={() => {
                         setSelectedUser(user);
+                        setIsModalOpen(true);
                     }}>
                         <Wand2 className="mr-2 h-4 w-4" />
                         Sugerir Treinamento
@@ -124,12 +125,15 @@ function SuggestTrainingModal({ user, courses, isOpen, setIsOpen }: SuggestTrain
         try {
             const result = await suggestTrainingAssignments({
                 userRole: user.role,
+                userArea: user.area || '',
                 completedTraining: user.completedTraining,
                 availableTraining: courses.map(c => ({
                     id: c.id,
                     title: c.title,
                     description: c.description,
-                    tags: c.tags || []
+                    tags: c.tags || [],
+                    accessRoles: c.accessRoles || [],
+                    accessAreas: c.accessAreas || [],
                 })),
             });
             
@@ -158,7 +162,7 @@ function SuggestTrainingModal({ user, courses, isOpen, setIsOpen }: SuggestTrain
             <DialogHeader>
                 <DialogTitle>Sugestões de Treinamento com IA</DialogTitle>
                 <DialogDescription>
-                    Gere atribuições de treinamento relevantes para {user?.name} com base em sua função e trabalho concluído.
+                    Gere atribuições de treinamento relevantes para {user?.name} com base em sua função, área e trabalho concluído.
                 </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">

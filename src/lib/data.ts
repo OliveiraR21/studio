@@ -70,7 +70,7 @@ export const users: User[] = [
     id: '2',
     name: 'John Doe',
     email: 'john.doe@example.com',
-    role: 'Usuário',
+    role: 'Analista',
     supervisor: 'Ricardo Supervisor',
     coordenador: 'Fernanda Coordenadora',
     gerente: 'Beatriz Gerente',
@@ -84,7 +84,7 @@ export const users: User[] = [
     id: '3',
     name: 'Jane Smith',
     email: 'jane.smith@example.com',
-    role: 'Usuário',
+    role: 'Assistente',
     supervisor: 'Ricardo Supervisor',
     coordenador: 'Fernanda Coordenadora',
     gerente: 'Beatriz Gerente',
@@ -98,7 +98,7 @@ export const users: User[] = [
     id: '4',
     name: 'Emily White',
     email: 'emily.white@example.com',
-    role: 'Usuário',
+    role: 'Analista',
     supervisor: 'Ricardo Supervisor',
     coordenador: 'Fernanda Coordenadora',
     gerente: 'Beatriz Gerente',
@@ -115,7 +115,7 @@ export const users: User[] = [
     id: '5',
     name: 'Michael Brown',
     email: 'michael.brown@example.com',
-    role: 'Usuário',
+    role: 'Assistente',
     supervisor: 'Ricardo Supervisor',
     coordenador: 'Fernanda Coordenadora',
     gerente: 'Beatriz Gerente',
@@ -135,6 +135,8 @@ export const availableCourses: Course[] = [
     thumbnailUrl: 'https://brsupply.sharepoint.com/sites/GestoComercial/_layouts/15/embed.aspx?UniqueId=e1118a67-1152-4e61-9971-8f719ec1f238',
     videoUrl: 'https://brsupply.sharepoint.com/sites/GestoComercial/_layouts/15/embed.aspx?UniqueId=964a79a2-7f5a-470d-84eb-74f9befb8c74&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
     tags: ['Segurança', 'Iniciante', 'Hard Skills'],
+    accessRoles: ['Assistente'],
+    accessAreas: ['Comercial', 'Logística', 'TI', 'Diretoria'],
     quiz: {
       questions: [
         {
@@ -152,6 +154,8 @@ export const availableCourses: Course[] = [
     thumbnailUrl: 'https://placehold.co/600x400.png',
     videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
     tags: ['Equipamento', 'Avançado', 'Hard Skills', 'Human Machine Skills'],
+    accessRoles: ['Analista'],
+    accessAreas: ['Logística'],
     quiz: {
       questions: [
         {
@@ -169,6 +173,7 @@ export const availableCourses: Course[] = [
     thumbnailUrl: 'https://placehold.co/600x400.png',
     videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
     tags: ['Gestão', 'Liderança', 'Soft Skills'],
+    accessRoles: ['Supervisor', 'Coordenador', 'Gerente', 'Diretor'],
     quiz: {
       questions: [
         {
@@ -186,6 +191,7 @@ export const availableCourses: Course[] = [
     thumbnailUrl: 'https://placehold.co/600x400.png',
     videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
     tags: ['Segurança', 'Químicos', 'Hard Skills'],
+    accessAreas: ['Logística'],
     quiz: {
       questions: [
         {
@@ -203,6 +209,7 @@ export const availableCourses: Course[] = [
     thumbnailUrl: 'https://placehold.co/600x400.png',
     videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
     tags: ['Soft Skills', 'Atendimento ao Cliente'],
+    accessAreas: ['Comercial'],
     quiz: {
       questions: [
         {
@@ -220,6 +227,8 @@ export const availableCourses: Course[] = [
     thumbnailUrl: 'https://placehold.co/600x400.png',
     videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
     tags: ['Logística', 'Iniciante', 'Hard Skills'],
+    accessRoles: ['Assistente', 'Analista'],
+    accessAreas: ['Logística'],
     quiz: {
       questions: [
         {

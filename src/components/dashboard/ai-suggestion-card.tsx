@@ -26,12 +26,15 @@ export function AiSuggestionCard({ user, courses }: AiSuggestionCardProps) {
         try {
             const result = await suggestTrainingAssignments({
                 userRole: user.role,
+                userArea: user.area || '',
                 completedTraining: user.completedTraining,
                 availableTraining: courses.map(c => ({
                     id: c.id,
                     title: c.title,
                     description: c.description,
-                    tags: c.tags || []
+                    tags: c.tags || [],
+                    accessRoles: c.accessRoles || [],
+                    accessAreas: c.accessAreas || [],
                 })),
             });
             

@@ -30,6 +30,8 @@ export function CourseListClient({ courses }: CourseListClientProps) {
           <TableRow>
             <TableHead>Título</TableHead>
             <TableHead>Tags</TableHead>
+            <TableHead>Áreas de Acesso</TableHead>
+            <TableHead>Cargos de Acesso</TableHead>
             <TableHead className="w-[150px] text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -42,12 +44,38 @@ export function CourseListClient({ courses }: CourseListClientProps) {
                 </Link>
               </TableCell>
               <TableCell>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-1">
                   {course.tags?.map((tag) => (
                     <Badge key={tag} variant="secondary">
                       {tag}
                     </Badge>
                   ))}
+                </div>
+              </TableCell>
+              <TableCell>
+                 <div className="flex flex-wrap gap-1">
+                  {course.accessAreas && course.accessAreas.length > 0 ? (
+                    course.accessAreas.map((area) => (
+                      <Badge key={area} variant="outline">
+                        {area}
+                      </Badge>
+                    ))
+                  ) : (
+                    <Badge variant="outline">Todos</Badge>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                 <div className="flex flex-wrap gap-1">
+                  {course.accessRoles && course.accessRoles.length > 0 ? (
+                    course.accessRoles.map((role) => (
+                      <Badge key={role} variant="outline">
+                        {role}
+                      </Badge>
+                    ))
+                   ) : (
+                    <Badge variant="outline">Todos</Badge>
+                  )}
                 </div>
               </TableCell>
               <TableCell className="text-right">
