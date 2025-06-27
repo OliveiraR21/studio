@@ -49,7 +49,7 @@ export const availableCourses: Course[] = [
     title: 'Painel Comercial - Apresentação',
     description: 'Uma visão abrangente dos protocolos e procedimentos essenciais de segurança no local de trabalho.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://brsupply.sharepoint.com/:v:/s/GestoComercial/EaJ5SpZafw1HhOt0-b77jHQB8xHcQcj4GoYlFHszDVs_Rg?e=nKhYMo&action=embedview',
+    videoUrl: 'https://brsupply.sharepoint.com/sites/GestoComercial/_layouts/15/embed.aspx?UniqueId=964a79a2-7f5a-470d-84eb-74f9befb8c74&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
     tags: ['Segurança', 'Iniciante'],
     quiz: {
       questions: [
