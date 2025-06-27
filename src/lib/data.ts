@@ -159,12 +159,15 @@ export const users: User[] = [
     role: 'Admin',
     area: 'TI',
     avatarUrl: 'https://placehold.co/100x100.png',
-    completedCourses: ['course-001'],
-    completedTracks: [],
+    completedCourses: ['course-001', 'course-005'],
+    completedTracks: ['track-vendas-1'],
     courseScores: [
       { courseId: 'course-001', score: 95, attempts: 1 },
+      { courseId: 'course-005', score: 100, attempts: 1 },
     ],
-    trackScores: [],
+    trackScores: [
+      { trackId: 'track-vendas-1', score: 98, attempts: 1 },
+    ],
   },
   {
     id: '10',

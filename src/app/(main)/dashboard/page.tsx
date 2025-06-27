@@ -55,6 +55,21 @@ export default function DashboardPage() {
     })
     .filter((course): course is Course & { score: number } => course !== null);
 
+  const trackPerformance = (currentUser.trackScores ?? [])
+    .map(scoreInfo => {
+      let trackDetails: Track | null = null;
+      for (const module of learningModules) {
+        const foundTrack = module.tracks.find(t => t.id === scoreInfo.trackId);
+        if (foundTrack) {
+          trackDetails = foundTrack;
+          break;
+        }
+      }
+      return trackDetails ? { ...trackDetails, score: scoreInfo.score } : null;
+    })
+    .filter((track): track is Track & { score: number } => track !== null)
+    .reverse(); // Newest first
+
   const isCourseCompleted = (courseId: string) => {
     return currentUser.completedCourses.includes(courseId);
   }
@@ -99,34 +114,52 @@ export default function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <ProgressChart completed={completedCoursesCount} total={totalCourses} />
 
-            <Card className="flex flex-col">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                        Média Geral
-                    </CardTitle>
-                    <GaugeCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent className="flex flex-1 flex-col items-center justify-center p-6">
-                    <div className="text-6xl font-bold">{averageScore}%</div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                        Média de todas as provas realizadas
-                    </p>
-                </CardContent>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Média Geral
+                </CardTitle>
+                <GaugeCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="p-6 text-center">
+                <div className="text-7xl font-bold tracking-tighter">{averageScore}%</div>
+                <p className="text-sm text-muted-foreground">
+                  Média de todas as provas
+                </p>
+                {trackPerformance.length > 0 && (
+                  <>
+                    <Separator className="my-4" />
+                    <div className="space-y-3 text-left">
+                      <h4 className="font-semibold text-sm text-center">Histórico de Trilhas</h4>
+                      <ul className="space-y-2">
+                        {trackPerformance.map((track, index) => (
+                          <li key={index} className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">{track.title}</span>
+                            <span className={`font-bold ${track.score >= PASSING_SCORE ? 'text-green-500' : 'text-destructive'}`}>
+                              {track.score}%
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+              </CardContent>
             </Card>
 
             <Card className="flex flex-col">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                        Trilhas Concluídas
-                    </CardTitle>
-                    <Trophy className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent className="flex flex-1 flex-col items-center justify-center p-6">
-                    <div className="text-5xl font-bold">{completedTracksCount}<span className="text-2xl font-medium text-muted-foreground"> de {totalTracks}</span></div>
-                     <p className="text-xs text-muted-foreground mt-2">
-                        Total de trilhas de conhecimento finalizadas
-                    </p>
-                </CardContent>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Trilhas Concluídas
+                </CardTitle>
+                <Trophy className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="flex flex-1 flex-col items-center justify-center p-6 text-center">
+                  <div className="text-7xl font-bold tracking-tighter">{completedTracksCount}</div>
+                  <p className="text-sm text-muted-foreground">
+                    de {totalTracks} trilhas no total
+                  </p>
+              </CardContent>
             </Card>
         </div>
         
