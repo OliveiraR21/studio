@@ -49,7 +49,7 @@ export const availableCourses: Course[] = [
     title: 'Introdução à Segurança no Trabalho',
     description: 'Uma visão abrangente dos protocolos e procedimentos essenciais de segurança no local de trabalho.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://www.youtube.com/embed/KEYP-OToqXg',
+    videoUrl: 'https://brsupply.sharepoint.com/:v:/s/GestoComercial/EaJ5SpZafw1HhOt0-b77jHQB8xHcQcj4GoYlFHszDVs_Rg?e=nKhYMo&action=embedview',
     tags: ['Segurança', 'Iniciante'],
     quiz: {
       questions: [
