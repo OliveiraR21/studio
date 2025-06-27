@@ -27,6 +27,7 @@ export interface User {
   coordenador?: string;
   gerente?: string;
   diretor?: string;
+  area?: string;
   completedTraining: string[];
   avatarUrl: string;
   quizScores?: { courseId: string; score: number }[];

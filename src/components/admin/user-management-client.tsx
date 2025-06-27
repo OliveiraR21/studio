@@ -45,7 +45,11 @@ export function UserManagementClient({ users, courses }: UserManagementClientPro
               <TableHead>Nome</TableHead>
               <TableHead>E-mail</TableHead>
               <TableHead>Função</TableHead>
-              <TableHead>Gestor Imediato</TableHead>
+              <TableHead>Área</TableHead>
+              <TableHead>Supervisor</TableHead>
+              <TableHead>Coordenador</TableHead>
+              <TableHead>Gerente</TableHead>
+              <TableHead>Diretor</TableHead>
               <TableHead>Concluídos</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -60,7 +64,11 @@ export function UserManagementClient({ users, courses }: UserManagementClientPro
                     {user.role}
                   </Badge>
                 </TableCell>
-                <TableCell>{user.supervisor || user.coordenador || user.gerente || user.diretor || 'N/A'}</TableCell>
+                <TableCell>{user.area || 'N/A'}</TableCell>
+                <TableCell>{user.supervisor || 'N/A'}</TableCell>
+                <TableCell>{user.coordenador || 'N/A'}</TableCell>
+                <TableCell>{user.gerente || 'N/A'}</TableCell>
+                <TableCell>{user.diretor || 'N/A'}</TableCell>
                 <TableCell>{user.completedTraining.length} cursos</TableCell>
                 <TableCell className="text-right">
                   <DialogTrigger asChild>
