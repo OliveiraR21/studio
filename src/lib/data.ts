@@ -3,10 +3,18 @@ import type { User, Course } from './types';
 export const users: User[] = [
   {
     id: '1',
-    name: 'Usuário Admin',
+    name: 'Admin',
     email: 'admin@example.com',
     role: 'Admin',
     completedTraining: ['course-001', 'course-003'],
+    avatarUrl: 'https://placehold.co/100x100.png',
+  },
+  {
+    id: '6',
+    name: 'UserGerente',
+    email: 'gerente@example.com',
+    role: 'Gerente',
+    completedTraining: ['course-001'],
     avatarUrl: 'https://placehold.co/100x100.png',
   },
   {

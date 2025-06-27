@@ -54,7 +54,7 @@ export function UserManagementClient({ users, courses }: UserManagementClientPro
                 <TableCell className="font-medium">{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
-                  <Badge variant={user.role === 'Admin' ? 'default' : 'secondary'}>
+                  <Badge variant={user.role === 'Admin' || user.role === 'Gerente' ? 'default' : 'secondary'}>
                     {user.role}
                   </Badge>
                 </TableCell>

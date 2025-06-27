@@ -18,7 +18,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     { href: '/admin/courses', icon: BookMarked, label: 'Gerenciamento de Cursos' },
   ];
 
-  const allNavItems = userRole === 'Admin' ? [...navItems, ...adminNavItems] : navItems;
+  const allNavItems = ['Admin', 'Gerente'].includes(userRole) ? [...navItems, ...adminNavItems] : navItems;
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
