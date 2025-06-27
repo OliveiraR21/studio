@@ -85,6 +85,11 @@ ${JSON.stringify(availableCourses, null, 2)}
         },
     });
 
+    if (!llmResponse || !llmResponse.text) {
+        console.error("AI response is empty or malformed.", llmResponse);
+        return "Desculpe, não consegui gerar uma resposta. Por favor, tente novamente.";
+    }
+    
     return llmResponse.text;
   }
 );
