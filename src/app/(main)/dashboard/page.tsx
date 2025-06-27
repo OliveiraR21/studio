@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { AlertCircle, Target } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import type { Course } from "@/lib/types";
 
 
 export default function DashboardPage() {
@@ -50,6 +51,23 @@ export default function DashboardPage() {
   const hardSkillsCourses = filterCoursesByTag('Hard Skills');
   const softSkillsCourses = filterCoursesByTag('Soft Skills');
   const humanMachineSkillsCourses = filterCoursesByTag('Human Machine Skills');
+
+  const calculateTrackProgress = (courses: Course[], completedTraining: string[]) => {
+    if (courses.length === 0) {
+      return { completed: 0, total: 0, percentage: 0 };
+    }
+    const courseIds = courses.map(c => c.id);
+    const completedInTrack = completedTraining.filter(id => courseIds.includes(id));
+    return {
+      completed: completedInTrack.length,
+      total: courses.length,
+      percentage: Math.round((completedInTrack.length / courses.length) * 100),
+    };
+  };
+
+  const hardSkillsProgress = calculateTrackProgress(hardSkillsCourses, currentUser.completedTraining);
+  const softSkillsProgress = calculateTrackProgress(softSkillsCourses, currentUser.completedTraining);
+  const humanMachineSkillsProgress = calculateTrackProgress(humanMachineSkillsCourses, currentUser.completedTraining);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -112,16 +130,25 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <TabsContent value="hard-skills">
+                <div className="text-sm text-muted-foreground mb-4">
+                    Progresso da trilha: {hardSkillsProgress.completed} de {hardSkillsProgress.total} cursos ({hardSkillsProgress.percentage}%)
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {hardSkillsCourses.map(course => <CourseCard key={course.id} course={course} />)}
                 </div>
               </TabsContent>
               <TabsContent value="soft-skills">
+                 <div className="text-sm text-muted-foreground mb-4">
+                    Progresso da trilha: {softSkillsProgress.completed} de {softSkillsProgress.total} cursos ({softSkillsProgress.percentage}%)
+                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {softSkillsCourses.map(course => <CourseCard key={course.id} course={course} />)}
                 </div>
               </TabsContent>
               <TabsContent value="human-machine-skills">
+                 <div className="text-sm text-muted-foreground mb-4">
+                    Progresso da trilha: {humanMachineSkillsProgress.completed} de {humanMachineSkillsProgress.total} cursos ({humanMachineSkillsProgress.percentage}%)
+                 </div>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {humanMachineSkillsCourses.length > 0 ? (
                         humanMachineSkillsCourses.map(course => <CourseCard key={course.id} course={course} />)
