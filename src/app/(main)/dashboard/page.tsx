@@ -19,11 +19,12 @@ import {
   AccordionTrigger 
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Lock, PlayCircle, Star } from "lucide-react";
+import { CheckCircle, Lock, PlayCircle, Star, Trophy, GaugeCircle } from "lucide-react";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import type { Track, Course } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
+import { ProgressChart } from "@/components/dashboard/progress-chart";
 
 // NOTE: All progress checking logic is for demonstration. 
 // In a real app, you would save progress to a database after a user 
@@ -33,6 +34,16 @@ export default function DashboardPage() {
   // In a real app, this would be the logged-in user from a session.
   const currentUser = users[0];
   
+  // Calculations for "Meu Painel"
+  const totalCourses = learningModules.reduce((sum, module) => sum + module.tracks.reduce((trackSum, track) => trackSum + track.courses.length, 0), 0);
+  const completedCoursesCount = currentUser.completedCourses.length;
+
+  const allScores = [...(currentUser.courseScores ?? []).map(s => s.score), ...(currentUser.trackScores ?? []).map(s => s.score)];
+  const averageScore = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
+
+  const totalTracks = learningModules.reduce((sum, module) => sum + module.tracks.length, 0);
+  const completedTracksCount = currentUser.completedTracks.length;
+
   const isCourseCompleted = (courseId: string) => {
     return currentUser.completedCourses.includes(courseId);
   }
@@ -69,8 +80,48 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto py-2">
+    <div className="container mx-auto py-2 space-y-8">
        <div className="mb-6">
+            <h1 className="text-3xl font-bold">Meu Painel</h1>
+            <p className="text-muted-foreground">
+                Um resumo do seu progresso e desempenho na plataforma.
+            </p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <ProgressChart completed={completedCoursesCount} total={totalCourses} />
+
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                        Média Geral
+                    </CardTitle>
+                    <GaugeCircle className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{averageScore}%</div>
+                    <p className="text-xs text-muted-foreground">
+                        Média de todas as provas realizadas
+                    </p>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                        Trilhas Concluídas
+                    </CardTitle>
+                    <Trophy className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{completedTracksCount} de {totalTracks}</div>
+                     <p className="text-xs text-muted-foreground">
+                        Total de trilhas de conhecimento finalizadas
+                    </p>
+                </CardContent>
+            </Card>
+        </div>
+
+      <div className="mb-6 pt-8">
             <h1 className="text-3xl font-bold">Minhas Trilhas de Conhecimento</h1>
             <p className="text-muted-foreground">
                 Siga os módulos e trilhas para evoluir em sua carreira.
