@@ -116,7 +116,7 @@ export default function DashboardPage() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle>
                   Média Geral
                 </CardTitle>
                 <GaugeCircle className="h-4 w-4 text-muted-foreground" />
@@ -133,12 +133,11 @@ export default function DashboardPage() {
                       <h4 className="font-semibold text-sm text-center">Histórico de Trilhas</h4>
                       <ul className="space-y-2">
                         {trackPerformance.map((track, index) => (
-                          <li key={index} className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">{track.title}</span>
-                            <span className={`font-bold ${track.score >= PASSING_SCORE ? 'text-green-500' : 'text-destructive'}`}>
-                              {track.score}%
-                            </span>
-                          </li>
+                           <li key={index} className="text-sm">
+                                <span className="text-muted-foreground">
+                                    {track.title} | <span className={`font-bold ${track.score >= PASSING_SCORE ? 'text-green-500' : 'text-destructive'}`}>{track.score}%</span>
+                                </span>
+                           </li>
                         ))}
                       </ul>
                     </div>
@@ -149,7 +148,7 @@ export default function DashboardPage() {
 
             <Card className="flex flex-col">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle>
                   Trilhas Concluídas
                 </CardTitle>
                 <Trophy className="h-4 w-4 text-muted-foreground" />
