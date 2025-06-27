@@ -4,12 +4,13 @@ import { useState } from "react";
 import { CoursePlayer } from "@/components/course/course-player";
 import { Quiz as QuizComponent } from "@/components/course/quiz";
 import { findCourseById } from "@/lib/data";
-import { notFound, useRouter } from "next/navigation";
+import { notFound, useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ArrowLeft, Lightbulb, Video } from "lucide-react";
 
-export default function CoursePage({ params }: { params: { id: string } }) {
+export default function CoursePage() {
+  const params = useParams<{ id: string }>();
   const result = findCourseById(params.id);
   const router = useRouter();
 
