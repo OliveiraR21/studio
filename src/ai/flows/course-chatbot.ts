@@ -44,6 +44,14 @@ const courseChatbotFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async ({ history, availableCourses }) => {
+    // The history must alternate between user and model messages.
+    // The Gemini API requires the history to start with a user message.
+    // We'll remove any leading model messages to ensure correctness.
+    let conversationHistory = [...history];
+    while (conversationHistory.length > 0 && conversationHistory[0].role === 'model') {
+      conversationHistory.shift();
+    }
+
     const llmResponse = await ai.generate({
         model: 'googleai/gemini-1.5-flash-latest',
         system: `Você é um "Assistente de Carreira" amigável e prestativo para a plataforma Br Supply Academy.
@@ -54,7 +62,7 @@ Seja sempre cordial e encorajador.
 Aqui está a lista de cursos disponíveis para sua referência:
 ${JSON.stringify(availableCourses, null, 2)}
 `,
-        history: history as Message[],
+        history: conversationHistory as Message[],
         config: {
             safetySettings: [
               {
