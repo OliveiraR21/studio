@@ -29,7 +29,7 @@ export default function CoursePage({ params }: { params: { id: string } }) {
         </div>
         <div className="lg:col-span-1">
             <div className="sticky top-6">
-                <h2 className="text-2xl font-semibold mb-4">Course Quiz</h2>
+                <h2 className="text-2xl font-semibold mb-4">Questionário do Curso</h2>
                 <Separator className="mb-4" />
                 <Quiz quiz={course.quiz} />
             </div>

@@ -42,8 +42,8 @@ export function Quiz({ quiz }: QuizProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Test Your Knowledge</CardTitle>
-        <CardDescription>Select the correct answer for each question.</CardDescription>
+        <CardTitle>Teste seu Conhecimento</CardTitle>
+        <CardDescription>Selecione a resposta correta para cada pergunta.</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
@@ -77,13 +77,13 @@ export function Quiz({ quiz }: QuizProps) {
         {submitted ? (
           <>
             <div className="text-center text-lg font-bold">
-              Your Score: {score} / {quiz.questions.length}
+              Sua Pontuação: {score} / {quiz.questions.length}
             </div>
-            <Button onClick={handleRetake}>Retake Quiz</Button>
+            <Button onClick={handleRetake}>Refazer Questionário</Button>
           </>
         ) : (
           <Button onClick={handleSubmit} disabled={Object.keys(answers).length !== quiz.questions.length}>
-            Submit Answers
+            Enviar Respostas
           </Button>
         )}
       </CardFooter>

@@ -10,11 +10,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const userRole = 'Admin';
 
   const navItems = [
-    { href: '/dashboard', icon: Home, label: 'Dashboard' },
+    { href: '/dashboard', icon: Home, label: 'Painel' },
   ];
 
   const adminNavItems = [
-    { href: '/admin/users', icon: UserCog, label: 'User Management' },
+    { href: '/admin/users', icon: UserCog, label: 'Gerenciamento de Usuários' },
   ];
 
   const allNavItems = userRole === 'Admin' ? [...navItems, ...adminNavItems] : navItems;

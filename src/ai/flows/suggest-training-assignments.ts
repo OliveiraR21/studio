@@ -1,31 +1,31 @@
 'use server';
 
 /**
- * @fileOverview This file implements an AI-powered tool that suggests appropriate training assignments for new users in a group,
- * considering their role and completed training, to avoid duplication and ensure relevant training is assigned automatically.
+ * @fileOverview Este arquivo implementa uma ferramenta com IA que sugere atribuições de treinamento apropriadas para novos usuários em um grupo,
+ * considerando sua função e treinamentos concluídos, para evitar duplicação e garantir que treinamentos relevantes sejam atribuídos automaticamente.
  *
- * - suggestTrainingAssignments - A function that suggests training assignments for a user.
- * - SuggestTrainingAssignmentsInput - The input type for the suggestTrainingAssignments function.
- * - SuggestTrainingAssignmentsOutput - The return type for the suggestTrainingAssignments function.
+ * - suggestTrainingAssignments - Uma função que sugere atribuições de treinamento para um usuário.
+ * - SuggestTrainingAssignmentsInput - O tipo de entrada para a função suggestTrainingAssignments.
+ * - SuggestTrainingAssignmentsOutput - O tipo de retorno para a função suggestTrainingAssignments.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const SuggestTrainingAssignmentsInputSchema = z.object({
-  userRole: z.string().describe('The role of the user in the group.'),
-  completedTraining: z.array(z.string()).describe('A list of IDs of training modules already completed by the user.'),
+  userRole: z.string().describe('A função do usuário no grupo.'),
+  completedTraining: z.array(z.string()).describe('Uma lista de IDs de módulos de treinamento já concluídos pelo usuário.'),
   availableTraining: z.array(z.object({
     id: z.string(),
     title: z.string(),
     description: z.string(),
     tags: z.array(z.string()).optional(),
-  })).describe('A list of available training modules with their IDs, titles, descriptions, and optional tags.'),
+  })).describe('Uma lista de módulos de treinamento disponíveis com seus IDs, títulos, descrições e tags opcionais.'),
 });
 export type SuggestTrainingAssignmentsInput = z.infer<typeof SuggestTrainingAssignmentsInputSchema>;
 
 const SuggestTrainingAssignmentsOutputSchema = z.object({
-  suggestedTrainingIds: z.array(z.string()).describe('A list of IDs of training modules suggested for the user, excluding those already completed.'),
+  suggestedTrainingIds: z.array(z.string()).describe('Uma lista de IDs de módulos de treinamento sugeridos para o usuário, excluindo aqueles já concluídos.'),
 });
 export type SuggestTrainingAssignmentsOutput = z.infer<typeof SuggestTrainingAssignmentsOutputSchema>;
 
@@ -37,17 +37,17 @@ const prompt = ai.definePrompt({
   name: 'suggestTrainingAssignmentsPrompt',
   input: {schema: SuggestTrainingAssignmentsInputSchema},
   output: {schema: SuggestTrainingAssignmentsOutputSchema},
-  prompt: `You are an AI assistant that suggests relevant training assignments for new users in a group, considering their role and completed training.
+  prompt: `Você é um assistente de IA que sugere atribuições de treinamento relevantes para novos usuários em um grupo, considerando sua função e treinamentos concluídos.
 
-  The user's role is: {{{userRole}}}
-  The user has completed the following training modules (IDs): {{#if completedTraining}}{{{completedTraining}}}{{else}}None{{/if}}
-  Available training modules are:
+  A função do usuário é: {{{userRole}}}
+  O usuário concluiu os seguintes módulos de treinamento (IDs): {{#if completedTraining}}{{{completedTraining}}}{{else}}Nenhum{{/if}}
+  Os módulos de treinamento disponíveis são:
   {{#each availableTraining}}
-  - ID: {{{this.id}}}, Title: {{{this.title}}}, Description: {{{this.description}}}, Tags: {{#if this.tags}}{{{this.tags}}}{{else}}None{{/if}}
+  - ID: {{{this.id}}}, Título: {{{this.title}}}, Descrição: {{{this.description}}}, Tags: {{#if this.tags}}{{{this.tags}}}{{else}}Nenhuma{{/if}}
   {{/each}}
 
-  Based on the user's role and completed training, suggest the most relevant training modules (by ID) from the available training modules, excluding those already completed.  Return only the list of IDs.
-  Ensure that the suggested training aligns with the user's role and is not redundant with their completed training.
+  Com base na função do usuário e nos treinamentos concluídos, sugira os módulos de treinamento mais relevantes (por ID) a partir dos módulos disponíveis, excluindo os que já foram concluídos. Retorne apenas a lista de IDs.
+  Garanta que o treinamento sugerido esteja alinhado com a função do usuário e não seja redundante com os treinamentos já concluídos.
   `,config: {
     safetySettings: [
       {

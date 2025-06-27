@@ -8,10 +8,10 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold tracking-tight mb-6">Your Learning Paths</h1>
+      <h1 className="text-3xl font-bold tracking-tight mb-6">Seus Caminhos de Aprendizagem</h1>
       
       <section>
-        <h2 className="text-2xl font-semibold tracking-tight mb-4">Assigned Courses</h2>
+        <h2 className="text-2xl font-semibold tracking-tight mb-4">Cursos Atribuídos</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {courses.slice(0, 4).map((course) => (
             <CourseCard key={course.id} course={course} />
@@ -20,7 +20,7 @@ export default function DashboardPage() {
       </section>
 
       <section className="mt-12">
-        <h2 className="text-2xl font-semibold tracking-tight mb-4">Explore New Skills</h2>
+        <h2 className="text-2xl font-semibold tracking-tight mb-4">Explore Novas Habilidades</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {courses.slice(4).map((course) => (
             <CourseCard key={course.id} course={course} />
