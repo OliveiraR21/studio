@@ -34,6 +34,7 @@ interface UserManagementClientProps {
 export function UserManagementClient({ users, courses }: UserManagementClientProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const managerRoles = ['Admin', 'Diretor', 'Gerente', 'Coordenador', 'Supervisor'];
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -44,6 +45,7 @@ export function UserManagementClient({ users, courses }: UserManagementClientPro
               <TableHead>Nome</TableHead>
               <TableHead>E-mail</TableHead>
               <TableHead>Função</TableHead>
+              <TableHead>Gestor Imediato</TableHead>
               <TableHead>Concluídos</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -54,10 +56,11 @@ export function UserManagementClient({ users, courses }: UserManagementClientPro
                 <TableCell className="font-medium">{user.name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
-                  <Badge variant={user.role === 'Admin' || user.role === 'Gerente' ? 'default' : 'secondary'}>
+                  <Badge variant={managerRoles.includes(user.role) ? 'default' : 'secondary'}>
                     {user.role}
                   </Badge>
                 </TableCell>
+                <TableCell>{user.supervisor || user.coordenador || user.gerente || user.diretor || 'N/A'}</TableCell>
                 <TableCell>{user.completedTraining.length} cursos</TableCell>
                 <TableCell className="text-right">
                   <DialogTrigger asChild>

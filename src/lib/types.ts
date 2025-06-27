@@ -22,7 +22,11 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'Admin' | 'Gerente' | 'Usuário';
+  role: 'Admin' | 'Diretor' | 'Gerente' | 'Coordenador' | 'Supervisor' | 'Usuário';
+  supervisor?: string;
+  coordenador?: string;
+  gerente?: string;
+  diretor?: string;
   completedTraining: string[];
   avatarUrl: string;
   quizScores?: { courseId: string; score: number }[];
