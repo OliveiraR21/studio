@@ -46,7 +46,7 @@ export const users: User[] = [
 export const availableCourses: Course[] = [
   {
     id: 'course-001',
-    title: 'Introdução à Segurança no Trabalho',
+    title: 'Painel Comercial - Apresentação',
     description: 'Uma visão abrangente dos protocolos e procedimentos essenciais de segurança no local de trabalho.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
     videoUrl: 'https://brsupply.sharepoint.com/:v:/s/GestoComercial/EaJ5SpZafw1HhOt0-b77jHQB8xHcQcj4GoYlFHszDVs_Rg?e=nKhYMo&action=embedview',
