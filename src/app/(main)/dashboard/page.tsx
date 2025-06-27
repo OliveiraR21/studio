@@ -19,7 +19,6 @@ import { AlertCircle, Target } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import type { Course } from "@/lib/types";
-import { AiSuggestionCard } from "@/components/dashboard/ai-suggestion-card";
 
 
 export default function DashboardPage() {
@@ -119,7 +118,6 @@ export default function DashboardPage() {
 
       {/* Coluna da Direita: Trilhas e IA */}
       <div className="lg:col-span-2 flex flex-col gap-6">
-        <AiSuggestionCard user={currentUser} courses={availableCourses} />
         <Tabs defaultValue="hard-skills" className="w-full">
           <Card>
             <CardHeader>
