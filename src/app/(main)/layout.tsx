@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { BookMarked, Home, Menu, UserCog } from 'lucide-react';
 import Link from 'next/link';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   // In a real app, user role would come from an auth session.
@@ -73,6 +74,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <div className="w-full flex-1">
             {/* Future search bar can go here */}
           </div>
+          <ThemeToggle />
           <UserNav />
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 overflow-auto bg-muted/20">
