@@ -8,6 +8,10 @@ export const users: User[] = [
     role: 'Admin',
     completedTraining: ['course-001', 'course-003'],
     avatarUrl: 'https://placehold.co/100x100.png',
+    quizScores: [
+      { courseId: 'course-001', score: 95 },
+      { courseId: 'course-003', score: 75 },
+    ],
   },
   {
     id: '6',
@@ -16,6 +20,7 @@ export const users: User[] = [
     role: 'Gerente',
     completedTraining: ['course-001'],
     avatarUrl: 'https://placehold.co/100x100.png',
+     quizScores: [{ courseId: 'course-001', score: 88 }],
   },
   {
     id: '2',
@@ -24,6 +29,7 @@ export const users: User[] = [
     role: 'Usuário',
     completedTraining: ['course-001'],
     avatarUrl: 'https://placehold.co/100x100.png',
+    quizScores: [{ courseId: 'course-001', score: 60 }],
   },
   {
     id: '3',
@@ -32,6 +38,7 @@ export const users: User[] = [
     role: 'Usuário',
     completedTraining: [],
     avatarUrl: 'https://placehold.co/100x100.png',
+    quizScores: [],
   },
    {
     id: '4',
@@ -40,6 +47,10 @@ export const users: User[] = [
     role: 'Usuário',
     completedTraining: ['course-002', 'course-004'],
     avatarUrl: 'https://placehold.co/100x100.png',
+    quizScores: [
+      { courseId: 'course-002', score: 90 },
+      { courseId: 'course-004', score: 82 },
+    ],
   },
   {
     id: '5',
@@ -48,6 +59,7 @@ export const users: User[] = [
     role: 'Usuário',
     completedTraining: ['course-005'],
     avatarUrl: 'https://placehold.co/100x100.png',
+    quizScores: [{ courseId: 'course-005', score: 70 }],
   },
 ];
 
@@ -58,7 +70,7 @@ export const availableCourses: Course[] = [
     description: 'Uma visão abrangente dos protocolos e procedimentos essenciais de segurança no local de trabalho.',
     thumbnailUrl: 'https://brsupply.sharepoint.com/sites/GestoComercial/_layouts/15/embed.aspx?UniqueId=e1118a67-1152-4e61-9971-8f719ec1f238',
     videoUrl: 'https://brsupply.sharepoint.com/sites/GestoComercial/_layouts/15/embed.aspx?UniqueId=964a79a2-7f5a-470d-84eb-74f9befb8c74&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
-    tags: ['Segurança', 'Iniciante'],
+    tags: ['Segurança', 'Iniciante', 'Hard Skills'],
     quiz: {
       questions: [
         {
@@ -75,7 +87,7 @@ export const availableCourses: Course[] = [
     description: 'Domine técnicas avançadas para uma operação segura e eficiente de empilhadeiras.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
     videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
-    tags: ['Equipamento', 'Avançado'],
+    tags: ['Equipamento', 'Avançado', 'Hard Skills', 'Human Machine Skills'],
     quiz: {
       questions: [
         {
@@ -92,7 +104,7 @@ export const availableCourses: Course[] = [
     description: 'Desenvolva habilidades de liderança essenciais para gerenciar e motivar sua equipe de forma eficaz.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
     videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
-    tags: ['Gestão', 'Liderança'],
+    tags: ['Gestão', 'Liderança', 'Soft Skills'],
     quiz: {
       questions: [
         {
@@ -109,7 +121,7 @@ export const availableCourses: Course[] = [
     description: 'Aprenda os procedimentos adequados para manusear e armazenar produtos químicos com segurança.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
     videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
-    tags: ['Segurança', 'Químicos'],
+    tags: ['Segurança', 'Químicos', 'Hard Skills'],
     quiz: {
       questions: [
         {
@@ -143,7 +155,7 @@ export const availableCourses: Course[] = [
     description: 'Uma introdução aos fundamentos da logística moderna e gestão da cadeia de suprimentos.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
     videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
-    tags: ['Logística', 'Iniciante'],
+    tags: ['Logística', 'Iniciante', 'Hard Skills'],
     quiz: {
       questions: [
         {

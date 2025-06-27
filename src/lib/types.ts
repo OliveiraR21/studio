@@ -25,4 +25,5 @@ export interface User {
   role: 'Admin' | 'Gerente' | 'Usuário';
   completedTraining: string[];
   avatarUrl: string;
+  quizScores?: { courseId: string; score: number }[];
 }
