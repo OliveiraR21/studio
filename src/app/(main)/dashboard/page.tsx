@@ -23,6 +23,7 @@ import { CheckCircle, Lock, PlayCircle, Star } from "lucide-react";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import type { Track, Course } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
 
 // NOTE: All progress checking logic is for demonstration. 
 // In a real app, you would save progress to a database after a user 
