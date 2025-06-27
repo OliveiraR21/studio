@@ -10,8 +10,15 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 import type { Message } from 'genkit';
 
+const MessageSchema = z.object({
+  role: z.enum(['user', 'model']),
+  parts: z.array(z.object({
+    text: z.string(),
+  })),
+});
+
 const CourseChatbotInputSchema = z.object({
-  history: z.array(z.any()).describe('The conversation history.'),
+  history: z.array(MessageSchema).describe('The conversation history.'),
   availableCourses: z
     .array(
       z.object({
@@ -38,7 +45,7 @@ const courseChatbotFlow = ai.defineFlow(
   },
   async ({ history, availableCourses }) => {
     const llmResponse = await ai.generate({
-        model: 'googleai/gemini-2.0-flash',
+        model: 'googleai/gemini-1.5-flash-latest',
         system: `Você é um "Assistente de Carreira" amigável e prestativo para a plataforma Br Supply Academy.
 Sua principal função é conversar com os usuários, entender suas necessidades de aprendizado e recomendar cursos relevantes da lista fornecida.
 Responda de forma concisa e útil. Se um curso específico for uma boa opção, mencione o título e explique brevemente por que ele é relevante. Não invente cursos que não existem na lista.
