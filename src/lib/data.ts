@@ -1,5 +1,156 @@
-import type { User, Course } from './types';
+import type { User, Module } from './types';
 
+// Main data export: A structured list of learning modules.
+export const learningModules: Module[] = [
+  {
+    id: 'module-hard-skills',
+    title: 'Hard Skills',
+    description: 'Desenvolva competências técnicas e operacionais essenciais para sua função.',
+    tracks: [
+      {
+        id: 'track-vendas-1',
+        title: 'Trilha de Vendas para Iniciantes',
+        description: 'Aprenda os conceitos fundamentais para iniciar sua carreira na área comercial.',
+        courses: [
+          {
+            id: 'course-001',
+            title: 'Painel Comercial - Apresentação',
+            description: 'Uma visão abrangente dos protocolos e procedimentos essenciais de segurança no local de trabalho.',
+            videoUrl: 'https://brsupply.sharepoint.com/sites/GestoComercial/_layouts/15/embed.aspx?UniqueId=964a79a2-7f5a-470d-84eb-74f9befb8c74&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
+            quiz: {
+              questions: [
+                {
+                  text: 'Qual é a principal função do Painel Comercial?',
+                  options: ['Registrar férias', 'Analisar o desempenho de vendas', 'Enviar e-mails', 'Criar planilhas'],
+                  correctAnswer: 'Analisar o desempenho de vendas',
+                },
+              ],
+            },
+          },
+          {
+            id: 'course-005',
+            title: 'Excelência no Atendimento ao Cliente',
+            description: 'Técnicas para fornecer um atendimento excepcional ao cliente e lidar com situações difíceis.',
+            videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
+            quiz: {
+              questions: [
+                {
+                  text: 'Qual é o modelo "LAST" para lidar com reclamações?',
+                  options: ['Listen, Apologize, Solve, Thank (Ouvir, Pedir desculpas, Resolver, Agradecer)', 'Leave, Avoid, Stay, Talk', 'Listen, Argue, Sell, Terminate', 'Look, Act, Shout, Tell'],
+                  correctAnswer: 'Listen, Apologize, Solve, Thank (Ouvir, Pedir desculpas, Resolver, Agradecer)',
+                },
+              ],
+            },
+          },
+        ],
+        quiz: {
+           questions: [
+            {
+              text: 'Qual a importância de um bom atendimento ao cliente?',
+              options: ['Aumentar os custos', 'Fidelizar o cliente', 'Diminuir as vendas', 'Não tem importância'],
+              correctAnswer: 'Fidelizar o cliente',
+            },
+             {
+              text: 'O Painel Comercial ajuda a tomar decisões baseadas em quê?',
+              options: ['Achismos', 'Dados e métricas', 'Intuição', 'Sorte'],
+              correctAnswer: 'Dados e métricas',
+            },
+          ],
+        }
+      },
+      {
+        id: 'track-logistica-1',
+        title: 'Trilha de Logística Essencial',
+        description: 'Entenda os processos que movimentam nossos produtos, desde o estoque até a entrega.',
+        courses: [
+           {
+            id: 'course-006',
+            title: 'Fundamentos de Logística e Cadeia de Suprimentos',
+            description: 'Uma introdução aos fundamentos da logística moderna e gestão da cadeia de suprimentos.',
+            videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
+          },
+          {
+            id: 'course-002',
+            title: 'Operação Avançada de Empilhadeira',
+            description: 'Domine técnicas avançadas para uma operação segura e eficiente de empilhadeiras.',
+            videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
+            quiz: {
+              questions: [
+                {
+                  text: 'Ao carregar uma carga, os garfos devem estar:',
+                  options: ['O mais alto possível', 'Inclinados para frente', 'Rentes ao chão', 'Na altura dos olhos'],
+                  correctAnswer: 'Rentes ao chão',
+                },
+              ],
+            },
+          },
+          {
+            id: 'course-004',
+            title: 'Manuseio e Segurança de Produtos Químicos',
+            description: 'Aprenda os procedimentos adequados para manusear e armazenar produtos químicos com segurança.',
+            videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
+          },
+        ],
+        quiz: {
+           questions: [
+            {
+              text: 'O que é um componente chave da cadeia de suprimentos?',
+              options: ['Marketing', 'Compras', 'Recursos Humanos', 'Vendas'],
+              correctAnswer: 'Compras',
+            },
+          ],
+        }
+      },
+    ]
+  },
+  {
+    id: 'module-soft-skills',
+    title: 'Soft Skills',
+    description: 'Aprimore suas habilidades interpessoais, de comunicação e liderança.',
+    tracks: [
+       {
+        id: 'track-lideranca-1',
+        title: 'Trilha de Liderança',
+        description: 'Desenvolva habilidades de liderança essenciais para gerenciar e motivar sua equipe de forma eficaz.',
+        courses: [
+          {
+            id: 'course-003',
+            title: 'Liderança e Gestão de Equipes',
+            description: 'Desenvolva habilidades de liderança essenciais para gerenciar e motivar sua equipe de forma eficaz.',
+            videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
+            quiz: {
+              questions: [
+                {
+                  text: 'Qual é uma característica fundamental de um bom líder?',
+                  options: ['Microgerenciamento', 'Comunicação ruim', 'Empatia', 'Evitar decisões'],
+                  correctAnswer: 'Empatia',
+                },
+              ],
+            },
+          },
+        ],
+        quiz: {
+           questions: [
+            {
+              text: 'A empatia é crucial para a liderança porque...',
+              options: ['Ajuda a controlar a equipe', 'Permite entender e se conectar com as pessoas', 'Não é importante', 'Facilita a punição'],
+              correctAnswer: 'Permite entender e se conectar com as pessoas',
+            },
+          ],
+        }
+      },
+    ]
+  },
+    {
+    id: 'module-human-machine',
+    title: 'Human-Machine Skills',
+    description: 'Aprenda a colaborar de forma eficaz com tecnologias e sistemas automatizados.',
+    tracks: []
+  }
+];
+
+
+// User data with new progress tracking structure
 export const users: User[] = [
   {
     id: '1',
@@ -7,12 +158,13 @@ export const users: User[] = [
     email: 'admin@example.com',
     role: 'Admin',
     area: 'TI',
-    completedTraining: ['course-001', 'course-003'],
     avatarUrl: 'https://placehold.co/100x100.png',
-    quizScores: [
+    completedCourses: ['course-001'],
+    completedTracks: [],
+    courseScores: [
       { courseId: 'course-001', score: 95 },
-      { courseId: 'course-003', score: 75 },
     ],
+    trackScores: [],
   },
   {
     id: '10',
@@ -20,12 +172,9 @@ export const users: User[] = [
     email: 'carlos.diretor@example.com',
     role: 'Diretor',
     area: 'Diretoria',
-    completedTraining: ['course-001', 'course-003'],
     avatarUrl: 'https://placehold.co/100x100.png',
-    quizScores: [
-        { courseId: 'course-001', score: 98 },
-        { courseId: 'course-003', score: 92 },
-    ],
+    completedCourses: ['course-001', 'course-003'],
+    completedTracks: [],
   },
   {
     id: '7',
@@ -34,9 +183,9 @@ export const users: User[] = [
     role: 'Gerente',
     diretor: 'Carlos Diretor',
     area: 'Comercial',
-    completedTraining: ['course-001', 'course-003'],
     avatarUrl: 'https://placehold.co/100x100.png',
-    quizScores: [{ courseId: 'course-001', score: 88 }],
+    completedCourses: ['course-001'],
+    completedTracks: [],
   },
   {
     id: '8',
@@ -46,12 +195,9 @@ export const users: User[] = [
     gerente: 'Beatriz Gerente',
     diretor: 'Carlos Diretor',
     area: 'Comercial',
-    completedTraining: ['course-001', 'course-003', 'course-005'],
     avatarUrl: 'https://placehold.co/100x100.png',
-    quizScores: [
-        { courseId: 'course-001', score: 90 },
-        { courseId: 'course-003', score: 82 },
-    ],
+    completedCourses: ['course-001', 'course-003', 'course-005'],
+    completedTracks: [],
   },
   {
     id: '9',
@@ -62,9 +208,9 @@ export const users: User[] = [
     gerente: 'Beatriz Gerente',
     diretor: 'Carlos Diretor',
     area: 'Comercial',
-    completedTraining: ['course-001', 'course-002', 'course-004'],
     avatarUrl: 'https://placehold.co/100x100.png',
-    quizScores: [{ courseId: 'course-005', score: 70 }],
+    completedCourses: ['course-001', 'course-002', 'course-004'],
+    completedTracks: [],
   },
   {
     id: '2',
@@ -76,9 +222,10 @@ export const users: User[] = [
     gerente: 'Beatriz Gerente',
     diretor: 'Carlos Diretor',
     area: 'Comercial',
-    completedTraining: ['course-001'],
     avatarUrl: 'https://placehold.co/100x100.png',
-    quizScores: [{ courseId: 'course-001', score: 60 }],
+    completedCourses: ['course-001'],
+    courseScores: [{ courseId: 'course-001', score: 60 }],
+    completedTracks: [],
   },
   {
     id: '3',
@@ -90,9 +237,9 @@ export const users: User[] = [
     gerente: 'Beatriz Gerente',
     diretor: 'Carlos Diretor',
     area: 'Comercial',
-    completedTraining: [],
     avatarUrl: 'https://placehold.co/100x100.png',
-    quizScores: [],
+    completedCourses: [],
+    completedTracks: [],
   },
    {
     id: '4',
@@ -104,12 +251,9 @@ export const users: User[] = [
     gerente: 'Beatriz Gerente',
     diretor: 'Carlos Diretor',
     area: 'Logística',
-    completedTraining: ['course-002', 'course-004'],
     avatarUrl: 'https://placehold.co/100x100.png',
-    quizScores: [
-      { courseId: 'course-002', score: 90 },
-      { courseId: 'course-004', score: 82 },
-    ],
+    completedCourses: ['course-002', 'course-004'],
+    completedTracks: [],
   },
   {
     id: '5',
@@ -121,122 +265,21 @@ export const users: User[] = [
     gerente: 'Beatriz Gerente',
     diretor: 'Carlos Diretor',
     area: 'Logística',
-    completedTraining: ['course-005'],
     avatarUrl: 'https://placehold.co/100x100.png',
-    quizScores: [{ courseId: 'course-005', score: 70 }],
+    completedCourses: ['course-005'],
+    completedTracks: [],
   },
 ];
 
-export const availableCourses: Course[] = [
-  {
-    id: 'course-001',
-    title: 'Painel Comercial - Apresentação',
-    description: 'Uma visão abrangente dos protocolos e procedimentos essenciais de segurança no local de trabalho.',
-    thumbnailUrl: 'https://brsupply.sharepoint.com/sites/GestoComercial/_layouts/15/embed.aspx?UniqueId=e1118a67-1152-4e61-9971-8f719ec1f238',
-    videoUrl: 'https://brsupply.sharepoint.com/sites/GestoComercial/_layouts/15/embed.aspx?UniqueId=964a79a2-7f5a-470d-84eb-74f9befb8c74&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
-    tags: ['Segurança', 'Iniciante', 'Hard Skills'],
-    accessRoles: ['Assistente'],
-    accessAreas: ['Comercial', 'Logística', 'TI', 'Diretoria'],
-    quiz: {
-      questions: [
-        {
-          text: 'Qual é o primeiro passo em caso de um alarme de incêndio?',
-          options: ['Continuar trabalhando', 'Evacuar imediatamente', 'Ligar para um amigo', 'Procurar a fonte'],
-          correctAnswer: 'Evacuar imediatamente',
-        },
-      ],
-    },
-  },
-  {
-    id: 'course-002',
-    title: 'Operação Avançada de Empilhadeira',
-    description: 'Domine técnicas avançadas para uma operação segura e eficiente de empilhadeiras.',
-    thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
-    tags: ['Equipamento', 'Avançado', 'Hard Skills', 'Human Machine Skills'],
-    accessRoles: ['Analista'],
-    accessAreas: ['Logística'],
-    quiz: {
-      questions: [
-        {
-          text: 'Ao carregar uma carga, os garfos devem estar:',
-          options: ['O mais alto possível', 'Inclinados para frente', 'Rentes ao chão', 'Na altura dos olhos'],
-          correctAnswer: 'Rentes ao chão',
-        },
-      ],
-    },
-  },
-  {
-    id: 'course-003',
-    title: 'Liderança e Gestão de Equipes',
-    description: 'Desenvolva habilidades de liderança essenciais para gerenciar e motivar sua equipe de forma eficaz.',
-    thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
-    tags: ['Gestão', 'Liderança', 'Soft Skills'],
-    accessRoles: ['Supervisor', 'Coordenador', 'Gerente', 'Diretor'],
-    quiz: {
-      questions: [
-        {
-          text: 'Qual é uma característica fundamental de um bom líder?',
-          options: ['Microgerenciamento', 'Comunicação ruim', 'Empatia', 'Evitar decisões'],
-          correctAnswer: 'Empatia',
-        },
-      ],
-    },
-  },
-  {
-    id: 'course-004',
-    title: 'Manuseio e Segurança de Produtos Químicos',
-    description: 'Aprenda os procedimentos adequados para manusear e armazenar produtos químicos com segurança.',
-    thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
-    tags: ['Segurança', 'Químicos', 'Hard Skills'],
-    accessAreas: ['Logística'],
-    quiz: {
-      questions: [
-        {
-          text: 'O que significa FISPQ?',
-          options: ['Ficha de Informações de Segurança de Produtos Químicos', 'Sistema de Entrega Segura', 'Armazenamento Seguro de Dados', 'Triagem Sistemática de Drogas'],
-          correctAnswer: 'Ficha de Informações de Segurança de Produtos Químicos',
-        },
-      ],
-    },
-  },
-  {
-    id: 'course-005',
-    title: 'Excelência no Atendimento ao Cliente',
-    description: 'Técnicas para fornecer um atendimento excepcional ao cliente e lidar com situações difíceis.',
-    thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
-    tags: ['Soft Skills', 'Atendimento ao Cliente'],
-    accessAreas: ['Comercial'],
-    quiz: {
-      questions: [
-        {
-          text: 'Qual é o modelo "LAST" para lidar com reclamações?',
-          options: ['Listen, Apologize, Solve, Thank (Ouvir, Pedir desculpas, Resolver, Agradecer)', 'Leave, Avoid, Stay, Talk', 'Listen, Argue, Sell, Terminate', 'Look, Act, Shout, Tell'],
-          correctAnswer: 'Listen, Apologize, Solve, Thank (Ouvir, Pedir desculpas, Resolver, Agradecer)',
-        },
-      ],
-    },
-  },
-  {
-    id: 'course-006',
-    title: 'Fundamentos de Logística e Cadeia de Suprimentos',
-    description: 'Uma introdução aos fundamentos da logística moderna e gestão da cadeia de suprimentos.',
-    thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
-    tags: ['Logística', 'Iniciante', 'Hard Skills'],
-    accessRoles: ['Assistente', 'Analista'],
-    accessAreas: ['Logística'],
-    quiz: {
-      questions: [
-        {
-          text: 'Qual é um componente chave de uma cadeia de suprimentos?',
-          options: ['Marketing', 'Compras', 'Recursos Humanos', 'Vendas'],
-          correctAnswer: 'Compras',
-        },
-      ],
-    },
+// Helper function to find a course by its ID across all modules and tracks.
+export function findCourseById(courseId: string) {
+  for (const module of learningModules) {
+    for (const track of module.tracks) {
+      const course = track.courses.find(c => c.id === courseId);
+      if (course) {
+        return { course, track };
+      }
+    }
   }
-];
+  return null;
+}

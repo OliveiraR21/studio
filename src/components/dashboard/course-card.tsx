@@ -8,32 +8,22 @@ interface CourseCardProps {
   course: Course;
 }
 
-export function CourseCard({ course }: CourseCardProps) {
-  const isEmbed = course.thumbnailUrl.includes('embed');
+// NOTE: This component is currently unused after the dashboard refactor,
+// but is kept for potential future use on different pages.
 
+export function CourseCard({ course }: CourseCardProps) {
   return (
     <Link href={`/courses/${course.id}`} className="block group">
       <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 ease-in-out group-hover:shadow-lg group-hover:shadow-primary/20 group-hover:border-primary/50">
         <CardHeader className="p-0">
           <div className="relative w-full h-40 overflow-hidden">
-            {isEmbed ? (
-               <iframe
-                src={course.thumbnailUrl}
-                title={`Capa para ${course.title}`}
-                className="w-full h-full border-0 transition-transform duration-300 ease-in-out group-hover:scale-105"
-                loading="lazy"
-                allowFullScreen={false}
-                sandbox="allow-scripts allow-same-origin"
-              ></iframe>
-            ) : (
-              <Image
-                src={course.thumbnailUrl}
+             <Image
+                src={"https://placehold.co/600x400.png"}
                 alt={course.title}
                 fill
                 className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
                 data-ai-hint="course thumbnail"
               />
-            )}
           </div>
         </CardHeader>
         <CardContent className="p-4 flex-grow">
@@ -44,11 +34,6 @@ export function CourseCard({ course }: CourseCardProps) {
             {course.description}
           </p>
         </CardContent>
-        <CardFooter className="p-4 pt-0">
-            {course.tags && course.tags.map(tag => (
-                <Badge key={tag} variant="secondary" className="mr-2">{tag}</Badge>
-            ))}
-        </CardFooter>
       </Card>
     </Link>
   );

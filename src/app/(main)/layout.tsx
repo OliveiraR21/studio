@@ -11,7 +11,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const userRole = 'Admin';
 
   const navItems = [
-    { href: '/dashboard', icon: Home, label: 'Painel' },
+    { href: '/dashboard', icon: Home, label: 'Minhas Trilhas' },
   ];
 
   const adminNavItems = [

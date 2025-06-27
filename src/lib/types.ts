@@ -1,13 +1,26 @@
+export interface Module {
+  id: string;
+  title: string;
+  description: string;
+  tracks: Track[];
+}
+
+export interface Track {
+  id: string;
+  title: string;
+  description: string;
+  courses: Course[];
+  // Every track must have a final quiz.
+  quiz: Quiz;
+}
+
 export interface Course {
   id: string;
   title: string;
   description: string;
-  thumbnailUrl: string;
   videoUrl: string;
-  tags?: string[];
-  quiz: Quiz;
-  accessRoles?: UserRole[];
-  accessAreas?: string[];
+  // A course can optionally have a quiz.
+  quiz?: Quiz;
 }
 
 export interface Quiz {
@@ -22,6 +35,7 @@ export interface Question {
 
 export type UserRole = 'Admin' | 'Diretor' | 'Gerente' | 'Coordenador' | 'Supervisor' | 'Analista' | 'Assistente';
 
+// User progress is now more granular.
 export interface User {
   id: string;
   name: string;
@@ -32,7 +46,13 @@ export interface User {
   gerente?: string;
   diretor?: string;
   area?: string;
-  completedTraining: string[];
   avatarUrl: string;
-  quizScores?: { courseId: string; score: number }[];
+  
+  // Track which courses and tracks have been completed.
+  completedCourses: string[]; // List of course IDs
+  completedTracks: string[]; // List of track IDs
+
+  // Track scores for both course and track quizzes.
+  courseScores?: { courseId: string; score: number }[];
+  trackScores?: { trackId: string; score: number }[];
 }

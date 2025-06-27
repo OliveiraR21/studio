@@ -1,6 +1,6 @@
 "use client";
 
-import type { Course } from "@/lib/types";
+import type { Track, Course } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -13,71 +13,49 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Edit, Trash2 } from "lucide-react";
+import { learningModules } from "@/lib/data";
 
-interface CourseListClientProps {
-  courses: Course[];
-}
-
-export function CourseListClient({ courses }: CourseListClientProps) {
-  // NOTE: Add, Edit and Delete functionality is not implemented
-  // as the data is static. This component is for display purposes.
-  // In a real app, these buttons would trigger modals/forms to modify the data.
+// This component is simplified to just list all available courses.
+// The complex logic of tracks and modules is handled on the dashboard.
+export function CourseListClient() {
+  const allCourses: (Course & { trackTitle: string })[] = [];
+  learningModules.forEach(module => {
+    module.tracks.forEach(track => {
+        track.courses.forEach(course => {
+            allCourses.push({ ...course, trackTitle: track.title });
+        });
+    });
+  });
 
   return (
     <div className="rounded-lg border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Título</TableHead>
-            <TableHead>Tags</TableHead>
-            <TableHead>Áreas de Acesso</TableHead>
-            <TableHead>Cargos de Acesso</TableHead>
+            <TableHead>Título do Curso</TableHead>
+            <TableHead>Trilha</TableHead>
+            <TableHead>Possui Prova?</TableHead>
             <TableHead className="w-[150px] text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {courses.map((course) => (
+          {allCourses.map((course) => (
             <TableRow key={course.id}>
               <TableCell className="font-medium">
                 <Link href={`/courses/${course.id}`} className="hover:underline">
                   {course.title}
                 </Link>
               </TableCell>
-              <TableCell>
-                <div className="flex flex-wrap gap-1">
-                  {course.tags?.map((tag) => (
-                    <Badge key={tag} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </TableCell>
-              <TableCell>
-                 <div className="flex flex-wrap gap-1">
-                  {course.accessAreas && course.accessAreas.length > 0 ? (
-                    course.accessAreas.map((area) => (
-                      <Badge key={area} variant="outline">
-                        {area}
-                      </Badge>
-                    ))
+               <TableCell>
+                  <Badge variant="secondary">{course.trackTitle}</Badge>
+               </TableCell>
+               <TableCell>
+                  {course.quiz ? (
+                    <Badge variant="default">Sim</Badge>
                   ) : (
-                    <Badge variant="outline">Todos</Badge>
+                    <Badge variant="outline">Não</Badge>
                   )}
-                </div>
-              </TableCell>
-              <TableCell>
-                 <div className="flex flex-wrap gap-1">
-                  {course.accessRoles && course.accessRoles.length > 0 ? (
-                    course.accessRoles.map((role) => (
-                      <Badge key={role} variant="outline">
-                        {role}
-                      </Badge>
-                    ))
-                   ) : (
-                    <Badge variant="outline">Todos</Badge>
-                  )}
-                </div>
-              </TableCell>
+               </TableCell>
               <TableCell className="text-right">
                  <Button variant="ghost" size="icon" disabled>
                     <Edit className="h-4 w-4" />
