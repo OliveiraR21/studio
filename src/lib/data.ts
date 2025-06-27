@@ -49,7 +49,7 @@ export const availableCourses: Course[] = [
     title: 'Introdução à Segurança no Trabalho',
     description: 'Uma visão abrangente dos protocolos e procedimentos essenciais de segurança no local de trabalho.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://placehold.co/1920x1080.mp4',
+    videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
     tags: ['Segurança', 'Iniciante'],
     quiz: {
       questions: [
@@ -66,7 +66,7 @@ export const availableCourses: Course[] = [
     title: 'Operação Avançada de Empilhadeira',
     description: 'Domine técnicas avançadas para uma operação segura e eficiente de empilhadeiras.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://placehold.co/1920x1080.mp4',
+    videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
     tags: ['Equipamento', 'Avançado'],
     quiz: {
       questions: [
@@ -83,7 +83,7 @@ export const availableCourses: Course[] = [
     title: 'Liderança e Gestão de Equipes',
     description: 'Desenvolva habilidades de liderança essenciais para gerenciar e motivar sua equipe de forma eficaz.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://placehold.co/1920x1080.mp4',
+    videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
     tags: ['Gestão', 'Liderança'],
     quiz: {
       questions: [
@@ -100,7 +100,7 @@ export const availableCourses: Course[] = [
     title: 'Manuseio e Segurança de Produtos Químicos',
     description: 'Aprenda os procedimentos adequados para manusear e armazenar produtos químicos com segurança.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://placehold.co/1920x1080.mp4',
+    videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
     tags: ['Segurança', 'Químicos'],
     quiz: {
       questions: [
@@ -117,7 +117,7 @@ export const availableCourses: Course[] = [
     title: 'Excelência no Atendimento ao Cliente',
     description: 'Técnicas para fornecer um atendimento excepcional ao cliente e lidar com situações difíceis.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://placehold.co/1920x1080.mp4',
+    videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
     tags: ['Soft Skills', 'Atendimento ao Cliente'],
     quiz: {
       questions: [
@@ -134,7 +134,7 @@ export const availableCourses: Course[] = [
     title: 'Fundamentos de Logística e Cadeia de Suprimentos',
     description: 'Uma introdução aos fundamentos da logística moderna e gestão da cadeia de suprimentos.',
     thumbnailUrl: 'https://placehold.co/600x400.png',
-    videoUrl: 'https://placehold.co/1920x1080.mp4',
+    videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
     tags: ['Logística', 'Iniciante'],
     quiz: {
       questions: [
