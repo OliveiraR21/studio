@@ -67,7 +67,7 @@ export function ProgressChart({ completed, total }: ProgressChartProps) {
                 y="50%"
                 textAnchor="middle"
                 dominantBaseline="middle"
-                className="fill-foreground text-7xl font-bold tracking-tighter"
+                className="fill-foreground text-5xl font-bold tracking-tighter"
              >
                 {`${Math.round(percentage)}%`}
             </text>

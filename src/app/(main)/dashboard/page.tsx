@@ -122,7 +122,7 @@ export default function DashboardPage() {
                 <GaugeCircle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent className="p-6 text-center">
-                <div className="text-7xl font-bold tracking-tighter">{averageScore}%</div>
+                <div className="text-5xl font-bold tracking-tighter">{averageScore}%</div>
                 <p className="text-sm text-muted-foreground">
                   Média de todas as provas
                 </p>
@@ -154,7 +154,7 @@ export default function DashboardPage() {
                 <Trophy className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent className="flex flex-1 flex-col items-center justify-center p-6 text-center">
-                  <div className="text-7xl font-bold tracking-tighter">{completedTracksCount}</div>
+                  <div className="text-5xl font-bold tracking-tighter">{completedTracksCount}</div>
                   <p className="text-sm text-muted-foreground">
                     de {totalTracks} trilhas no total
                   </p>
