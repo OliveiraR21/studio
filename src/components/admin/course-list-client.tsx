@@ -14,10 +14,12 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Edit, Trash2 } from "lucide-react";
 import { learningModules } from "@/lib/data";
+import { useToast } from "@/hooks/use-toast";
 
 // This component is simplified to just list all available courses.
 // The complex logic of tracks and modules is handled on the dashboard.
 export function CourseListClient() {
+  const { toast } = useToast();
   const allCourses: (Course & { trackTitle: string })[] = [];
   learningModules.forEach(module => {
     module.tracks.forEach(track => {
@@ -26,6 +28,13 @@ export function CourseListClient() {
         });
     });
   });
+
+  const handleActionClick = () => {
+    toast({
+      title: "Funcionalidade em desenvolvimento",
+      description: "A edição e exclusão de dados ainda não foram implementadas.",
+    });
+  };
 
   return (
     <div className="rounded-lg border">
@@ -57,11 +66,11 @@ export function CourseListClient() {
                   )}
                </TableCell>
               <TableCell className="text-right">
-                 <Button variant="ghost" size="icon" disabled>
+                 <Button variant="ghost" size="icon" onClick={handleActionClick}>
                     <Edit className="h-4 w-4" />
                     <span className="sr-only">Editar</span>
                 </Button>
-                <Button variant="ghost" size="icon" disabled>
+                <Button variant="ghost" size="icon" onClick={handleActionClick}>
                     <Trash2 className="h-4 w-4" />
                      <span className="sr-only">Excluir</span>
                 </Button>

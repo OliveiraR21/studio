@@ -19,8 +19,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 
 export function TrackManagementClient() {
+  const { toast } = useToast();
+
+  const handleActionClick = () => {
+    toast({
+      title: "Funcionalidade em desenvolvimento",
+      description: "A edição e exclusão de dados ainda não foram implementadas.",
+    });
+  };
+
   return (
     <Card>
         <CardHeader>
@@ -55,11 +65,11 @@ export function TrackManagementClient() {
                                                 <TableCell className="font-medium">{track.title}</TableCell>
                                                 <TableCell>{track.courses.length}</TableCell>
                                                 <TableCell className="text-right">
-                                                    <Button variant="ghost" size="icon" disabled>
+                                                    <Button variant="ghost" size="icon" onClick={handleActionClick}>
                                                         <Edit className="h-4 w-4" />
                                                         <span className="sr-only">Editar Trilha</span>
                                                     </Button>
-                                                    <Button variant="ghost" size="icon" disabled>
+                                                    <Button variant="ghost" size="icon" onClick={handleActionClick}>
                                                         <Trash2 className="h-4 w-4" />
                                                         <span className="sr-only">Excluir Trilha</span>
                                                     </Button>
