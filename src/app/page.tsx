@@ -1,11 +1,11 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BookOpen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -68,11 +68,11 @@ export default function LoginPage() {
         </div>
       </div>
       <div className="hidden bg-muted lg:block">
-        <img
+        <Image
           src="https://placehold.co/1200x900.png"
           alt="Image"
-          width="1920"
-          height="1080"
+          width={1200}
+          height={900}
           data-ai-hint="professional training"
           className="h-full w-full object-cover dark:brightness-[0.3] dark:grayscale"
         />
