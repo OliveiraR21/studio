@@ -37,14 +37,14 @@ export function ProgressChart({ completed, total }: ProgressChartProps) {
   }
 
   return (
-    <Card>
+    <Card className="flex flex-col">
       <CardHeader>
         <CardTitle>Evolução</CardTitle>
         <CardDescription>
           Você completou {completed} de {total} cursos.
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center justify-center">
+      <CardContent className="flex flex-1 items-center justify-center p-6">
         <ChartContainer config={chartConfig} className="mx-auto aspect-square h-[200px]">
           <PieChart>
             <Tooltip

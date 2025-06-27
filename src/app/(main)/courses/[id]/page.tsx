@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { ArrowLeft, Lightbulb, Video, ThumbsUp, ThumbsDown, AlertCircle } from "lucide-react";
 
-const PASSING_SCORE = 70;
+const PASSING_SCORE = 90;
 
 export default function CoursePage() {
   const params = useParams<{ id: string }>();

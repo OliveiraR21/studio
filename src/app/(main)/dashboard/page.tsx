@@ -31,7 +31,7 @@ import { Separator } from "@/components/ui/separator";
 // In a real app, you would save progress to a database after a user 
 // completes a course or track quiz.
 
-const PASSING_SCORE = 70;
+const PASSING_SCORE = 90;
 
 export default function DashboardPage() {
   // In a real app, this would be the logged-in user from a session.
@@ -99,31 +99,31 @@ export default function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <ProgressChart completed={completedCoursesCount} total={totalCourses} />
 
-            <Card>
+            <Card className="flex flex-col">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                         Média Geral
                     </CardTitle>
                     <GaugeCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{averageScore}%</div>
-                    <p className="text-xs text-muted-foreground">
+                <CardContent className="flex flex-1 flex-col items-center justify-center p-6">
+                    <div className="text-6xl font-bold">{averageScore}%</div>
+                    <p className="text-xs text-muted-foreground mt-2">
                         Média de todas as provas realizadas
                     </p>
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="flex flex-col">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
                         Trilhas Concluídas
                     </CardTitle>
                     <Trophy className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
-                <CardContent>
-                    <div className="text-2xl font-bold">{completedTracksCount} de {totalTracks}</div>
-                     <p className="text-xs text-muted-foreground">
+                <CardContent className="flex flex-1 flex-col items-center justify-center p-6">
+                    <div className="text-5xl font-bold">{completedTracksCount}<span className="text-2xl font-medium text-muted-foreground"> de {totalTracks}</span></div>
+                     <p className="text-xs text-muted-foreground mt-2">
                         Total de trilhas de conhecimento finalizadas
                     </p>
                 </CardContent>
