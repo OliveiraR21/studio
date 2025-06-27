@@ -53,6 +53,6 @@ export interface User {
   completedTracks: string[]; // List of track IDs
 
   // Track scores for both course and track quizzes.
-  courseScores?: { courseId: string; score: number }[];
-  trackScores?: { trackId: string; score: number }[];
+  courseScores?: { courseId: string; score: number; attempts: number }[];
+  trackScores?: { trackId: string; score: number; attempts: number }[];
 }

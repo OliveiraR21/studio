@@ -162,7 +162,7 @@ export const users: User[] = [
     completedCourses: ['course-001'],
     completedTracks: [],
     courseScores: [
-      { courseId: 'course-001', score: 95 },
+      { courseId: 'course-001', score: 95, attempts: 1 },
     ],
     trackScores: [],
   },
@@ -175,6 +175,10 @@ export const users: User[] = [
     avatarUrl: 'https://placehold.co/100x100.png',
     completedCourses: ['course-001', 'course-003'],
     completedTracks: [],
+    courseScores: [
+      { courseId: 'course-001', score: 100, attempts: 1 },
+      { courseId: 'course-003', score: 90, attempts: 1 },
+    ],
   },
   {
     id: '7',
@@ -186,6 +190,7 @@ export const users: User[] = [
     avatarUrl: 'https://placehold.co/100x100.png',
     completedCourses: ['course-001'],
     completedTracks: [],
+    courseScores: [{ courseId: 'course-001', score: 85, attempts: 1 }],
   },
   {
     id: '8',
@@ -198,6 +203,11 @@ export const users: User[] = [
     avatarUrl: 'https://placehold.co/100x100.png',
     completedCourses: ['course-001', 'course-003', 'course-005'],
     completedTracks: [],
+     courseScores: [
+      { courseId: 'course-001', score: 90, attempts: 1 },
+      { courseId: 'course-003', score: 80, attempts: 2 },
+      { courseId: 'course-005', score: 95, attempts: 1 },
+    ],
   },
   {
     id: '9',
@@ -211,6 +221,10 @@ export const users: User[] = [
     avatarUrl: 'https://placehold.co/100x100.png',
     completedCourses: ['course-001', 'course-002', 'course-004'],
     completedTracks: [],
+    courseScores: [
+        { courseId: 'course-001', score: 75, attempts: 1 },
+        { courseId: 'course-002', score: 88, attempts: 1 },
+    ],
   },
   {
     id: '2',
@@ -223,8 +237,8 @@ export const users: User[] = [
     diretor: 'Carlos Diretor',
     area: 'Comercial',
     avatarUrl: 'https://placehold.co/100x100.png',
-    completedCourses: ['course-001'],
-    courseScores: [{ courseId: 'course-001', score: 60 }],
+    completedCourses: [],
+    courseScores: [{ courseId: 'course-001', score: 60, attempts: 1 }],
     completedTracks: [],
   },
   {
@@ -254,6 +268,7 @@ export const users: User[] = [
     avatarUrl: 'https://placehold.co/100x100.png',
     completedCourses: ['course-002', 'course-004'],
     completedTracks: [],
+    courseScores: [{ courseId: 'course-002', score: 55, attempts: 2 }],
   },
   {
     id: '5',
@@ -268,6 +283,7 @@ export const users: User[] = [
     avatarUrl: 'https://placehold.co/100x100.png',
     completedCourses: ['course-005'],
     completedTracks: [],
+    courseScores: [{ courseId: 'course-005', score: 100, attempts: 1 }],
   },
 ];
 
@@ -277,7 +293,7 @@ export function findCourseById(courseId: string) {
     for (const track of module.tracks) {
       const course = track.courses.find(c => c.id === courseId);
       if (course) {
-        return { course, track };
+        return { course, track, module };
       }
     }
   }

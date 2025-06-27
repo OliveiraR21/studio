@@ -1,4 +1,4 @@
-import { users, learningModules } from "@/lib/data";
+import { users, learningModules, findCourseById } from "@/lib/data";
 import { 
   Card, 
   CardContent, 
@@ -19,16 +19,19 @@ import {
   AccordionTrigger 
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Lock, PlayCircle, Star, Trophy, GaugeCircle } from "lucide-react";
+import { CheckCircle, Lock, PlayCircle, Star, Trophy, GaugeCircle, AlertTriangle, BookCheck } from "lucide-react";
 import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import type { Track, Course } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { ProgressChart } from "@/components/dashboard/progress-chart";
+import { Separator } from "@/components/ui/separator";
 
 // NOTE: All progress checking logic is for demonstration. 
 // In a real app, you would save progress to a database after a user 
 // completes a course or track quiz.
+
+const PASSING_SCORE = 70;
 
 export default function DashboardPage() {
   // In a real app, this would be the logged-in user from a session.
@@ -44,6 +47,14 @@ export default function DashboardPage() {
   const totalTracks = learningModules.reduce((sum, module) => sum + module.tracks.length, 0);
   const completedTracksCount = currentUser.completedTracks.length;
 
+  const coursesToRetake = (currentUser.courseScores ?? [])
+    .filter(scoreInfo => scoreInfo.score < PASSING_SCORE)
+    .map(scoreInfo => {
+        const courseDetails = findCourseById(scoreInfo.courseId);
+        return courseDetails ? { ...courseDetails.course, score: scoreInfo.score } : null;
+    })
+    .filter((course): course is Course & { score: number } => course !== null);
+
   const isCourseCompleted = (courseId: string) => {
     return currentUser.completedCourses.includes(courseId);
   }
@@ -56,26 +67,24 @@ export default function DashboardPage() {
   const isTrackUnlocked = (track: Track, previousTrack?: Track) => {
     if (!previousTrack) return true; // The first track is always unlocked.
     
-    const isPreviousTrackCompleted = currentUser.completedTracks.includes(previousTrack.id);
-    
-    // In a real app, you'd check the score of the previous track's quiz.
-    // const previousTrackScore = currentUser.trackScores?.find(s => s.trackId === previousTrack.id)?.score ?? 0;
-    // return isPreviousTrackCompleted && previousTrackScore >= 80;
-
-    return isPreviousTrackCompleted;
+    return currentUser.completedTracks.includes(previousTrack.id);
   }
 
   const isCourseUnlocked = (course: Course, previousCourse?: Course) => {
     if (!previousCourse) return true; // First course in a track is always unlocked.
-
-    const isPreviousCourseCompleted = isCourseCompleted(previousCourse.id);
     
-    // In a real app, you'd check the score of the previous course's quiz if it has one.
-    // if (previousCourse.quiz) {
-    //   const previousCourseScore = currentUser.courseScores?.find(s => s.courseId === previousCourse.id)?.score ?? 0;
-    //   return isPreviousCourseCompleted && previousCourseScore >= 80;
-    // }
+    // Check if the previous course is marked as complete.
+    // In a real app, this would be the definitive source.
+    const isPreviousCourseCompleted = isCourseCompleted(previousCourse.id);
+    if (isPreviousCourseCompleted) return true;
 
+    // If not marked complete, check if it had a quiz and if the user passed.
+    if (previousCourse.quiz) {
+      const previousCourseScore = currentUser.courseScores?.find(s => s.courseId === previousCourse.id)?.score ?? 0;
+      return previousCourseScore >= PASSING_SCORE;
+    }
+    
+    // If the previous course had no quiz, just being completed is enough (handled above).
     return isPreviousCourseCompleted;
   }
 
@@ -120,6 +129,45 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
         </div>
+        
+        {/* Courses to Retake Card */}
+        <Card className="border-amber-500/50 bg-amber-500/5">
+            <CardHeader>
+                <div className="flex items-center gap-3">
+                    <AlertTriangle className="h-6 w-6 text-amber-600" />
+                    <div>
+                        <CardTitle>Pendências de Estudo</CardTitle>
+                        <CardDescription>
+                            Cursos com nota abaixo do esperado que precisam ser refeitos para progredir.
+                        </CardDescription>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent>
+                {coursesToRetake.length > 0 ? (
+                    <ul className="space-y-3">
+                        {coursesToRetake.map(course => (
+                            <li key={course.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                                <div className="flex flex-col">
+                                    <span className="font-semibold">{course.title}</span>
+                                    <span className="text-sm text-destructive">Sua nota: {course.score}%</span>
+                                </div>
+                                <Button size="sm" asChild>
+                                    <Link href={`/courses/${course.id}`}>Refazer Prova</Link>
+                                </Button>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <div className="flex flex-col items-center justify-center text-center p-6 gap-3">
+                        <BookCheck className="h-10 w-10 text-green-500" />
+                        <p className="font-semibold">Você está em dia com todas as suas provas!</p>
+                        <p className="text-sm text-muted-foreground">Nenhuma pendência encontrada. Ótimo trabalho!</p>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+
 
       <div className="mb-6 pt-8">
             <h1 className="text-3xl font-bold">Minhas Trilhas de Conhecimento</h1>
@@ -173,7 +221,7 @@ export default function DashboardPage() {
                         <ul className="space-y-3 pl-12 border-l-2 border-dashed ml-4">
                            {track.courses.map((course, courseIndex) => {
                               const previousCourse = courseIndex > 0 ? track.courses[courseIndex - 1] : undefined;
-                              const courseUnlocked = isCourseUnlocked(course, previousCourse);
+                              const courseUnlocked = unlocked && isCourseUnlocked(course, previousCourse);
                               const completed = isCourseCompleted(course.id);
                               
                               return (
