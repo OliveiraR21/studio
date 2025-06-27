@@ -2,7 +2,7 @@ import { Logo } from '@/components/layout/logo';
 import { UserNav } from '@/components/layout/user-nav';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Home, Menu, UserCog } from 'lucide-react';
+import { BookMarked, Home, Menu, UserCog } from 'lucide-react';
 import Link from 'next/link';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
@@ -15,6 +15,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   const adminNavItems = [
     { href: '/admin/users', icon: UserCog, label: 'Gerenciamento de Usuários' },
+    { href: '/admin/courses', icon: BookMarked, label: 'Gerenciamento de Cursos' },
   ];
 
   const allNavItems = userRole === 'Admin' ? [...navItems, ...adminNavItems] : navItems;
