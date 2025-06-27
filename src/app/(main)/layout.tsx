@@ -5,8 +5,6 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { BookMarked, Home, Menu, UserCog } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
-import { availableCourses } from '@/lib/data';
-import { ChatWidget } from '@/components/chat/chat-widget';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   // In a real app, user role would come from an auth session.
@@ -83,7 +81,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
       </div>
-      <ChatWidget courses={availableCourses} />
     </div>
   );
 }

@@ -19,6 +19,7 @@ import { AlertCircle, Target } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import type { Course } from "@/lib/types";
+import { AiSuggestionCard } from "@/components/dashboard/ai-suggestion-card";
 
 
 export default function DashboardPage() {
@@ -162,6 +163,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </Tabs>
+        <AiSuggestionCard user={currentUser} courses={availableCourses} />
       </div>
     </div>
   );
