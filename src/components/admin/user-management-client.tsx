@@ -1,7 +1,7 @@
 "use client";
 
 import type { User, Course } from "@/lib/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -36,7 +36,7 @@ export function UserManagementClient({ users, courses }: UserManagementClientPro
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <>
+    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
       <div className="rounded-lg border">
         <Table>
           <TableHeader>
@@ -63,7 +63,6 @@ export function UserManagementClient({ users, courses }: UserManagementClientPro
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm" onClick={() => {
                         setSelectedUser(user);
-                        setIsModalOpen(true);
                     }}>
                         <Wand2 className="mr-2 h-4 w-4" />
                         Sugerir Treinamento
@@ -81,7 +80,7 @@ export function UserManagementClient({ users, courses }: UserManagementClientPro
         isOpen={isModalOpen}
         setIsOpen={setIsModalOpen}
       />
-    </>
+    </Dialog>
   );
 }
 
@@ -97,6 +96,14 @@ function SuggestTrainingModal({ user, courses, isOpen, setIsOpen }: SuggestTrain
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [suggestions, setSuggestions] = useState<Course[]>([]);
+
+    useEffect(() => {
+        // Reset state when modal is closed
+        if (!isOpen) {
+            setSuggestions([]);
+            setIsLoading(false);
+        }
+    }, [isOpen]);
 
     const handleGetSuggestions = async () => {
         if (!user) return;
@@ -134,72 +141,61 @@ function SuggestTrainingModal({ user, courses, isOpen, setIsOpen }: SuggestTrain
             setIsLoading(false);
         }
     };
-    
-    // Reset state when modal is closed
-    const onOpenChange = (open: boolean) => {
-        if (!open) {
-            setSuggestions([]);
-            setIsLoading(false);
-        }
-        setIsOpen(open);
-    }
 
     return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[625px]">
-                <DialogHeader>
-                    <DialogTitle>Sugestões de Treinamento com IA</DialogTitle>
-                    <DialogDescription>
-                        Gere atribuições de treinamento relevantes para {user?.name} com base em sua função e trabalho concluído.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                    {!suggestions.length && !isLoading && (
-                        <div className="flex flex-col items-center justify-center text-center gap-4 p-8 border-2 border-dashed rounded-lg">
-                            <Wand2 className="h-12 w-12 text-muted-foreground" />
-                            <p className="text-muted-foreground">Clique no botão abaixo para gerar sugestões baseadas em IA.</p>
-                             <Button onClick={handleGetSuggestions}>
-                                <Wand2 className="mr-2 h-4 w-4" />
-                                Obter Sugestões da IA
-                            </Button>
-                        </div>
-                    )}
-                    {isLoading && (
-                        <div className="flex items-center justify-center p-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                            <p className="ml-4">Gerando sugestões...</p>
-                        </div>
-                    )}
-                    {suggestions.length > 0 && (
-                        <div>
-                            <h3 className="font-semibold mb-2">Cursos Sugeridos para {user?.name}:</h3>
-                             <ScrollArea className="h-72 w-full rounded-md border p-2">
-                                <div className="space-y-2">
-                                    {suggestions.map(course => (
-                                        <div key={course.id} className="p-2 border rounded-md flex justify-between items-center">
-                                            <div>
-                                                <p className="font-medium">{course.title}</p>
-                                                <p className="text-sm text-muted-foreground">{course.description.substring(0,60)}...</p>
-                                            </div>
-                                            <Button size="sm" variant="ghost">Atribuir</Button>
-                                        </div>
-                                    ))}
-                                </div>
-                             </ScrollArea>
-                        </div>
-                    )}
-                </div>
-                <DialogFooter>
-                    {suggestions.length > 0 && !isLoading && (
-                        <Button onClick={handleGetSuggestions} variant="outline" size="sm">
+        <DialogContent className="sm:max-w-[625px]">
+            <DialogHeader>
+                <DialogTitle>Sugestões de Treinamento com IA</DialogTitle>
+                <DialogDescription>
+                    Gere atribuições de treinamento relevantes para {user?.name} com base em sua função e trabalho concluído.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                {!suggestions.length && !isLoading && (
+                    <div className="flex flex-col items-center justify-center text-center gap-4 p-8 border-2 border-dashed rounded-lg">
+                        <Wand2 className="h-12 w-12 text-muted-foreground" />
+                        <p className="text-muted-foreground">Clique no botão abaixo para gerar sugestões baseadas em IA.</p>
+                         <Button onClick={handleGetSuggestions}>
                             <Wand2 className="mr-2 h-4 w-4" />
-                            Gerar Novamente
+                            Obter Sugestões da IA
                         </Button>
-                    )}
-                     <Button variant="secondary" onClick={() => setIsOpen(false)}>Fechar</Button>
-                     <Button>Atribuir Selecionados</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                    </div>
+                )}
+                {isLoading && (
+                    <div className="flex items-center justify-center p-8">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="ml-4">Gerando sugestões...</p>
+                    </div>
+                )}
+                {suggestions.length > 0 && (
+                    <div>
+                        <h3 className="font-semibold mb-2">Cursos Sugeridos para {user?.name}:</h3>
+                         <ScrollArea className="h-72 w-full rounded-md border p-2">
+                            <div className="space-y-2">
+                                {suggestions.map(course => (
+                                    <div key={course.id} className="p-2 border rounded-md flex justify-between items-center">
+                                        <div>
+                                            <p className="font-medium">{course.title}</p>
+                                            <p className="text-sm text-muted-foreground">{course.description.substring(0,60)}...</p>
+                                        </div>
+                                        <Button size="sm" variant="ghost">Atribuir</Button>
+                                    </div>
+                                ))}
+                            </div>
+                         </ScrollArea>
+                    </div>
+                )}
+            </div>
+            <DialogFooter>
+                {suggestions.length > 0 && !isLoading && (
+                    <Button onClick={handleGetSuggestions} variant="outline" size="sm">
+                        <Wand2 className="mr-2 h-4 w-4" />
+                        Gerar Novamente
+                    </Button>
+                )}
+                 <Button variant="secondary" onClick={() => setIsOpen(false)}>Fechar</Button>
+                 <Button>Atribuir Selecionados</Button>
+            </DialogFooter>
+        </DialogContent>
     )
 }
