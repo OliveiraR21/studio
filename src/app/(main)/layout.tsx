@@ -6,6 +6,7 @@ import {
   LayoutGrid,
   Network,
   UserCog,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -27,12 +28,16 @@ import {
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   // In a real app, user role would come from an auth session.
-  const userRole = 'Admin';
+  // We simulate a 'Gerente' to show the new "Minha Equipe" menu.
+  const userRole = 'Gerente';
 
-  const navItems = [
+  const baseNavItems = [
     { href: '/dashboard', icon: Home, label: 'Meu Painel' },
     { href: '/meus-cursos', icon: LayoutGrid, label: 'Meus Cursos' },
   ];
+
+  const managerRoles = ['Supervisor', 'Coordenador', 'Gerente', 'Diretor'];
+  const teamNavItem = { href: '/team', icon: Users, label: 'Minha Equipe' };
 
   const adminNavItems = [
     { href: '/admin/users', icon: UserCog, label: 'Gerenciamento de Usuários' },
@@ -44,9 +49,17 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     },
   ];
 
-  const allNavItems = ['Admin', 'Gerente'].includes(userRole)
-    ? [...navItems, ...adminNavItems]
-    : navItems;
+  const allNavItems = [...baseNavItems];
+
+  // Add "Minha Equipe" for managers and admin
+  if (managerRoles.includes(userRole) || userRole === 'Admin') {
+    allNavItems.push(teamNavItem);
+  }
+
+  // Add Admin items only for Admin
+  if (userRole === 'Admin') {
+    allNavItems.push(...adminNavItems);
+  }
 
   return (
     <SidebarProvider>
