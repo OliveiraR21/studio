@@ -3,6 +3,7 @@
 import {
   BookMarked,
   Home,
+  LayoutGrid,
   Network,
   UserCog,
 } from 'lucide-react';
@@ -28,7 +29,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   // In a real app, user role would come from an auth session.
   const userRole = 'Admin';
 
-  const navItems = [{ href: '/dashboard', icon: Home, label: 'Meu Painel' }];
+  const navItems = [
+    { href: '/dashboard', icon: Home, label: 'Meu Painel' },
+    { href: '/meus-cursos', icon: LayoutGrid, label: 'Meus Cursos' },
+  ];
 
   const adminNavItems = [
     { href: '/admin/users', icon: UserCog, label: 'Gerenciamento de Usuários' },
