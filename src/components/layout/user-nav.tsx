@@ -14,8 +14,8 @@ import Link from "next/link";
 
 export function UserNav() {
   // In a real app, user would be from session. Using mock data.
-  // We simulate a 'Gerente' to match the layout's role.
-  const user = users.find(u => u.role === 'Gerente');
+  // We simulate an 'Admin' to match the layout's role.
+  const user = users.find(u => u.role === 'Admin');
 
   if (!user) return null;
 

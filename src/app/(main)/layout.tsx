@@ -28,8 +28,8 @@ import {
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   // In a real app, user role would come from an auth session.
-  // We simulate a 'Gerente' to show the new "Minha Equipe" menu.
-  const userRole = 'Gerente';
+  // We simulate an 'Admin' to show all navigation items.
+  const userRole = 'Admin';
 
   const baseNavItems = [
     { href: '/dashboard', icon: Home, label: 'Meu Painel' },

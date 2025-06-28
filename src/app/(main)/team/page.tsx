@@ -25,17 +25,17 @@ const getSubordinates = (managerName: string, allUsers: User[]): User[] => {
 
 export default function TeamManagementPage() {
   // In a real app, this would be the logged-in user from a session.
-  // We are simulating a 'Gerente' (Manager) login.
-  const currentUser = users.find(u => u.role === 'Gerente');
+  // We are simulating an 'Admin' login.
+  const currentUser = users.find(u => u.role === 'Admin');
   
   if (!currentUser) {
     return (
         <div className="container mx-auto">
             <Card>
                 <CardHeader>
-                    <CardTitle>Equipe não encontrada</CardTitle>
+                    <CardTitle>Usuário não encontrado</CardTitle>
                     <CardDescription>
-                        Não foi possível encontrar um usuário com função de gerência para exibir a equipe. Verifique os dados em <code className="font-mono bg-muted p-1 rounded">src/lib/data.ts</code>.
+                        Não foi possível encontrar um usuário com a função apropriada. Verifique os dados em <code className="font-mono bg-muted p-1 rounded">src/lib/data.ts</code>.
                     </CardDescription>
                 </CardHeader>
             </Card>
