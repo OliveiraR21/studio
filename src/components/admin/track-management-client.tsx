@@ -2,7 +2,6 @@
 "use client";
 
 import type { Module } from "@/lib/types";
-import { learningModules } from "@/lib/data";
 import {
   Accordion,
   AccordionContent,
@@ -32,7 +31,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-export function TrackManagementClient() {
+interface TrackManagementClientProps {
+    modules: Module[];
+}
+
+export function TrackManagementClient({ modules }: TrackManagementClientProps) {
   const { toast } = useToast();
 
   const handleActionClick = () => {
@@ -52,7 +55,7 @@ export function TrackManagementClient() {
         </CardHeader>
         <CardContent>
              <Accordion type="multiple" className="w-full space-y-4">
-                {learningModules.map((module: Module) => (
+                {modules.map((module: Module) => (
                     <AccordionItem value={module.id} key={module.id} className="border rounded-lg">
                         <AccordionTrigger className="p-6 text-lg font-semibold hover:no-underline [&[data-state=open]>svg]:rotate-180">
                            <div className="text-left">

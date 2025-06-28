@@ -1,5 +1,5 @@
 import { TeamManagementClient } from "@/components/team/team-management-client";
-import { users } from "@/lib/data";
+import { getUsers, getUserById } from "@/lib/data-access";
 import type { User } from "@/lib/types";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
@@ -23,10 +23,11 @@ const getSubordinates = (managerName: string, allUsers: User[]): User[] => {
     return [...new Map(allSubordinates.map(item => [item.id, item])).values()];
 };
 
-export default function TeamManagementPage() {
+export default async function TeamManagementPage() {
   // In a real app, this would be the logged-in user from a session.
   // We are simulating an 'Admin' login.
-  const currentUser = users.find(u => u.role === 'Admin');
+  const allUsers = await getUsers();
+  const currentUser = allUsers.find(u => u.id === '1');
   
   if (!currentUser) {
     return (
@@ -46,8 +47,8 @@ export default function TeamManagementPage() {
   // For an Admin, show all users except the admin themselves.
   // For a Manager, get their subordinates.
   const teamMembers = currentUser.role === 'Admin'
-    ? users.filter(u => u.id !== currentUser.id)
-    : getSubordinates(currentUser.name, users);
+    ? allUsers.filter(u => u.id !== currentUser.id)
+    : getSubordinates(currentUser.name, allUsers);
 
   return (
     <div className="container mx-auto space-y-6">

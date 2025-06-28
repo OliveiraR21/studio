@@ -2,7 +2,7 @@
 "use client";
 
 import type { User, UserRole } from "@/lib/types";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -29,8 +29,9 @@ import {
   CardDescription
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { learningModules } from "@/lib/data";
 import { Users, GaugeCircle, AreaChart } from "lucide-react";
+import { getLearningModules } from "@/lib/data-access";
+import type { Module } from "@/lib/types";
 
 interface TeamManagementClientProps {
   teamMembers: User[];
@@ -38,25 +39,35 @@ interface TeamManagementClientProps {
 
 const ROLE_ORDER: UserRole[] = ['Assistente', 'Analista', 'Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin'];
 
-// Calculate the average score for a user
-const calculateAverageScore = (user: User): number => {
-    const allScores = [...(user.courseScores ?? []).map(s => s.score), ...(user.trackScores ?? []).map(s => s.score)];
-    if (allScores.length === 0) return 0;
-    return Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length);
-};
-
-// Calculate course completion percentage
-const calculateCompletionPercentage = (user: User): number => {
-    const totalCourses = learningModules.reduce((sum, module) => sum + module.tracks.reduce((trackSum, track) => trackSum + track.courses.length, 0), 0);
-    if (totalCourses === 0) return 0;
-    const completedCount = user.completedCourses.length;
-    return Math.round((completedCount / totalCourses) * 100);
-};
-
 export function TeamManagementClient({ teamMembers }: TeamManagementClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [managerFilter, setManagerFilter] = useState("all");
+  const [modules, setModules] = useState<Module[]>([]);
+
+  useEffect(() => {
+    // Fetch modules on client to calculate completion percentage
+    getLearningModules().then(setModules);
+  }, []);
+
+  const totalCourses = useMemo(() => {
+    if (modules.length === 0) return 1; // Avoid division by zero
+    return modules.reduce((sum, module) => sum + module.tracks.reduce((trackSum, track) => trackSum + track.courses.length, 0), 0);
+  }, [modules]);
+
+  // Calculate the average score for a user
+  const calculateAverageScore = (user: User): number => {
+      const allScores = [...(user.courseScores ?? []).map(s => s.score), ...(user.trackScores ?? []).map(s => s.score)];
+      if (allScores.length === 0) return 0;
+      return Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length);
+  };
+
+  // Calculate course completion percentage
+  const calculateCompletionPercentage = (user: User): number => {
+      if (totalCourses === 0) return 0;
+      const completedCount = user.completedCourses.length;
+      return Math.round((completedCount / totalCourses) * 100);
+  };
 
   const roles = useMemo(() => {
     const uniqueRoles = [...new Set(teamMembers.map((m) => m.role))];
@@ -112,7 +123,7 @@ export function TeamManagementClient({ teamMembers }: TeamManagementClientProps)
       0
     );
     return Math.round(totalProgress / filteredMembers.length);
-  }, [filteredMembers]);
+  }, [filteredMembers, calculateCompletionPercentage]);
 
   const teamAverageScore = useMemo(() => {
     if (filteredMembers.length === 0) return 0;
@@ -263,5 +274,3 @@ export function TeamManagementClient({ teamMembers }: TeamManagementClientProps)
       </div>
   );
 }
-
-    

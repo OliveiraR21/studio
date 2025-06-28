@@ -1,4 +1,4 @@
-import { users, learningModules, findCourseById } from "@/lib/data";
+import { getUsers, getLearningModules, findCourseById, findNextCourseForUser } from "@/lib/data-access";
 import { 
   Card, 
   CardContent, 
@@ -14,31 +14,17 @@ import type { Track, Course } from "@/lib/types";
 import { ProgressChart } from "@/components/dashboard/progress-chart";
 import { Separator } from "@/components/ui/separator";
 
-// NOTE: All progress checking logic is for demonstration. 
-// In a real app, you would save progress to a database after a user 
-// completes a course or track quiz.
-
 const PASSING_SCORE = 90;
 
-// Finds the very first course that is not marked as completed.
-// A more robust implementation would check for unlock status as well.
-function findNextCourse(currentUser: (typeof users)[0]): Course | null {
-    for (const module of learningModules) {
-        for (const track of module.tracks) {
-            for (const course of track.courses) {
-                if (!currentUser.completedCourses.includes(course.id)) {
-                    // This is the next course to do
-                    return course;
-                }
-            }
-        }
-    }
-    return null; // All courses completed
-}
-
-export default function DashboardPage() {
+export default async function DashboardPage() {
   // In a real app, this would be the logged-in user from a session.
-  const currentUser = users[0];
+  const allUsers = await getUsers();
+  const currentUser = allUsers.find(u => u.id === '1'); // Simulating Admin login
+  const learningModules = await getLearningModules();
+
+  if (!currentUser) {
+    return <div>Usuário não encontrado.</div>
+  }
   
   // Calculations for "Meu Painel"
   const totalCourses = learningModules.reduce((sum, module) => sum + module.tracks.reduce((trackSum, track) => trackSum + track.courses.length, 0), 0);
@@ -53,7 +39,7 @@ export default function DashboardPage() {
   const coursesToRetake = (currentUser.courseScores ?? [])
     .filter(scoreInfo => scoreInfo.score < PASSING_SCORE)
     .map(scoreInfo => {
-        const courseDetails = findCourseById(scoreInfo.courseId);
+        const courseDetails = findCourseById(scoreInfo.courseId, learningModules);
         return courseDetails ? { ...courseDetails.course, score: scoreInfo.score } : null;
     })
     .filter((course): course is Course & { score: number } => course !== null);
@@ -73,7 +59,7 @@ export default function DashboardPage() {
     .filter((track): track is Track & { score: number } => track !== null)
     .reverse(); // Newest first
 
-  const nextCourse = findNextCourse(currentUser);
+  const nextCourse = findNextCourseForUser(currentUser, learningModules);
 
   return (
     <div className="container mx-auto py-2 space-y-8">

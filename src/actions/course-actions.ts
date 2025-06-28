@@ -1,8 +1,10 @@
 'use server';
 
 import { z } from 'zod';
-import { findCourseById } from '@/lib/data';
+import { createCourse, updateCourse } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
+import type { Course } from '@/lib/types';
+import { redirect } from 'next/navigation';
 
 const courseFormSchema = z.object({
   id: z.string().optional(),
@@ -41,25 +43,16 @@ export async function saveCourse(
     };
   }
 
-  const { id, title, description, videoUrl } = validatedFields.data;
+  const { id, ...courseData } = validatedFields.data;
 
   try {
     if (id) {
-      console.log('--- ATUALIZANDO CURSO (SIMULAÇÃO) ---');
-      console.log('ID:', id);
-      const existingCourse = findCourseById(id);
-      if (!existingCourse) {
-        return { success: false, message: 'Curso não encontrado.', errors: {} };
-      }
-      console.log('Dados Antigos:', existingCourse.course);
-      console.log('Novos Dados:', { title, description, videoUrl });
-      console.log('------------------------------------');
+      await updateCourse(id, courseData);
     } else {
-      const newId = `course-${Math.random().toString(36).substr(2, 9)}`;
-      console.log('--- CRIANDO NOVO CURSO (SIMULAÇÃO) ---');
-      console.log('Novo ID Gerado:', newId);
-      console.log('Dados:', { title, description, videoUrl });
-      console.log('-----------------------------------');
+      // This is a simplified version. In a real scenario, you'd also
+      // need to associate the new course with a track.
+      // For now, it creates an "orphan" course.
+      await createCourse(courseData as Omit<Course, 'id'>);
     }
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
@@ -67,6 +60,7 @@ export async function saveCourse(
   }
 
   revalidatePath('/admin/courses');
+  // Redirecting is handled on the client-side useEffect for better UX with toasts
   
-  return { success: true, message: `Curso "${title}" salvo com sucesso!` };
+  return { success: true, message: `Curso "${courseData.title}" salvo com sucesso!` };
 }

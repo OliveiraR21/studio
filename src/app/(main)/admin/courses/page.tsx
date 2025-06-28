@@ -1,9 +1,12 @@
 import { CourseListClient } from "@/components/admin/course-list-client";
 import { Button } from "@/components/ui/button";
+import { getLearningModules } from "@/lib/data-access";
 import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 
-export default function AdminCoursesPage() {
+export default async function AdminCoursesPage() {
+  const learningModules = await getLearningModules();
+  
   return (
     <div className="container mx-auto">
         <div className="flex items-center justify-between mb-6">
@@ -20,7 +23,7 @@ export default function AdminCoursesPage() {
               </Link>
             </Button>
         </div>
-        <CourseListClient />
+        <CourseListClient modules={learningModules} />
     </div>
   );
 }

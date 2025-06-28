@@ -1,11 +1,4 @@
-import { users, learningModules } from "@/lib/data";
-import { 
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription
-} from "@/components/ui/card";
+import { getUsers, getLearningModules } from "@/lib/data-access";
 import { 
   Tabs, 
   TabsContent, 
@@ -20,49 +13,56 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Lock, Star, NotebookText } from "lucide-react";
-import Link from "next/link";
 import { Progress } from "@/components/ui/progress";
 import type { Track, Course } from "@/lib/types";
 import { CourseCard } from "@/components/dashboard/course-card";
 import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
 
-// In a real app, this would be the logged-in user from a session.
-const currentUser = users[0];
 const PASSING_SCORE = 90;
 
-const isCourseCompleted = (courseId: string) => {
-  return currentUser.completedCourses.includes(courseId);
-}
+export default async function MyCoursesPage() {
+  // In a real app, this would be the logged-in user from a session.
+  const allUsers = await getUsers();
+  const currentUser = allUsers.find(u => u.id === '1'); // Simulating Admin login
+  const learningModules = await getLearningModules();
 
-const getTrackProgress = (track: Track) => {
-  if (track.courses.length === 0) return 0;
-  const completedCount = track.courses.filter(c => isCourseCompleted(c.id)).length;
-  return (completedCount / track.courses.length) * 100;
-}
-
-const isTrackUnlocked = (track: Track, previousTrack?: Track) => {
-  if (!previousTrack) return true; // The first track is always unlocked.
-  return currentUser.completedTracks.includes(previousTrack.id);
-}
-
-const isCourseUnlocked = (course: Course, isParentTrackUnlocked: boolean, previousCourse?: Course) => {
-  if (!isParentTrackUnlocked) return false;
-  if (!previousCourse) return true; // First course in a track is always unlocked.
-  
-  const isPreviousCourseCompleted = isCourseCompleted(previousCourse.id);
-  if (isPreviousCourseCompleted) return true;
-
-  // If previous course had a quiz, check score.
-  if (previousCourse.quiz) {
-    const previousCourseScore = currentUser.courseScores?.find(s => s.courseId === previousCourse.id)?.score ?? 0;
-    return previousCourseScore >= PASSING_SCORE;
+  if (!currentUser) {
+    return <div>Usuário não encontrado</div>
   }
-  
-  // If no quiz, just being marked complete is enough (handled above)
-  return isPreviousCourseCompleted;
-}
 
-export default function MyCoursesPage() {
+  const isCourseCompleted = (courseId: string) => {
+    return currentUser.completedCourses.includes(courseId);
+  }
+
+  const getTrackProgress = (track: Track) => {
+    if (track.courses.length === 0) return 0;
+    const completedCount = track.courses.filter(c => isCourseCompleted(c.id)).length;
+    return (completedCount / track.courses.length) * 100;
+  }
+
+  const isTrackUnlocked = (track: Track, previousTrack?: Track) => {
+    if (!previousTrack) return true; // The first track is always unlocked.
+    return currentUser.completedTracks.includes(previousTrack.id);
+  }
+
+  const isCourseUnlocked = (course: Course, isParentTrackUnlocked: boolean, previousCourse?: Course) => {
+    if (!isParentTrackUnlocked) return false;
+    if (!previousCourse) return true; // First course in a track is always unlocked.
+    
+    const isPreviousCourseCompleted = isCourseCompleted(previousCourse.id);
+    if (isPreviousCourseCompleted) return true;
+
+    // If previous course had a quiz, check score.
+    if (previousCourse.quiz) {
+      const previousCourseScore = currentUser.courseScores?.find(s => s.courseId === previousCourse.id)?.score ?? 0;
+      return previousCourseScore >= PASSING_SCORE;
+    }
+    
+    // If no quiz, just being marked complete is enough (handled above)
+    return isPreviousCourseCompleted;
+  }
+
   return (
     <div className="container mx-auto py-2 space-y-8">
       <div className="mb-6">
@@ -71,7 +71,7 @@ export default function MyCoursesPage() {
               Explore suas trilhas de conhecimento e continue sua jornada de aprendizado.
           </p>
       </div>
-      <Tabs defaultValue={learningModules[0].id}>
+      <Tabs defaultValue={learningModules[0]?.id}>
         <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-4 h-auto">
           {learningModules.map(module => (
             <TabsTrigger key={module.id} value={module.id} className="h-full flex flex-col items-start p-4 text-left">

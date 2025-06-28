@@ -1,12 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { users } from "@/lib/data";
+import { getUserById } from "@/lib/data-access";
 import { User as UserIcon, Mail, Briefcase, Building2 } from "lucide-react";
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
   // In a real app, this would be the logged-in user from a session.
-  const currentUser = users.find(u => u.role === 'Admin');
+  const currentUser = await getUserById('1'); // Simulating Admin login
 
   if (!currentUser) {
     return (

@@ -9,14 +9,25 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { users } from "@/lib/data";
+import { getUserById } from "@/lib/data-access";
 import { User, Settings } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { User as UserType } from "@/lib/types";
 
 export function UserNav() {
-  // In a real app, user would be from session. Using mock data.
-  // We simulate an 'Admin' to match the layout's role.
-  const user = users.find(u => u.role === 'Admin');
+  const [user, setUser] = useState<UserType | null>(null);
+
+  useEffect(() => {
+    // In a real app, user ID would come from an auth session.
+    // We simulate fetching the Admin user.
+    async function fetchUser() {
+      const fetchedUser = await getUserById('1');
+      setUser(fetchedUser);
+    }
+    fetchUser();
+  }, [])
+
 
   if (!user) return null;
 

@@ -1,10 +1,8 @@
 import { UserManagementClient } from "@/components/admin/user-management-client";
-import { users } from "@/lib/data";
+import { getUsers } from "@/lib/data-access";
 
-export default function AdminUsersPage() {
-  // In a real app, you would fetch this data from your database
-  // and check for admin privileges.
-  const allUsers = users;
+export default async function AdminUsersPage() {
+  const allUsers = await getUsers();
 
   return (
     <div className="container mx-auto">

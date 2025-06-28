@@ -1,6 +1,6 @@
 "use client";
 
-import type { Course } from "@/lib/types";
+import type { Course, Module } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -21,14 +21,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Edit, Trash2, FileText } from "lucide-react";
-import { learningModules } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-export function CourseListClient() {
+interface CourseListClientProps {
+    modules: Module[];
+}
+
+export function CourseListClient({ modules }: CourseListClientProps) {
   const { toast } = useToast();
+  
   const allCourses: (Course & { trackTitle: string })[] = [];
-  learningModules.forEach(module => {
+  modules.forEach(module => {
     module.tracks.forEach(track => {
         track.courses.forEach(course => {
             allCourses.push({ ...course, trackTitle: track.title });

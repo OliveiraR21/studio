@@ -1,4 +1,4 @@
-import { findCourseById } from "@/lib/data";
+import { findCourseById } from "@/lib/data-access";
 import { CourseForm } from "@/components/admin/course-form";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -6,16 +6,15 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
-export default function EditCoursePage({ params }: { params: { id: string } }) {
+export default async function EditCoursePage({ params }: { params: { id: string } }) {
   const isNew = params.id === 'new';
   let course = null;
 
   if (!isNew) {
-    const result = findCourseById(params.id);
-    if (!result) {
+    course = await findCourseById(params.id);
+    if (!course) {
       notFound();
     }
-    course = result.course;
   }
 
   return (
