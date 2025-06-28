@@ -1,9 +1,9 @@
 'use client';
 
 import type { Course } from '@/lib/types';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormStatus } from 'react-dom';
+import { useActionState, useEffect } from 'react';
 import { saveCourse } from '@/actions/course-actions';
-import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
@@ -34,7 +34,7 @@ export function CourseForm({ course }: CourseFormProps) {
   const { toast } = useToast();
 
   const initialState = { message: '', errors: {}, success: false };
-  const [state, dispatch] = useFormState(saveCourse, initialState);
+  const [state, dispatch] = useActionState(saveCourse, initialState);
 
   useEffect(() => {
     if (state.success) {
