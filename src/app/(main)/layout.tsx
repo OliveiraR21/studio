@@ -14,6 +14,7 @@ import { UserNav } from '@/components/layout/user-nav';
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
@@ -63,10 +64,13 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             ))}
           </SidebarMenu>
         </SidebarContent>
+        <SidebarFooter>
+          <SidebarTrigger />
+        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6">
-          <SidebarTrigger />
+          <SidebarTrigger className="md:hidden" />
           <div className="w-full flex-1">
             {/* Future search bar can go here */}
           </div>
