@@ -36,10 +36,11 @@ export function CourseListClient() {
     });
   });
 
-  const handleActionClick = () => {
+  const handleDeleteClick = () => {
     toast({
+      variant: "destructive",
       title: "Funcionalidade em desenvolvimento",
-      description: "A edição e exclusão de dados ainda não foram implementadas.",
+      description: "A exclusão de dados ainda não foi implementada.",
     });
   };
 
@@ -114,11 +115,13 @@ export function CourseListClient() {
                   )}
                </TableCell>
               <TableCell className="text-right">
-                 <Button variant="ghost" size="icon" onClick={handleActionClick}>
-                    <Edit className="h-4 w-4" />
-                    <span className="sr-only">Editar</span>
+                 <Button variant="ghost" size="icon" asChild>
+                    <Link href={`/admin/courses/${course.id}/edit`}>
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Editar</span>
+                    </Link>
                 </Button>
-                <Button variant="ghost" size="icon" onClick={handleActionClick}>
+                <Button variant="ghost" size="icon" onClick={handleDeleteClick}>
                     <Trash2 className="h-4 w-4" />
                      <span className="sr-only">Excluir</span>
                 </Button>
