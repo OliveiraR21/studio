@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
   return (
-    <div className="w-full h-screen lg:grid lg:min-h-screen lg:grid-cols-2">
+    <div className="w-full min-h-screen lg:grid lg:grid-cols-2">
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[350px] gap-6">
            <div className="grid gap-2 text-center">
