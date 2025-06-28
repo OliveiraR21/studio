@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { users } from "@/lib/data";
+import { User, Settings } from "lucide-react";
 import Link from "next/link";
 
 export function UserNav() {
@@ -38,11 +39,17 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            Perfil
+          <DropdownMenuItem asChild>
+            <Link href="/profile">
+                <User className="mr-2 h-4 w-4" />
+                <span>Perfil</span>
+            </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            Configurações
+          <DropdownMenuItem asChild>
+            <Link href="/settings">
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Configurações</span>
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
