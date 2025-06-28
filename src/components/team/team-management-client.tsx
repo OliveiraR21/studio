@@ -1,6 +1,7 @@
+
 "use client";
 
-import type { User } from "@/lib/types";
+import type { User, UserRole } from "@/lib/types";
 import { useState, useMemo } from "react";
 import {
   Table,
@@ -35,6 +36,8 @@ interface TeamManagementClientProps {
   teamMembers: User[];
 }
 
+const ROLE_ORDER: UserRole[] = ['Assistente', 'Analista', 'Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin'];
+
 // Calculate the average score for a user
 const calculateAverageScore = (user: User): number => {
     const allScores = [...(user.courseScores ?? []).map(s => s.score), ...(user.trackScores ?? []).map(s => s.score)];
@@ -55,10 +58,16 @@ export function TeamManagementClient({ teamMembers }: TeamManagementClientProps)
   const [roleFilter, setRoleFilter] = useState("all");
   const [managerFilter, setManagerFilter] = useState("all");
 
-  const roles = useMemo(
-    () => [...new Set(teamMembers.map((m) => m.role).sort())],
-    [teamMembers]
-  );
+  const roles = useMemo(() => {
+    const uniqueRoles = [...new Set(teamMembers.map((m) => m.role))];
+    return uniqueRoles.sort((a, b) => {
+        const indexA = ROLE_ORDER.indexOf(a);
+        const indexB = ROLE_ORDER.indexOf(b);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+    });
+  }, [teamMembers]);
 
   const managers = useMemo(
     () => [
@@ -254,3 +263,5 @@ export function TeamManagementClient({ teamMembers }: TeamManagementClientProps)
       </div>
   );
 }
+
+    
