@@ -18,6 +18,7 @@ import type { Track, Course } from "@/lib/types";
 import { CourseCard } from "@/components/dashboard/course-card";
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
+import { UserNotFound } from "@/components/layout/user-not-found";
 
 const PASSING_SCORE = 90;
 
@@ -28,7 +29,7 @@ export default async function MyCoursesPage() {
   const learningModules = await getLearningModules();
 
   if (!currentUser) {
-    return <div>Usuário não encontrado</div>
+    return <UserNotFound />
   }
 
   const isCourseCompleted = (courseId: string) => {

@@ -3,21 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { getUserById } from "@/lib/data-access";
 import { User as UserIcon, Mail, Briefcase, Building2 } from "lucide-react";
+import { UserNotFound } from "@/components/layout/user-not-found";
 
 export default async function ProfilePage() {
   // In a real app, this would be the logged-in user from a session.
   const currentUser = await getUserById('1'); // Simulating Admin login
 
   if (!currentUser) {
-    return (
-        <div className="container mx-auto">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Usuário não encontrado</CardTitle>
-                </CardHeader>
-            </Card>
-        </div>
-    );
+    return <UserNotFound />;
   }
 
   return (

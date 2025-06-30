@@ -2,6 +2,7 @@ import { TeamManagementClient } from "@/components/team/team-management-client";
 import { getUsers, getUserById } from "@/lib/data-access";
 import type { User } from "@/lib/types";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { UserNotFound } from "@/components/layout/user-not-found";
 
 // This function recursively finds all subordinates for a given manager.
 const getSubordinates = (managerName: string, allUsers: User[]): User[] => {
@@ -30,18 +31,7 @@ export default async function TeamManagementPage() {
   const currentUser = allUsers.find(u => u.id === '1');
   
   if (!currentUser) {
-    return (
-        <div className="container mx-auto">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Usuário não encontrado</CardTitle>
-                    <CardDescription>
-                        Não foi possível encontrar um usuário com a função apropriada. Verifique os dados em <code className="font-mono bg-muted p-1 rounded">src/lib/data.ts</code>.
-                    </CardDescription>
-                </CardHeader>
-            </Card>
-        </div>
-    );
+    return <UserNotFound />;
   }
 
   // For an Admin, show all users except the admin themselves.

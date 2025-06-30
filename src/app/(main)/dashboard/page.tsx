@@ -13,6 +13,7 @@ import Link from "next/link";
 import type { Track, Course } from "@/lib/types";
 import { ProgressChart } from "@/components/dashboard/progress-chart";
 import { Separator } from "@/components/ui/separator";
+import { UserNotFound } from "@/components/layout/user-not-found";
 
 const PASSING_SCORE = 90;
 
@@ -23,7 +24,7 @@ export default async function DashboardPage() {
   const learningModules = await getLearningModules();
 
   if (!currentUser) {
-    return <div>Usuário não encontrado.</div>
+    return <UserNotFound />
   }
   
   // Calculations for "Meu Painel"
