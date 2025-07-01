@@ -189,6 +189,60 @@ export const learningModules: Module[] = [
             title: 'Treinamento Portal | BRS',
             description: 'Aprenda a navegar e utilizar todas as funcionalidades do portal BRS para otimizar seu fluxo de trabalho.',
             videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
+            quiz: {
+              questions: [
+                {
+                  text: 'Qual o principal objetivo do Portal BRS?',
+                  options: ['Gerenciar o fluxo de caixa pessoal dos funcionários.', 'Otimizar o processo de vendas e o relacionamento com o cliente.', 'Servir como uma rede social interna.', 'Agendar reuniões com fornecedores.'],
+                  correctAnswer: 'Otimizar o processo de vendas e o relacionamento com o cliente.',
+                },
+                {
+                  text: 'Onde você pode encontrar informações sobre o histórico de um cliente?',
+                  options: ['Na seção de "Notícias".', 'No cadastro do cliente, na aba "Histórico".', 'Em um relatório de RH.', 'Apenas por telefone.'],
+                  correctAnswer: 'No cadastro do cliente, na aba "Histórico".',
+                },
+                {
+                  text: 'Qual funcionalidade permite registrar uma nova oportunidade de venda?',
+                  options: ['O botão "Novo Pedido".', 'A opção "Cadastrar Oportunidade" no menu de Vendas.', 'Enviando um e-mail para o suporte.', 'O calendário de eventos.'],
+                  correctAnswer: 'A opção "Cadastrar Oportunidade" no menu de Vendas.',
+                },
+                {
+                  text: 'Para que serve a seção "Dashboard" do portal?',
+                  options: ['Para alterar sua senha.', 'Para visualizar gráficos e métricas de desempenho em tempo real.', 'Para ler os termos de uso da plataforma.', 'Para solicitar materiais de escritório.'],
+                  correctAnswer: 'Para visualizar gráficos e métricas de desempenho em tempo real.',
+                },
+                {
+                  text: 'Qual o primeiro passo para cadastrar um novo cliente no Portal BRS?',
+                  options: ['Verificar se o CNPJ já existe na base de dados.', 'Enviar a proposta comercial.', 'Ligar para o cliente.', 'Criar um pedido.'],
+                  correctAnswer: 'Verificar se o CNPJ já existe na base de dados.',
+                },
+                {
+                  text: 'A funcionalidade de "Catálogo de Produtos" permite:',
+                  options: ['Apenas visualizar os produtos.', 'Consultar preços, estoque e detalhes técnicos dos produtos.', 'Comprar produtos para uso pessoal.', 'Cadastrar novos fornecedores.'],
+                  correctAnswer: 'Consultar preços, estoque e detalhes técnicos dos produtos.',
+                },
+                {
+                  text: 'Como você acompanha o status de um pedido realizado no portal?',
+                  options: ['Esperando um e-mail de confirmação.', 'Na seção "Meus Pedidos", filtrando pelo número ou cliente.', 'Ligando para o setor de logística.', 'O portal não oferece essa funcionalidade.'],
+                  correctAnswer: 'Na seção "Meus Pedidos", filtrando pelo número ou cliente.',
+                },
+                {
+                  text: 'Qual a importância de manter os dados dos clientes atualizados no portal?',
+                  options: ['Não é importante, os dados são apenas para referência.', 'Para garantir a comunicação eficaz, o faturamento correto e o bom relacionamento.', 'Apenas para cumprir uma norma interna sem impacto prático.', 'Para aumentar o número de registros no banco de dados.'],
+                  correctAnswer: 'Para garantir a comunicação eficaz, o faturamento correto e o bom relacionamento.',
+                },
+                {
+                  text: 'O que deve ser feito caso você esqueça sua senha de acesso ao Portal BRS?',
+                  options: ['Contatar o CEO da empresa.', 'Clicar em "Esqueci minha senha" na tela de login e seguir as instruções.', 'Pedir a senha de um colega emprestada.', 'Criar uma nova conta.'],
+                  correctAnswer: 'Clicar em "Esqueci minha senha" na tela de login e seguir as instruções.',
+                },
+                {
+                  text: 'Para qual finalidade a seção de "Relatórios" é utilizada?',
+                  options: ['Para ler notícias sobre a empresa.', 'Para bater papo com outros vendedores.', 'Para extrair dados consolidados sobre vendas, clientes e desempenho.', 'Para visualizar a lista de aniversariantes do mês.'],
+                  correctAnswer: 'Para extrair dados consolidados sobre vendas, clientes e desempenho.',
+                },
+              ],
+            },
           },
         ],
         quiz: {
