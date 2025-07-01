@@ -4,14 +4,22 @@ import { z } from 'zod';
 import { createCourse, updateCourse } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
 import type { Course } from '@/lib/types';
-import { redirect } from 'next/navigation';
 
 const courseFormSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(3, 'O título precisa ter pelo menos 3 caracteres.'),
   description: z.string().min(10, 'A descrição precisa ter pelo menos 10 caracteres.'),
   videoUrl: z.string().url('Por favor, insira uma URL válida.'),
+  durationInMinutes: z.coerce.number().int().positive().optional(),
+  trackId: z.string().optional(),
+}).refine(data => {
+    // If id is not present (new course), trackId must be present.
+    return !!data.id || !!data.trackId;
+}, {
+    message: "É necessário selecionar uma trilha para um novo curso.",
+    path: ["trackId"],
 });
+
 
 export type CourseFormState = {
   message: string;
@@ -19,6 +27,8 @@ export type CourseFormState = {
     title?: string[];
     description?: string[];
     videoUrl?: string[];
+    durationInMinutes?: string[];
+    trackId?: string[];
   };
   success: boolean;
 };
@@ -28,12 +38,16 @@ export async function saveCourse(
   formData: FormData
 ): Promise<CourseFormState> {
     
-  const validatedFields = courseFormSchema.safeParse({
+  const rawData = {
     id: formData.get('id') || undefined,
     title: formData.get('title'),
     description: formData.get('description'),
     videoUrl: formData.get('videoUrl'),
-  });
+    durationInMinutes: formData.get('durationInMinutes') || undefined,
+    trackId: formData.get('trackId') || undefined,
+  };
+
+  const validatedFields = courseFormSchema.safeParse(rawData);
 
   if (!validatedFields.success) {
     return {
@@ -43,16 +57,15 @@ export async function saveCourse(
     };
   }
 
-  const { id, ...courseData } = validatedFields.data;
+  const { id, trackId, ...courseDetails } = validatedFields.data;
 
   try {
     if (id) {
-      await updateCourse(id, courseData);
+      // For updates, we don't change the trackId, so it's not passed.
+      await updateCourse(id, courseDetails);
     } else {
-      // This is a simplified version. In a real scenario, you'd also
-      // need to associate the new course with a track.
-      // For now, it creates an "orphan" course.
-      await createCourse(courseData as Omit<Course, 'id'>);
+      // The schema refinement ensures trackId is present for new courses.
+      await createCourse({ trackId: trackId!, ...courseDetails });
     }
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
@@ -60,7 +73,7 @@ export async function saveCourse(
   }
 
   revalidatePath('/admin/courses');
-  // Redirecting is handled on the client-side useEffect for better UX with toasts
+  revalidatePath('/admin/tracks');
   
-  return { success: true, message: `Curso "${courseData.title}" salvo com sucesso!` };
+  return { success: true, message: `Curso "${validatedFields.data.title}" salvo com sucesso!` };
 }

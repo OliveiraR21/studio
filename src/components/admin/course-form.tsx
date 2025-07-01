@@ -1,6 +1,6 @@
 'use client';
 
-import type { Course } from '@/lib/types';
+import type { Course, Module } from '@/lib/types';
 import { useFormStatus } from 'react-dom';
 import { useActionState, useEffect } from 'react';
 import { saveCourse } from '@/actions/course-actions';
@@ -12,9 +12,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup } from '@/components/ui/select';
 
 interface CourseFormProps {
   course: Course | null;
+  modules: Module[];
 }
 
 function SubmitButton({ isNew }: { isNew: boolean }) {
@@ -28,7 +30,7 @@ function SubmitButton({ isNew }: { isNew: boolean }) {
 }
 
 
-export function CourseForm({ course }: CourseFormProps) {
+export function CourseForm({ course, modules }: CourseFormProps) {
   const isNew = course === null;
   const router = useRouter();
   const { toast } = useToast();
@@ -62,6 +64,30 @@ export function CourseForm({ course }: CourseFormProps) {
     <form action={dispatch} className="space-y-6">
       {!isNew && <input type="hidden" name="id" value={course.id} />}
       
+      {isNew && (
+        <div className="space-y-2">
+            <Label htmlFor="trackId">Trilha de Aprendizagem</Label>
+            <Select name="trackId" required>
+                <SelectTrigger id="trackId">
+                    <SelectValue placeholder="Selecione a trilha para este curso" />
+                </SelectTrigger>
+                <SelectContent>
+                    {modules.map(module => (
+                        <SelectGroup key={module.id}>
+                            <Label className="px-2 py-1.5 text-sm font-semibold">{module.title}</Label>
+                            {module.tracks.map(track => (
+                                <SelectItem key={track.id} value={track.id}>
+                                    {track.title}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    ))}
+                </SelectContent>
+            </Select>
+            {state.errors?.trackId && <p className="text-sm text-destructive">{state.errors.trackId[0]}</p>}
+        </div>
+      )}
+
       <div className="space-y-2">
         <Label htmlFor="title">Título do Curso</Label>
         <Input 
@@ -99,6 +125,19 @@ export function CourseForm({ course }: CourseFormProps) {
         />
         {state.errors?.videoUrl && <p className="text-sm text-destructive">{state.errors.videoUrl[0]}</p>}
       </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="durationInMinutes">Duração (minutos)</Label>
+        <Input 
+          id="durationInMinutes" 
+          name="durationInMinutes"
+          type="number"
+          defaultValue={course?.durationInMinutes || ''}
+          placeholder="Ex: 15"
+        />
+        {state.errors?.durationInMinutes && <p className="text-sm text-destructive">{state.errors.durationInMinutes[0]}</p>}
+      </div>
+
 
       <div className="flex justify-end gap-4">
         <Button variant="outline" type="button" onClick={() => router.back()}>Cancelar</Button>

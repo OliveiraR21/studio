@@ -1,4 +1,4 @@
-import { findCourseById } from "@/lib/data-access";
+import { findCourseById, getLearningModules } from "@/lib/data-access";
 import { CourseForm } from "@/components/admin/course-form";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -6,16 +6,19 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { QuizGenerator } from "@/components/admin/quiz-generator";
+import type { Course, Module } from "@/lib/types";
 
 export default async function EditCoursePage({ params }: { params: { id: string } }) {
   const isNew = params.id === 'new';
-  let course = null;
+  let course: Course | null = null;
+  const modules = await getLearningModules();
 
   if (!isNew) {
-    course = await findCourseById(params.id);
-    if (!course) {
+    const result = findCourseById(params.id, modules);
+    if (!result) {
       notFound();
     }
+    course = result.course;
   }
 
   return (
@@ -38,7 +41,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <CourseForm course={course} />
+          <CourseForm course={course} modules={modules} />
         </CardContent>
       </Card>
 

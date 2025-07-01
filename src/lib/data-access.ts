@@ -58,26 +58,55 @@ export function findNextCourseForUser(user: User, modules: Module[]): Course | n
 
 // --- Mutation Functions (Simulated) ---
 
-// Simulates creating a course. The change is not persisted.
-export async function createCourse(courseData: Omit<Course, 'id'>): Promise<Course> {
-    console.log('Simulating course creation:', courseData);
-    // In a mock environment, we can't persist this easily without complex state management.
-    // We'll return a mock object that looks real for the UI.
+// Creates a course in-memory. The change persists for the lifetime of the dev server.
+export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; durationInMinutes?: number; }): Promise<Course> {
+    console.log('Creating course in-memory:', courseData);
+    
+    let trackToUpdate: Track | undefined;
+    let moduleToUpdate: Module | undefined;
+
+    for (const module of allModules) {
+        trackToUpdate = module.tracks.find(t => t.id === courseData.trackId);
+        if (trackToUpdate) {
+            moduleToUpdate = module;
+            break;
+        }
+    }
+
+    if (!trackToUpdate || !moduleToUpdate) {
+        throw new Error(`Track with ID ${courseData.trackId} not found.`);
+    }
+
     const newCourse: Course = {
-        id: `mock-course-${Date.now()}`,
-        // These are placeholder IDs as the course is not actually added to any module/track
-        moduleId: 'mock-module-id', 
-        trackId: 'mock-track-id', 
-        ...courseData,
-        quiz: courseData.quiz || undefined
+        id: `course-${Date.now()}`,
+        moduleId: moduleToUpdate.id,
+        trackId: trackToUpdate.id,
+        title: courseData.title,
+        description: courseData.description,
+        videoUrl: courseData.videoUrl,
+        durationInMinutes: courseData.durationInMinutes || 0,
     };
+
+    trackToUpdate.courses.push(newCourse);
+    
+    console.log(`Course "${newCourse.title}" added to track "${trackToUpdate.title}". Current courses in track: ${trackToUpdate.courses.length}`);
+
     return Promise.resolve(newCourse);
 }
 
-// Simulates updating a course. The change is not persisted.
-export async function updateCourse(courseId: string, courseData: Partial<Course>): Promise<void> {
-    console.log(`Simulating update for course ${courseId} with:`, courseData);
-    // In a mock environment, this is a no-op (no operation).
-    // The data is not actually changed in the mock-data.ts file.
+// Updates a course in-memory. The change persists for the lifetime of the dev server.
+export async function updateCourse(courseId: string, courseData: Partial<Omit<Course, 'id' | 'trackId' | 'moduleId'>>): Promise<void> {
+    console.log(`Updating course ${courseId} in-memory with:`, courseData);
+
+    const result = findCourseById(courseId);
+    if (!result) {
+        throw new Error(`Course with ID ${courseId} not found for update.`);
+    }
+
+    // Update the course object. In JS, this modifies the object in the `allModules` array by reference.
+    Object.assign(result.course, courseData);
+
+    console.log(`Course "${result.course.title}" updated.`);
+
     return Promise.resolve();
 }
