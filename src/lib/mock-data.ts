@@ -171,7 +171,7 @@ export const learningModules: Module[] = [
             trackId: 'track-hs-vt',
             title: 'Excelência no Atendimento ao Cliente',
             description: 'Técnicas para fornecer um atendimento excepcional ao cliente e lidar com situações difíceis.',
-            videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
+            videoUrl: 'https://app.heygen.com/embed/fake-video-id-for-testing',
             quiz: {
               questions: [
                 {
@@ -210,7 +210,7 @@ export const learningModules: Module[] = [
             trackId: 'track-hs-le',
             title: 'Fundamentos de Logística e Cadeia de Suprimentos',
             description: 'Uma introdução aos fundamentos da logística moderna e gestão da cadeia de suprimentos.',
-            videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
+            videoUrl: 'https://www.youtube.com/embed/V8-p3cT4xSg',
           },
           {
             id: 'course-hs-le-2',
@@ -218,7 +218,7 @@ export const learningModules: Module[] = [
             trackId: 'track-hs-le',
             title: 'Operação Avançada de Empilhadeira',
             description: 'Domine técnicas avançadas para uma operação segura e eficiente de empilhadeiras.',
-            videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
+            videoUrl: 'https://www.youtube.com/embed/k-p8s_v1yYI',
             quiz: {
               questions: [
                 {
@@ -235,7 +235,7 @@ export const learningModules: Module[] = [
             trackId: 'track-hs-le',
             title: 'Manuseio e Segurança de Produtos Químicos',
             description: 'Aprenda os procedimentos adequados para manusear e armazenar produtos químicos com segurança.',
-            videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
+            videoUrl: 'https://www.youtube.com/embed/uG-sEjW4H6M',
           },
         ],
         quiz: {
@@ -267,7 +267,7 @@ export const learningModules: Module[] = [
             trackId: 'track-ss-li',
             title: 'Liderança e Gestão de Equipes',
             description: 'Desenvolva habilidades de liderança essenciais para gerenciar e motivar sua equipe de forma eficaz.',
-            videoUrl: 'https://www.youtube.com/embed/1T312yT6-yA',
+            videoUrl: 'https://www.youtube.com/embed/g2sA0d3k2wE',
             quiz: {
               questions: [
                 {
