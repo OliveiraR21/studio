@@ -182,6 +182,14 @@ export const learningModules: Module[] = [
               ],
             },
           },
+          {
+            id: 'course-hs-vt-3',
+            moduleId: 'module-hs',
+            trackId: 'track-hs-vt',
+            title: 'Treinamento Portal | BRS',
+            description: 'Aprenda a navegar e utilizar todas as funcionalidades do portal BRS para otimizar seu fluxo de trabalho.',
+            videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
+          },
         ],
         quiz: {
            questions: [
