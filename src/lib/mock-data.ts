@@ -8,15 +8,10 @@ export const users: User[] = [
     role: 'Admin',
     area: 'TI',
     avatarUrl: 'https://placehold.co/100x100.png',
-    completedCourses: ['course-hs-vt-1'],
+    completedCourses: [],
     completedTracks: [],
-    courseScores: [
-      { courseId: 'course-hs-vt-1', score: 95, attempts: 1 },
-      { courseId: 'course-ss-li-1', score: 100, attempts: 1 },
-    ],
-    trackScores: [
-      { trackId: 'track-hs-vt', score: 98, attempts: 1 },
-    ],
+    courseScores: [],
+    trackScores: [],
   },
   {
     id: '2',
@@ -25,11 +20,10 @@ export const users: User[] = [
     role: 'Diretor',
     area: 'Diretoria',
     avatarUrl: 'https://placehold.co/100x100.png',
-    completedCourses: ['course-hs-vt-1'],
+    completedCourses: [],
     completedTracks: [],
-    courseScores: [
-      { courseId: 'course-hs-vt-1', score: 100, attempts: 1 },
-    ],
+    courseScores: [],
+    trackScores: [],
   },
   {
     id: '3',
@@ -39,9 +33,10 @@ export const users: User[] = [
     diretor: 'Carlos Diretor',
     area: 'Comercial',
     avatarUrl: 'https://placehold.co/100x100.png',
-    completedCourses: ['course-hs-vt-1'],
+    completedCourses: [],
     completedTracks: [],
-    courseScores: [{ courseId: 'course-hs-vt-1', score: 85, attempts: 1 }],
+    courseScores: [],
+    trackScores: [],
   },
   {
     id: '4',
@@ -52,12 +47,10 @@ export const users: User[] = [
     diretor: 'Carlos Diretor',
     area: 'Comercial',
     avatarUrl: 'https://placehold.co/100x100.png',
-    completedCourses: ['course-hs-vt-1', 'course-ss-li-1'],
+    completedCourses: [],
     completedTracks: [],
-     courseScores: [
-      { courseId: 'course-hs-vt-1', score: 90, attempts: 1 },
-      { courseId: 'course-ss-li-1', score: 95, attempts: 1 },
-    ],
+    courseScores: [],
+    trackScores: [],
   },
   {
     id: '5',
@@ -69,12 +62,10 @@ export const users: User[] = [
     diretor: 'Carlos Diretor',
     area: 'Comercial',
     avatarUrl: 'https://placehold.co/100x100.png',
-    completedCourses: ['course-hs-vt-1', 'course-hs-vt-2'],
+    completedCourses: [],
     completedTracks: [],
-    courseScores: [
-        { courseId: 'course-hs-vt-1', score: 75, attempts: 1 },
-        { courseId: 'course-hs-vt-2', score: 88, attempts: 1 },
-    ],
+    courseScores: [],
+    trackScores: [],
   },
   {
     id: '6',
@@ -88,7 +79,7 @@ export const users: User[] = [
     area: 'Comercial',
     avatarUrl: 'https://placehold.co/100x100.png',
     completedCourses: [],
-    courseScores: [{ courseId: 'course-hs-vt-1', score: 60, attempts: 1 }],
+    courseScores: [],
     completedTracks: [],
   },
   {
@@ -116,9 +107,9 @@ export const users: User[] = [
     diretor: 'Carlos Diretor',
     area: 'Logística',
     avatarUrl: 'https://placehold.co/100x100.png',
-    completedCourses: ['course-hs-le-2'],
+    completedCourses: [],
     completedTracks: [],
-    courseScores: [{ courseId: 'course-hs-le-2', score: 55, attempts: 2 }],
+    courseScores: [],
   },
   {
     id: '9',
@@ -143,172 +134,68 @@ export const learningModules: Module[] = [
     description: 'Desenvolva competências técnicas e operacionais essenciais para sua função.',
     tracks: [
       {
-        id: 'track-hs-vt',
+        id: 'track-hs-pe',
         moduleId: 'module-hs',
-        title: 'Trilha de Vendas para Iniciantes',
-        description: 'Aprenda os conceitos fundamentais para iniciar sua carreira na área comercial.',
-        courses: [
-          {
-            id: 'course-hs-vt-1',
-            moduleId: 'module-hs',
-            trackId: 'track-hs-vt',
-            title: 'Painel Comercial - Apresentação',
-            description: 'Uma visão abrangente dos protocolos e procedimentos essenciais de segurança no local de trabalho.',
-            videoUrl: 'https://brsupply.sharepoint.com/sites/GestoComercial/_layouts/15/embed.aspx?UniqueId=964a79a2-7f5a-470d-84eb-74f9befb8c74&embed=%7B%22ust%22%3Atrue%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
-            quiz: {
-              questions: [
-                {
-                  text: 'Qual é a principal função do Painel Comercial?',
-                  options: ['Registrar férias', 'Analisar o desempenho de vendas', 'Enviar e-mails', 'Criar planilhas'],
-                  correctAnswer: 'Analisar o desempenho de vendas',
-                },
-              ],
-            },
-          },
-          {
-            id: 'course-hs-vt-2',
-            moduleId: 'module-hs',
-            trackId: 'track-hs-vt',
-            title: 'Excelência no Atendimento ao Cliente',
-            description: 'Técnicas para fornecer um atendimento excepcional ao cliente e lidar com situações difíceis.',
-            videoUrl: 'https://app.heygen.com/embed/fake-video-id-for-testing',
-            quiz: {
-              questions: [
-                {
-                  text: 'Qual é o modelo "LAST" para lidar com reclamações?',
-                  options: ['Listen, Apologize, Solve, Thank (Ouvir, Pedir desculpas, Resolver, Agradecer)', 'Leave, Avoid, Stay, Talk', 'Listen, Argue, Sell, Terminate', 'Look, Act, Shout, Tell'],
-                  correctAnswer: 'Listen, Apologize, Solve, Thank (Ouvir, Pedir desculpas, Resolver, Agradecer)',
-                },
-              ],
-            },
-          },
-          {
-            id: 'course-hs-vt-3',
-            moduleId: 'module-hs',
-            trackId: 'track-hs-vt',
-            title: 'Treinamento Portal | BRS',
-            description: 'Aprenda a navegar e utilizar todas as funcionalidades do portal BRS para otimizar seu fluxo de trabalho.',
-            videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
-            quiz: {
-              questions: [
-                {
-                  text: 'Qual o principal objetivo do Portal BRS?',
-                  options: ['Gerenciar o fluxo de caixa pessoal dos funcionários.', 'Otimizar o processo de vendas e o relacionamento com o cliente.', 'Servir como uma rede social interna.', 'Agendar reuniões com fornecedores.'],
-                  correctAnswer: 'Otimizar o processo de vendas e o relacionamento com o cliente.',
-                },
-                {
-                  text: 'Onde você pode encontrar informações sobre o histórico de um cliente?',
-                  options: ['Na seção de "Notícias".', 'No cadastro do cliente, na aba "Histórico".', 'Em um relatório de RH.', 'Apenas por telefone.'],
-                  correctAnswer: 'No cadastro do cliente, na aba "Histórico".',
-                },
-                {
-                  text: 'Qual funcionalidade permite registrar uma nova oportunidade de venda?',
-                  options: ['O botão "Novo Pedido".', 'A opção "Cadastrar Oportunidade" no menu de Vendas.', 'Enviando um e-mail para o suporte.', 'O calendário de eventos.'],
-                  correctAnswer: 'A opção "Cadastrar Oportunidade" no menu de Vendas.',
-                },
-                {
-                  text: 'Para que serve a seção "Dashboard" do portal?',
-                  options: ['Para alterar sua senha.', 'Para visualizar gráficos e métricas de desempenho em tempo real.', 'Para ler os termos de uso da plataforma.', 'Para solicitar materiais de escritório.'],
-                  correctAnswer: 'Para visualizar gráficos e métricas de desempenho em tempo real.',
-                },
-                {
-                  text: 'Qual o primeiro passo para cadastrar um novo cliente no Portal BRS?',
-                  options: ['Verificar se o CNPJ já existe na base de dados.', 'Enviar a proposta comercial.', 'Ligar para o cliente.', 'Criar um pedido.'],
-                  correctAnswer: 'Verificar se o CNPJ já existe na base de dados.',
-                },
-                {
-                  text: 'A funcionalidade de "Catálogo de Produtos" permite:',
-                  options: ['Apenas visualizar os produtos.', 'Consultar preços, estoque e detalhes técnicos dos produtos.', 'Comprar produtos para uso pessoal.', 'Cadastrar novos fornecedores.'],
-                  correctAnswer: 'Consultar preços, estoque e detalhes técnicos dos produtos.',
-                },
-                {
-                  text: 'Como você acompanha o status de um pedido realizado no portal?',
-                  options: ['Esperando um e-mail de confirmação.', 'Na seção "Meus Pedidos", filtrando pelo número ou cliente.', 'Ligando para o setor de logística.', 'O portal não oferece essa funcionalidade.'],
-                  correctAnswer: 'Na seção "Meus Pedidos", filtrando pelo número ou cliente.',
-                },
-                {
-                  text: 'Qual a importância de manter os dados dos clientes atualizados no portal?',
-                  options: ['Não é importante, os dados são apenas para referência.', 'Para garantir a comunicação eficaz, o faturamento correto e o bom relacionamento.', 'Apenas para cumprir uma norma interna sem impacto prático.', 'Para aumentar o número de registros no banco de dados.'],
-                  correctAnswer: 'Para garantir a comunicação eficaz, o faturamento correto e o bom relacionamento.',
-                },
-                {
-                  text: 'O que deve ser feito caso você esqueça sua senha de acesso ao Portal BRS?',
-                  options: ['Contatar o CEO da empresa.', 'Clicar em "Esqueci minha senha" na tela de login e seguir as instruções.', 'Pedir a senha de um colega emprestada.', 'Criar uma nova conta.'],
-                  correctAnswer: 'Clicar em "Esqueci minha senha" na tela de login e seguir as instruções.',
-                },
-                {
-                  text: 'Para qual finalidade a seção de "Relatórios" é utilizada?',
-                  options: ['Para ler notícias sobre a empresa.', 'Para bater papo com outros vendedores.', 'Para extrair dados consolidados sobre vendas, clientes e desempenho.', 'Para visualizar a lista de aniversariantes do mês.'],
-                  correctAnswer: 'Para extrair dados consolidados sobre vendas, clientes e desempenho.',
-                },
-              ],
-            },
-          },
-        ],
-        quiz: {
-           questions: [
-            {
-              text: 'Qual a importância de um bom atendimento ao cliente?',
-              options: ['Aumentar os custos', 'Fidelizar o cliente', 'Diminuir as vendas', 'Não tem importância'],
-              correctAnswer: 'Fidelizar o cliente',
-            },
-             {
-              text: 'O Painel Comercial ajuda a tomar decisões baseadas em quê?',
-              options: ['Achismos', 'Dados e métricas', 'Intuição', 'Sorte'],
-              correctAnswer: 'Dados e métricas',
-            },
-          ],
-        }
+        title: 'Planejamento de Estoques',
+        description: 'Aprenda a otimizar os níveis de estoque para garantir a disponibilidade de produtos.',
+        courses: [],
+        quiz: { questions: [] }
       },
       {
-        id: 'track-hs-le',
+        id: 'track-hs-cp',
         moduleId: 'module-hs',
-        title: 'Trilha de Logística Essencial',
-        description: 'Entenda os processos que movimentam nossos produtos, desde o estoque até a entrega.',
-        courses: [
-           {
-            id: 'course-hs-le-1',
-            moduleId: 'module-hs',
-            trackId: 'track-hs-le',
-            title: 'Fundamentos de Logística e Cadeia de Suprimentos',
-            description: 'Uma introdução aos fundamentos da logística moderna e gestão da cadeia de suprimentos.',
-            videoUrl: 'https://www.youtube.com/embed/V8-p3cT4xSg',
-          },
-          {
-            id: 'course-hs-le-2',
-            moduleId: 'module-hs',
-            trackId: 'track-hs-le',
-            title: 'Operação Avançada de Empilhadeira',
-            description: 'Domine técnicas avançadas para uma operação segura e eficiente de empilhadeiras.',
-            videoUrl: 'https://www.youtube.com/embed/k-p8s_v1yYI',
-            quiz: {
-              questions: [
-                {
-                  text: 'Ao carregar uma carga, os garfos devem estar:',
-                  options: ['O mais alto possível', 'Inclinados para frente', 'Rentes ao chão', 'Na altura dos olhos'],
-                  correctAnswer: 'Rentes ao chão',
-                },
-              ],
-            },
-          },
-          {
-            id: 'course-hs-le-3',
-            moduleId: 'module-hs',
-            trackId: 'track-hs-le',
-            title: 'Manuseio e Segurança de Produtos Químicos',
-            description: 'Aprenda os procedimentos adequados para manusear e armazenar produtos químicos com segurança.',
-            videoUrl: 'https://www.youtube.com/embed/uG-sEjW4H6M',
-          },
-        ],
-        quiz: {
-           questions: [
-            {
-              text: 'O que é um componente chave da cadeia de suprimentos?',
-              options: ['Marketing', 'Compras', 'Recursos Humanos', 'Vendas'],
-              correctAnswer: 'Compras',
-            },
-          ],
-        }
+        title: 'Ciclo do Pedido',
+        description: 'Entenda todas as etapas do ciclo de vida de um pedido, da criação à entrega.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hs-pnc',
+        moduleId: 'module-hs',
+        title: 'Pedidos Não Conformes',
+        description: 'Saiba como identificar, tratar e prevenir pedidos que não seguem os padrões.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hs-co',
+        moduleId: 'module-hs',
+        title: 'Cadastros Operacionais',
+        description: 'Domine os processos de cadastro que são a base para as operações da empresa.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hs-fat',
+        moduleId: 'module-hs',
+        title: 'Faturamento',
+        description: 'Compreenda o processo de faturamento, desde a emissão da nota até a contabilização.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hs-inad',
+        moduleId: 'module-hs',
+        title: 'Inadimplência',
+        description: 'Aprenda a gerenciar e reduzir os índices de inadimplência dos clientes.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hs-sc',
+        moduleId: 'module-hs',
+        title: 'Satisfação de Clientes',
+        description: 'Desenvolva técnicas para medir e melhorar a satisfação dos nossos clientes.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hs-mb',
+        moduleId: 'module-hs',
+        title: 'Margem Bruta (MB)',
+        description: 'Entenda como calcular e analisar a margem bruta para a tomada de decisões.',
+        courses: [],
+        quiz: { questions: [] }
       },
     ]
   },
@@ -317,39 +204,53 @@ export const learningModules: Module[] = [
     title: 'Soft Skills',
     description: 'Aprimore suas habilidades interpessoais, de comunicação e liderança.',
     tracks: [
-       {
-        id: 'track-ss-li',
+      {
+        id: 'track-ss-lid',
         moduleId: 'module-ss',
-        title: 'Trilha de Liderança',
-        description: 'Desenvolva habilidades de liderança essenciais para gerenciar e motivar sua equipe de forma eficaz.',
-        courses: [
-          {
-            id: 'course-ss-li-1',
-            moduleId: 'module-ss',
-            trackId: 'track-ss-li',
-            title: 'Liderança e Gestão de Equipes',
-            description: 'Desenvolva habilidades de liderança essenciais para gerenciar e motivar sua equipe de forma eficaz.',
-            videoUrl: 'https://www.youtube.com/embed/g2sA0d3k2wE',
-            quiz: {
-              questions: [
-                {
-                  text: 'Qual é uma característica fundamental de um bom líder?',
-                  options: ['Microgerenciamento', 'Comunicação ruim', 'Empatia', 'Evitar decisões'],
-                  correctAnswer: 'Empatia',
-                },
-              ],
-            },
-          },
-        ],
-        quiz: {
-           questions: [
-            {
-              text: 'A empatia é crucial para a liderança porque...',
-              options: ['Ajuda a controlar a equipe', 'Permite entender e se conectar com as pessoas', 'Não é importante', 'Facilita a punição'],
-              correctAnswer: 'Permite entender e se conectar com as pessoas',
-            },
-          ],
-        }
+        title: 'Liderança',
+        description: 'Desenvolva habilidades para inspirar, motivar e guiar equipes ao sucesso.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-ss-te',
+        moduleId: 'module-ss',
+        title: 'Trabalho em Equipe',
+        description: 'Aprenda a colaborar de forma eficaz, promovendo um ambiente produtivo e harmonioso.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-ss-ie',
+        moduleId: 'module-ss',
+        title: 'Inteligência Emocional',
+        description: 'Gerencie suas emoções e entenda as dos outros para construir relacionamentos mais fortes.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-ss-pc',
+        moduleId: 'module-ss',
+        title: 'Pensamento Crítico',
+        description: 'Desenvolva a capacidade de analisar informações e tomar decisões baseadas em lógica.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-ss-in',
+        moduleId: 'module-ss',
+        title: 'Inovação',
+        description: 'Aprenda a gerar e implementar novas ideias para resolver problemas e criar valor.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-ss-or',
+        moduleId: 'module-ss',
+        title: 'Orientação para Resultados',
+        description: 'Mantenha o foco em metas e objetivos para alcançar resultados excepcionais.',
+        courses: [],
+        quiz: { questions: [] }
       },
     ]
   },
@@ -357,6 +258,55 @@ export const learningModules: Module[] = [
     id: 'module-hms',
     title: 'Human-Machine Skills',
     description: 'Aprenda a colaborar de forma eficaz com tecnologias e sistemas automatizados.',
-    tracks: []
+    tracks: [
+      {
+        id: 'track-hms-intro',
+        moduleId: 'module-hms',
+        title: 'Introdução',
+        description: 'Conceitos fundamentais sobre a colaboração entre humanos e inteligência artificial.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hms-lial',
+        moduleId: 'module-hms',
+        title: 'Literacia de IA para Líderes',
+        description: 'Entenda o potencial da IA para tomar decisões estratégicas na liderança.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hms-pe',
+        moduleId: 'module-hms',
+        title: 'Prompt Engineering',
+        description: 'Aprenda a arte de criar instruções eficazes para obter os melhores resultados de IAs generativas.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hms-iacs',
+        moduleId: 'module-hms',
+        title: 'IA e Cybersecurity',
+        description: 'Descubra como a IA está transformando a segurança digital, tanto na defesa quanto nas ameaças.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hms-ait',
+        moduleId: 'module-hms',
+        title: 'AI Tools',
+        description: 'Explore uma gama de ferramentas de IA para aumentar a produtividade no dia a dia.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hms-cp',
+        moduleId: 'module-hms',
+        title: 'Copilot',
+        description: 'Domine o Microsoft Copilot para otimizar suas tarefas no ambiente de trabalho.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+    ]
   }
 ];
