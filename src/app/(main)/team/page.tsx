@@ -48,7 +48,7 @@ export default async function TeamManagementPage() {
                 Visualize o progresso e o desempenho dos membros da sua equipe. Use a busca para filtrar por nome.
             </p>
         </div>
-        <TeamManagementClient teamMembers={teamMembers} />
+        <TeamManagementClient teamMembers={teamMembers} allCoursesCount={0} />
     </div>
   );
 }

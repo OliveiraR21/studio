@@ -35,25 +35,17 @@ import type { Module } from "@/lib/types";
 
 interface TeamManagementClientProps {
   teamMembers: User[];
+  allCoursesCount: number; // Now passed as a prop
 }
 
 const ROLE_ORDER: UserRole[] = ['Assistente', 'Analista', 'Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin'];
 
-export function TeamManagementClient({ teamMembers }: TeamManagementClientProps) {
+export function TeamManagementClient({ teamMembers, allCoursesCount }: TeamManagementClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [managerFilter, setManagerFilter] = useState("all");
-  const [modules, setModules] = useState<Module[]>([]);
-
-  useEffect(() => {
-    // Fetch modules on client to calculate completion percentage
-    getLearningModules().then(setModules);
-  }, []);
-
-  const totalCourses = useMemo(() => {
-    if (modules.length === 0) return 1; // Avoid division by zero
-    return modules.reduce((sum, module) => sum + module.tracks.reduce((trackSum, track) => trackSum + track.courses.length, 0), 0);
-  }, [modules]);
+  
+  const totalCourses = allCoursesCount > 0 ? allCoursesCount : 1; // Avoid division by zero
 
   // Calculate the average score for a user
   const calculateAverageScore = (user: User): number => {
@@ -64,7 +56,6 @@ export function TeamManagementClient({ teamMembers }: TeamManagementClientProps)
 
   // Calculate course completion percentage
   const calculateCompletionPercentage = (user: User): number => {
-      if (totalCourses === 0) return 0;
       const completedCount = user.completedCourses.length;
       return Math.round((completedCount / totalCourses) * 100);
   };

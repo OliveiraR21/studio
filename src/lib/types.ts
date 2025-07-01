@@ -7,6 +7,7 @@ export interface Module {
 
 export interface Track {
   id: string;
+  moduleId: string;
   title: string;
   description: string;
   courses: Course[];
@@ -16,6 +17,8 @@ export interface Track {
 
 export interface Course {
   id: string;
+  moduleId: string;
+  trackId: string;
   title: string;
   description: string;
   videoUrl: string;

@@ -1,60 +1,28 @@
-import { collection, getDocs, doc, getDoc, addDoc, updateDoc, query, where, orderBy } from 'firebase/firestore';
-import { db } from './firebase';
 import type { User, Module, Track, Course } from './types';
+import { learningModules as allModules, users as allUsers } from './mock-data';
 
-// Helper to convert Firestore doc to a typed object with ID
-function docToType<T>(d: any): T {
-    const data = d.data();
-    return {
-        ...data,
-        id: d.id,
-    } as T;
-}
+// --- Data Fetching Functions ---
 
-// Fetch all learning modules and their nested tracks/courses
+// Fetch all learning modules and their nested tracks/courses from mock data
 export async function getLearningModules(): Promise<Module[]> {
-    const modulesQuery = query(collection(db, 'modules'), orderBy('title'));
-    const tracksQuery = query(collection(db, 'tracks'), orderBy('title'));
-    const coursesQuery = query(collection(db, 'courses'), orderBy('title'));
-
-    const [moduleSnap, trackSnap, courseSnap] = await Promise.all([
-        getDocs(modulesQuery),
-        getDocs(tracksQuery),
-        getDocs(coursesQuery),
-    ]);
-
-    const courses = courseSnap.docs.map(docToType<Course>);
-    const tracks = trackSnap.docs.map(docToType<Track>);
-    const modules = moduleSnap.docs.map(docToType<Module>);
-
-    // Nest courses into tracks
-    tracks.forEach(track => {
-        track.courses = courses.filter(c => c.trackId === track.id);
-    });
-
-    // Nest tracks into modules
-    modules.forEach(module => {
-        module.tracks = tracks.filter(t => t.moduleId === module.id);
-    });
-
-    return modules;
+    return Promise.resolve(allModules);
 }
 
+// Fetch all users from mock data
 export async function getUsers(): Promise<User[]> {
-    const usersCollection = collection(db, 'users');
-    const userSnapshot = await getDocs(usersCollection);
-    return userSnapshot.docs.map(docToType<User>);
+    return Promise.resolve(allUsers);
 }
 
+// Fetch a single user by ID from mock data
 export async function getUserById(userId: string): Promise<User | null> {
-    const userDocRef = doc(db, 'users', userId);
-    const userSnap = await getDoc(userDocRef);
-    return userSnap.exists() ? docToType<User>(userSnap) : null;
+    const user = allUsers.find(u => u.id === userId);
+    return Promise.resolve(user || null);
 }
 
-export async function findCourseById(courseId: string, modules?: Module[]): Promise<{ course: Course, track: Track, module: Module } | null> {
-    const allModules = modules || await getLearningModules();
-    for (const module of allModules) {
+// Find a course by its ID within the mock data structure
+export function findCourseById(courseId: string, modules?: Module[]): { course: Course, track: Track, module: Module } | null {
+    const allModulesToSearch = modules || allModules;
+    for (const module of allModulesToSearch) {
         for (const track of module.tracks) {
             const course = track.courses.find(c => c.id === courseId);
             if (course) {
@@ -65,31 +33,16 @@ export async function findCourseById(courseId: string, modules?: Module[]): Prom
     return null;
 }
 
+// Find a course and its parent track by the course ID
 export async function findCourseByIdWithTrack(courseId: string): Promise<{ course: Course, track: Track } | null> {
-    const courseDocRef = doc(db, 'courses', courseId);
-    const courseSnap = await getDoc(courseDocRef);
-
-    if (!courseSnap.exists()) {
-        return null;
+    const result = findCourseById(courseId);
+    if (result) {
+        return { course: result.course, track: result.track };
     }
-    const course = docToType<Course>(courseSnap);
-    
-    if (!course.trackId) {
-        return null;
-    }
-    
-    const trackDocRef = doc(db, 'tracks', course.trackId);
-    const trackSnap = await getDoc(trackDocRef);
-
-    if (!trackSnap.exists()) {
-        return null;
-    }
-    const track = docToType<Track>(trackSnap);
-
-    return { course, track };
+    return null;
 }
 
-// Finds the very first course that is not marked as completed.
+// Finds the very first course that is not marked as completed for a given user.
 export function findNextCourseForUser(user: User, modules: Module[]): Course | null {
     for (const module of modules) {
         for (const track of module.tracks) {
@@ -103,17 +56,28 @@ export function findNextCourseForUser(user: User, modules: Module[]): Course | n
     return null; // All courses completed
 }
 
-// --- Mutation Functions ---
+// --- Mutation Functions (Simulated) ---
+
+// Simulates creating a course. The change is not persisted.
 export async function createCourse(courseData: Omit<Course, 'id'>): Promise<Course> {
-    const courseCollection = collection(db, 'courses');
-    const docRef = await addDoc(courseCollection, courseData);
-    return {
-        id: docRef.id,
+    console.log('Simulating course creation:', courseData);
+    // In a mock environment, we can't persist this easily without complex state management.
+    // We'll return a mock object that looks real for the UI.
+    const newCourse: Course = {
+        id: `mock-course-${Date.now()}`,
+        // These are placeholder IDs as the course is not actually added to any module/track
+        moduleId: 'mock-module-id', 
+        trackId: 'mock-track-id', 
         ...courseData,
-    }
+        quiz: courseData.quiz || undefined
+    };
+    return Promise.resolve(newCourse);
 }
 
+// Simulates updating a course. The change is not persisted.
 export async function updateCourse(courseId: string, courseData: Partial<Course>): Promise<void> {
-    const courseDocRef = doc(db, 'courses', courseId);
-    await updateDoc(courseDocRef, courseData);
+    console.log(`Simulating update for course ${courseId} with:`, courseData);
+    // In a mock environment, this is a no-op (no operation).
+    // The data is not actually changed in the mock-data.ts file.
+    return Promise.resolve();
 }
