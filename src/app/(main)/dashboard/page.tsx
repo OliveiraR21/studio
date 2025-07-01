@@ -17,6 +17,21 @@ import { UserNotFound } from "@/components/layout/user-not-found";
 
 const PASSING_SCORE = 90;
 
+// Helper function to format minutes into "Xh Ym"
+const formatDuration = (totalMinutes: number) => {
+    if (!totalMinutes || totalMinutes === 0) return "0m";
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    let result = '';
+    if (hours > 0) {
+        result += `${hours}h `;
+    }
+    if (minutes > 0 || hours === 0) {
+        result += `${minutes}m`;
+    }
+    return result.trim();
+};
+
 export default async function DashboardPage() {
   // In a real app, this would be the logged-in user from a session.
   const allUsers = await getUsers();
@@ -58,6 +73,12 @@ export default async function DashboardPage() {
     .reverse(); // Newest first
 
   const nextCourse = findNextCourseForUser(currentUser, learningModules);
+
+  // Calculate training hours
+  const totalDuration = allCourses.reduce((acc, course) => acc + (course.durationInMinutes || 0), 0);
+  const completedCourses = allCourses.filter(course => currentUser.completedCourses.includes(course.id));
+  const completedDuration = completedCourses.reduce((acc, course) => acc + (course.durationInMinutes || 0), 0);
+  const pendingDuration = totalDuration - completedDuration;
 
   return (
     <div className="container mx-auto py-2 space-y-8">
@@ -109,11 +130,25 @@ export default async function DashboardPage() {
                 </CardTitle>
                 <Trophy className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
-              <CardContent className="flex flex-1 flex-col items-center justify-center p-6 text-center">
-                  <div className="text-4xl font-bold tracking-tighter">{currentUser.completedTracks.length}</div>
-                  <p className="text-sm text-muted-foreground">
-                    de {learningModules.flatMap(m => m.tracks).length} no total
-                  </p>
+              <CardContent className="flex flex-1 flex-col justify-between p-6">
+                  <div className="text-center">
+                      <div className="text-4xl font-bold tracking-tighter">{currentUser.completedTracks.length}</div>
+                      <p className="text-sm text-muted-foreground">
+                        de {learningModules.flatMap(m => m.tracks).length} no total
+                      </p>
+                  </div>
+                  
+                  <div className="space-y-1 text-xs text-muted-foreground pt-4">
+                      <Separator className="mb-2" />
+                      <div className="flex justify-between w-full">
+                          <span>Horas Concluídas:</span>
+                          <span className="font-semibold text-foreground">{formatDuration(completedDuration)}</span>
+                      </div>
+                      <div className="flex justify-between w-full">
+                          <span>Horas Pendentes:</span>
+                          <span className="font-semibold text-foreground">{formatDuration(pendingDuration)}</span>
+                      </div>
+                  </div>
               </CardContent>
             </Card>
             
