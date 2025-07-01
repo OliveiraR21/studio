@@ -23,7 +23,7 @@ const QuestionSchema = z.object({
 });
 
 const GenerateQuizOutputSchema = z.object({
-  questions: z.array(QuestionSchema).min(2).max(4).describe('Uma lista de 2 a 4 perguntas para o questionário.'),
+  questions: z.array(QuestionSchema).min(5).max(10).describe('Uma lista de 5 a 10 perguntas para o questionário.'),
 });
 export type GenerateQuizOutput = z.infer<typeof GenerateQuizOutputSchema>;
 
@@ -40,7 +40,7 @@ const prompt = ai.definePrompt({
 
 Sua tarefa é criar um questionário de múltipla escolha com base no título e na descrição de um curso fornecido. Você não pode assistir ao vídeo, então deve basear as perguntas estritamente nas informações textuais fornecidas.
 
-Gere um questionário relevante com 3 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados no título e na descrição.
+Gere um questionário relevante com 10 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados no título e na descrição.
 
 Título do Curso: {{{title}}}
 Descrição do Curso: {{{description}}}
