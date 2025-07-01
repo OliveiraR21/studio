@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { QuizGenerator } from "@/components/admin/quiz-generator";
 
 export default async function EditCoursePage({ params }: { params: { id: string } }) {
   const isNew = params.id === 'new';
@@ -18,7 +19,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
   }
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto space-y-6">
       <div className="mb-6">
         <Button variant="ghost" asChild>
             <Link href="/admin/courses">
@@ -40,6 +41,13 @@ export default async function EditCoursePage({ params }: { params: { id: string 
           <CourseForm course={course} />
         </CardContent>
       </Card>
+
+      {!isNew && course && (
+        <QuizGenerator 
+            title={course.title}
+            description={course.description} 
+        />
+      )}
     </div>
   );
 }
