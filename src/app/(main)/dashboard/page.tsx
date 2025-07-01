@@ -8,7 +8,7 @@ import {
   CardFooter
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trophy, GaugeCircle, AlertTriangle, BookCheck, Play } from "lucide-react";
+import { Trophy, GaugeCircle, AlertTriangle, BookCheck, Play, Clock } from "lucide-react";
 import Link from "next/link";
 import type { Track, Course } from "@/lib/types";
 import { ProgressChart } from "@/components/dashboard/progress-chart";
@@ -16,6 +16,20 @@ import { Separator } from "@/components/ui/separator";
 import { UserNotFound } from "@/components/layout/user-not-found";
 
 const PASSING_SCORE = 90;
+
+const formatDuration = (totalMinutes: number) => {
+    if (totalMinutes < 1) return "0m";
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    let result = '';
+    if (hours > 0) {
+        result += `${hours}h `;
+    }
+    if (minutes > 0) {
+        result += `${minutes}m`;
+    }
+    return result.trim();
+};
 
 export default async function DashboardPage() {
   // In a real app, this would be the logged-in user from a session.
@@ -27,15 +41,22 @@ export default async function DashboardPage() {
     return <UserNotFound />
   }
   
-  // Calculations for "Meu Painel"
-  const totalCourses = learningModules.reduce((sum, module) => sum + module.tracks.reduce((trackSum, track) => trackSum + track.courses.length, 0), 0);
+  const allCourses = learningModules.flatMap(module => module.tracks.flatMap(track => track.courses));
+  const totalCourses = allCourses.length;
   const completedCoursesCount = currentUser.completedCourses.length;
 
   const allScores = [...(currentUser.courseScores ?? []).map(s => s.score), ...(currentUser.trackScores ?? []).map(s => s.score)];
   const averageScore = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
 
-  const totalTracks = learningModules.reduce((sum, module) => sum + module.tracks.length, 0);
-  const completedTracksCount = currentUser.completedTracks.length;
+  const totalDurationInMinutes = allCourses.reduce((sum, course) => sum + course.durationInMinutes, 0);
+  
+  const completedCoursesDetails = currentUser.completedCourses
+    .map(courseId => allCourses.find(c => c.id === courseId))
+    .filter((course): course is Course => course !== undefined);
+  
+  const completedDurationInMinutes = completedCoursesDetails.reduce((sum, course) => sum + course.durationInMinutes, 0);
+  
+  const pendingDurationInMinutes = totalDurationInMinutes - completedDurationInMinutes;
 
   const coursesToRetake = (currentUser.courseScores ?? [])
     .filter(scoreInfo => scoreInfo.score < PASSING_SCORE)
@@ -108,15 +129,20 @@ export default async function DashboardPage() {
             <Card className="flex flex-col">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle>
-                  Trilhas Concluídas
+                  Horas de Treinamento
                 </CardTitle>
-                <Trophy className="h-4 w-4 text-muted-foreground" />
+                <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent className="flex flex-1 flex-col items-center justify-center p-6 text-center">
-                  <div className="text-5xl font-bold tracking-tighter">{completedTracksCount}</div>
+                  <div className="text-4xl font-bold tracking-tighter">{formatDuration(completedDurationInMinutes)}</div>
                   <p className="text-sm text-muted-foreground">
-                    de {totalTracks} trilhas no total
+                    de {formatDuration(totalDurationInMinutes)} no total
                   </p>
+                  <Separator className="my-4" />
+                  <div className="text-center w-full">
+                     <p className="font-semibold text-destructive">{formatDuration(pendingDurationInMinutes)}</p>
+                     <p className="text-xs text-muted-foreground">Pendentes</p>
+                  </div>
               </CardContent>
             </Card>
             
