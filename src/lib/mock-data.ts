@@ -146,7 +146,71 @@ export const learningModules: Module[] = [
         moduleId: 'module-hs',
         title: 'Ciclo do Pedido',
         description: 'Entenda todas as etapas do ciclo de vida de um pedido, da criação à entrega.',
-        courses: [],
+        courses: [
+          {
+            id: 'course-brs-portal-training',
+            moduleId: 'module-hs',
+            trackId: 'track-hs-cp',
+            title: 'Treinamento Portal | BRS',
+            description: 'Aprenda a navegar e utilizar o portal BRS para gerenciar o ciclo de pedidos de forma eficiente, desde a criação até o acompanhamento da entrega.',
+            videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
+            durationInMinutes: 5,
+            quiz: {
+              questions: [
+                {
+                  text: 'Qual é a finalidade principal do Portal BRS, conforme apresentado no treinamento?',
+                  options: [
+                    'Gerenciar relatórios financeiros da empresa.',
+                    'Acompanhar e gerenciar todo o ciclo de vida dos pedidos.',
+                    'Realizar solicitações de recursos humanos.',
+                    'Publicar atualizações nas redes sociais da companhia.'
+                  ],
+                  correctAnswer: 'Acompanhar e gerenciar todo o ciclo de vida dos pedidos.'
+                },
+                {
+                  text: 'Qual é o primeiro passo para um novo pedido dentro do Portal BRS?',
+                  options: [
+                    'Emissão da nota fiscal.',
+                    'Criação do pedido na plataforma.',
+                    'Rastreamento da entrega.',
+                    'Cadastro de novos clientes.'
+                  ],
+                  correctAnswer: 'Criação do pedido na plataforma.'
+                },
+                {
+                  text: 'Que tipo de informação é possível consultar ao rastrear um pedido no portal?',
+                  options: [
+                    'O funcionário do mês da transportadora.',
+                    'A previsão do tempo para a data de entrega.',
+                    'O status atual e a localização do pedido.',
+                    'O valor das ações da empresa na bolsa.'
+                  ],
+                  correctAnswer: 'O status atual e a localização do pedido.'
+                },
+                {
+                  text: 'Como o Portal BRS auxilia na gestão de pedidos não conformes?',
+                  options: [
+                    'Ele rejeita automaticamente qualquer pedido com erro.',
+                    'Oferece uma seção específica para o tratamento e acompanhamento de não conformidades.',
+                    'Apaga o pedido do sistema para evitar problemas.',
+                    'Envia um alerta por e-mail para o CEO da empresa.'
+                  ],
+                  correctAnswer: 'Oferece uma seção específica para o tratamento e acompanhamento de não conformidades.'
+                },
+                {
+                  text: 'Qual é um benefício chave de utilizar o Portal BRS para a gestão de pedidos?',
+                  options: [
+                    'Aumento do trabalho manual para conferência.',
+                    'Comunicação mais lenta entre os departamentos.',
+                    'Centralização da informação e agilidade no processo.',
+                    'Maior necessidade de impressão e uso de papel.'
+                  ],
+                  correctAnswer: 'Centralização da informação e agilidade no processo.'
+                }
+              ]
+            }
+          }
+        ],
         quiz: { questions: [] }
       },
       {
