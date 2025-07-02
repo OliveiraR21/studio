@@ -11,14 +11,14 @@ import {
   AccordionItem, 
   AccordionTrigger 
 } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import { CheckCircle, Lock, Star, NotebookText } from "lucide-react";
+import { CheckCircle, Lock, NotebookText } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import type { Track, Course } from "@/lib/types";
 import { CourseCard } from "@/components/dashboard/course-card";
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
 import { UserNotFound } from "@/components/layout/user-not-found";
+import { TrackFinalActions } from "@/components/course/track-final-actions";
 
 const PASSING_SCORE = 90;
 
@@ -139,18 +139,11 @@ export default async function MyCoursesPage() {
                           
                           <Separator className="my-6" />
 
-                          <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
-                             <div className="flex items-center gap-3">
-                               <Star className={`h-6 w-6 ${allCoursesInTrackCompleted ? 'text-amber-400' : 'text-muted-foreground'}`} />
-                                <div>
-                                    <h4 className={`font-semibold ${!allCoursesInTrackCompleted ? 'text-muted-foreground' : ''}`}>Prova Final da Trilha</h4>
-                                    <p className="text-xs text-muted-foreground">Conclua todos os cursos para desbloquear.</p>
-                                </div>
-                             </div>
-                              <Button size="sm" disabled={!allCoursesInTrackCompleted || trackCompleted}>
-                                {trackCompleted ? 'Revisar Nota' : 'Iniciar Prova Final'}
-                              </Button>
-                           </div>
+                          <TrackFinalActions
+                            trackTitle={track.title}
+                            allCoursesInTrackCompleted={allCoursesInTrackCompleted}
+                            trackCompleted={trackCompleted}
+                          />
                         </div>
                       </AccordionContent>
                     </AccordionItem>
