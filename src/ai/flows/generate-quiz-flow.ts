@@ -24,7 +24,7 @@ const QuestionSchema = z.object({
 });
 
 const GenerateQuizOutputSchema = z.object({
-  questions: z.array(QuestionSchema).min(30).max(40).describe('Um banco de 40 perguntas para o questionário.'),
+  questions: z.array(QuestionSchema).describe('Um banco de questões com aproximadamente 40 perguntas para o questionário.'),
 });
 export type GenerateQuizOutput = z.infer<typeof GenerateQuizOutputSchema>;
 
