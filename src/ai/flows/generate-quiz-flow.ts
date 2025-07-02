@@ -13,6 +13,7 @@ import { z } from 'genkit';
 const GenerateQuizInputSchema = z.object({
   title: z.string().describe('O título do curso.'),
   description: z.string().describe('A descrição detalhada do curso.'),
+  transcript: z.string().optional().describe('A transcrição ou legenda completa do conteúdo do vídeo.'),
 });
 export type GenerateQuizInput = z.infer<typeof GenerateQuizInputSchema>;
 
@@ -38,9 +39,16 @@ const prompt = ai.definePrompt({
   output: { schema: GenerateQuizOutputSchema },
   prompt: `Você é um especialista em design instrucional encarregado de criar conteúdo educacional para uma plataforma de e-learning corporativa.
 
-Sua tarefa é criar um questionário de múltipla escolha com base no título e na descrição de um curso fornecido. Você não pode assistir ao vídeo, então deve basear as perguntas estritamente nas informações textuais fornecidas.
+Sua tarefa é criar um questionário de múltipla escolha com base no conteúdo de um curso fornecido.
 
-Gere um questionário relevante com 10 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados no título e na descrição.
+Gere um questionário relevante com 10 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados.
+
+{{#if transcript}}
+Use a seguinte transcrição do vídeo como a fonte PRIMÁRIA de informação para criar as perguntas. O título e a descrição podem ser usados como contexto adicional.
+Transcrição do Vídeo: {{{transcript}}}
+{{else}}
+Você não tem acesso ao vídeo, então deve basear as perguntas estritamente no título e na descrição fornecidos.
+{{/if}}
 
 Título do Curso: {{{title}}}
 Descrição do Curso: {{{description}}}

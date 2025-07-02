@@ -16,6 +16,8 @@ import {
 import { Wand2, Loader2, Save, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 interface QuizGeneratorProps {
   title: string;
@@ -26,13 +28,14 @@ export function QuizGenerator({ title, description }: QuizGeneratorProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
+  const [transcript, setTranscript] = useState("");
 
   const handleGenerate = async () => {
     setIsLoading(true);
     setGeneratedQuiz(null);
 
     try {
-      const result = await generateQuiz({ title, description });
+      const result = await generateQuiz({ title, description, transcript });
       setGeneratedQuiz(result);
       toast({
         title: 'Questionário gerado!',
@@ -68,7 +71,7 @@ export function QuizGenerator({ title, description }: QuizGeneratorProps) {
             <div>
                 <CardTitle>Gerador de Questionário com IA</CardTitle>
                 <CardDescription>
-                Crie um questionário automaticamente com base no título e descrição do curso.
+                Crie um questionário automaticamente com base no título e descrição do curso, ou forneça uma transcrição para maior precisão.
                 </CardDescription>
             </div>
         </div>
@@ -82,9 +85,20 @@ export function QuizGenerator({ title, description }: QuizGeneratorProps) {
         )}
 
         {!isLoading && !generatedQuiz && (
-            <div className="flex flex-col items-center justify-center gap-4 text-center">
-                <p className="text-sm text-muted-foreground">O modelo de IA irá analisar o título e a descrição para criar as perguntas.</p>
-                <Button onClick={handleGenerate}>
+            <div className="flex flex-col items-center justify-center gap-4 text-center p-4">
+                <div className="w-full space-y-2 text-left">
+                  <Label htmlFor="transcript">Transcrição do Vídeo (Opcional)</Label>
+                  <Textarea
+                    id="transcript"
+                    value={transcript}
+                    onChange={(e) => setTranscript(e.target.value)}
+                    placeholder="Cole a legenda ou um resumo detalhado do conteúdo do vídeo aqui para obter perguntas mais precisas e aprofundadas."
+                    rows={6}
+                    className="bg-background/50"
+                  />
+                  <p className="text-xs text-muted-foreground">Se este campo for deixado em branco, a IA usará apenas o título e a descrição.</p>
+                </div>
+                <Button onClick={handleGenerate} className="mt-4">
                     <Wand2 className="mr-2 h-4 w-4" />
                     Gerar Questionário
                 </Button>
