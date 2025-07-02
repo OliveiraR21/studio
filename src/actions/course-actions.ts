@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { createCourse, updateCourse } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
-import type { Course } from '@/lib/types';
+import type { Course, Quiz } from '@/lib/types';
 
 const courseFormSchema = z.object({
   id: z.string().optional(),
@@ -76,4 +76,24 @@ export async function saveCourse(
   revalidatePath('/admin/tracks');
   
   return { success: true, message: `Curso "${validatedFields.data.title}" salvo com sucesso!` };
+}
+
+export async function saveQuiz(courseId: string, quiz: Quiz): Promise<{ success: boolean; message: string }> {
+  if (!courseId) {
+    return { success: false, message: "ID do curso não fornecido." };
+  }
+  
+  try {
+    // updateCourse updates a course in-memory.
+    await updateCourse(courseId, { quiz });
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
+    return { success: false, message: `Falha ao salvar o questionário: ${errorMessage}` };
+  }
+
+  // Revalidate paths to ensure the UI updates with the new quiz data
+  revalidatePath(`/admin/courses`);
+  revalidatePath(`/admin/courses/${courseId}/edit`);
+  
+  return { success: true, message: 'Questionário salvo com sucesso!' };
 }

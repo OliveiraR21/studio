@@ -47,6 +47,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
 
       {!isNew && course && (
         <QuizGenerator 
+            courseId={course.id}
             title={course.title}
             description={course.description} 
         />

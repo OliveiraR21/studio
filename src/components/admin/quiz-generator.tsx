@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { Quiz } from '@/lib/types';
 import { generateQuiz } from '@/ai/flows/generate-quiz-flow';
+import { saveQuiz } from '@/actions/course-actions';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,13 +21,15 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 interface QuizGeneratorProps {
+  courseId: string;
   title: string;
   description: string;
 }
 
-export function QuizGenerator({ title, description }: QuizGeneratorProps) {
+export function QuizGenerator({ courseId, title, description }: QuizGeneratorProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
   const [transcript, setTranscript] = useState("");
 
@@ -55,12 +58,36 @@ export function QuizGenerator({ title, description }: QuizGeneratorProps) {
     }
   };
 
-  const handleSave = () => {
-    console.log("Saving quiz:", JSON.stringify(generatedQuiz, null, 2));
-    toast({
-      title: "Função em desenvolvimento",
-      description: "O questionário foi impresso no console. Por favor, adicione-o manualmente ao mock-data.ts por enquanto.",
-    });
+  const handleSave = async () => {
+    if (!generatedQuiz) return;
+    setIsSaving(true);
+    
+    try {
+      const result = await saveQuiz(courseId, generatedQuiz);
+
+      if (result.success) {
+        toast({
+          title: "Sucesso!",
+          description: result.message,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erro ao Salvar",
+          description: result.message,
+        });
+      }
+    } catch (error) {
+        console.error('Failed to save quiz:', error);
+        toast({
+            variant: 'destructive',
+            title: 'Ocorreu um erro',
+            description:
+            'Não foi possível salvar o questionário. Tente novamente.',
+        });
+    } finally {
+        setIsSaving(false);
+    }
   };
 
   return (
@@ -113,7 +140,7 @@ export function QuizGenerator({ title, description }: QuizGeneratorProps) {
                 As perguntas foram geradas por IA. Verifique se estão corretas e fazem sentido antes de salvar.
               </AlertDescription>
             </Alert>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[50vh] overflow-y-auto p-1 pr-4">
               {generatedQuiz.questions.map((q, index) => (
                 <div key={index} className="space-y-2 rounded-lg border bg-background p-4">
                   <p className="font-semibold">
@@ -142,13 +169,13 @@ export function QuizGenerator({ title, description }: QuizGeneratorProps) {
       </CardContent>
        {generatedQuiz && !isLoading && (
         <CardFooter className="flex justify-end gap-3 border-t pt-6">
-            <Button variant="ghost" onClick={handleGenerate}>
+            <Button variant="ghost" onClick={handleGenerate} disabled={isSaving}>
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Gerar Novamente
             </Button>
-            <Button onClick={handleSave}>
-                <Save className="mr-2 h-4 w-4" />
-                Salvar Questionário
+            <Button onClick={handleSave} disabled={isSaving}>
+                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                {isSaving ? 'Salvando...' : 'Salvar Questionário'}
             </Button>
         </CardFooter>
       )}
