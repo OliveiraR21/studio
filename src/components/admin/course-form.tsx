@@ -1,8 +1,8 @@
 'use client';
 
-import type { Course, Module } from '@/lib/types';
+import type { Course, Module, Track } from '@/lib/types';
 import { useFormStatus } from 'react-dom';
-import { useEffect, useActionState, useState, useMemo } from 'react';
+import { useEffect, useActionState, useMemo } from 'react';
 import { saveCourse } from '@/actions/course-actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -11,12 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Loader2, ChevronsUpDown, Check } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-import { cn } from '@/lib/utils';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 
 interface CourseFormProps {
   course: Course | null;
@@ -53,24 +49,8 @@ export function CourseForm({ course, modules }: CourseFormProps) {
 
   const initialState = { message: '', errors: {}, success: false };
   const [state, dispatch] = useActionState(saveCourse, initialState);
-
-  const [selectedModuleId, setSelectedModuleId] = useState<string | null>(course?.moduleId ?? null);
-  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(course?.trackId ?? null);
-  const [popoverOpen, setPopoverOpen] = useState(false);
-
-  const availableTracks = useMemo(() => {
-    if (!selectedModuleId) return [];
-    const module = modules.find(m => m.id === selectedModuleId);
-    return module?.tracks ?? [];
-  }, [selectedModuleId, modules]);
-
-  // When selected module changes, reset selected track if it's not in the new list
-  useEffect(() => {
-    if (selectedTrackId && !availableTracks.some(t => t.id === selectedTrackId)) {
-        setSelectedTrackId(null);
-    }
-  }, [selectedModuleId, availableTracks, selectedTrackId]);
-
+  
+  const allTracks = useMemo(() => modules.flatMap(m => m.tracks), [modules]);
 
   useEffect(() => {
     if (state.success) {
@@ -99,78 +79,21 @@ export function CourseForm({ course, modules }: CourseFormProps) {
       {!isNew && <input type="hidden" name="id" value={course.id} />}
       
       {isNew && (
-        <div className="space-y-4">
-            <div className="space-y-2">
-                <Label htmlFor="moduleId">Módulo</Label>
-                <Select
-                    onValueChange={(value) => {
-                        setSelectedModuleId(value);
-                    }}
-                    defaultValue={selectedModuleId ?? ""}
-                    required
-                >
-                    <SelectTrigger id="moduleId">
-                        <SelectValue placeholder="Primeiro, selecione um módulo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {modules.map(module => (
-                            <SelectItem key={module.id} value={module.id}>
-                                {module.title}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
-            
-            <div className="space-y-2">
-                <Label htmlFor="trackId">Trilha de Aprendizagem</Label>
-                <input type="hidden" name="trackId" value={selectedTrackId ?? ''} />
-                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-                    <PopoverTrigger asChild>
-                    <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={popoverOpen}
-                        className="w-full justify-between"
-                        disabled={!selectedModuleId}
-                    >
-                        {selectedTrackId
-                        ? availableTracks.find((track) => track.id === selectedTrackId)?.title
-                        : "Depois, selecione a trilha..."}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                        <Command>
-                            <CommandInput placeholder="Filtrar trilha..." />
-                            <CommandList>
-                                <CommandEmpty>Nenhuma trilha encontrada.</CommandEmpty>
-                                <CommandGroup>
-                                    {availableTracks.map((track) => (
-                                    <CommandItem
-                                        key={track.id}
-                                        value={track.title}
-                                        onSelect={() => {
-                                            setSelectedTrackId(track.id);
-                                            setPopoverOpen(false);
-                                        }}
-                                    >
-                                        <Check
-                                            className={cn(
-                                                "mr-2 h-4 w-4",
-                                                selectedTrackId === track.id ? "opacity-100" : "opacity-0"
-                                            )}
-                                        />
-                                        {track.title}
-                                    </CommandItem>
-                                    ))}
-                                </CommandGroup>
-                            </CommandList>
-                        </Command>
-                    </PopoverContent>
-                </Popover>
-                {state.errors?.trackId && <p className="text-sm text-destructive">{state.errors.trackId[0]}</p>}
-            </div>
+        <div className="space-y-2">
+            <Label htmlFor="trackId">Trilha de Aprendizagem</Label>
+            <Select name="trackId" defaultValue={course?.trackId ?? ""} required={isNew}>
+                <SelectTrigger id="trackId">
+                    <SelectValue placeholder="Selecione uma trilha" />
+                </SelectTrigger>
+                <SelectContent>
+                    {allTracks.map((track: Track) => (
+                        <SelectItem key={track.id} value={track.id}>
+                            {track.title}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            {state.errors?.trackId && <p className="text-sm text-destructive">{state.errors.trackId[0]}</p>}
         </div>
       )}
 

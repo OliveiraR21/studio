@@ -1,15 +1,6 @@
 import type { User, Module } from './types';
 
-// This is a common pattern to persist data across hot reloads in development.
-// In a real app, this would be handled by a proper database.
-declare global {
-  var mockDb: {
-    users: User[];
-    learningModules: Module[];
-  } | undefined;
-}
-
-const initialUsers: User[] = [
+export const users: User[] = [
   {
     id: '1',
     name: 'Admin',
@@ -136,7 +127,7 @@ const initialUsers: User[] = [
   },
 ];
 
-const initialLearningModules: Module[] = [
+export const learningModules: Module[] = [
   {
     id: 'module-hs',
     title: 'Hard Skills',
@@ -164,6 +155,60 @@ const initialLearningModules: Module[] = [
             description: 'Aprenda a navegar e utilizar o portal BRS para gerenciar o ciclo de pedidos de forma eficiente, desde a criação até o acompanhamento da entrega.',
             videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
             durationInSeconds: 300,
+            quiz: {
+              questions: [
+                {
+                  text: "Qual é o primeiro passo para criar um pedido no portal BRS?",
+                  options: [
+                    "Inserir o CNPJ do cliente",
+                    "Selecionar o tipo de frete",
+                    "Adicionar produtos ao carrinho",
+                    "Definir a data de entrega"
+                  ],
+                  correctAnswer: "Inserir o CNPJ do cliente"
+                },
+                {
+                  text: "Qual informação NÃO é necessária para a busca de clientes no portal?",
+                  options: [
+                    "CNPJ",
+                    "Código do cliente",
+                    "Nome da empresa",
+                    "Endereço de e-mail do comprador"
+                  ],
+                  correctAnswer: "Endereço de e-mail do comprador"
+                },
+                {
+                  text: "O que o sistema faz após você inserir um CNPJ válido?",
+                  options: [
+                    "Envia o pedido automaticamente",
+                    "Carrega os dados da empresa e as opções de entrega",
+                    "Pede para confirmar o e-mail",
+                    "Mostra o histórico de compras"
+                  ],
+                  correctAnswer: "Carrega os dados da empresa e as opções de entrega"
+                },
+                {
+                  text: "Qual é o propósito da aba 'Acompanhamento' no portal?",
+                  options: [
+                    "Para cadastrar novos produtos",
+                    "Para visualizar o status de todos os pedidos feitos",
+                    "Para alterar a senha de acesso",
+                    "Para entrar em contato com o suporte"
+                  ],
+                  correctAnswer: "Para visualizar o status de todos os pedidos feitos"
+                },
+                {
+                  text: "Qual das opções de frete mencionadas é de responsabilidade do cliente?",
+                  options: [
+                    "CIF",
+                    "FOB",
+                    "Entrega Expressa",
+                    "Todas as anteriores"
+                  ],
+                  correctAnswer: "FOB"
+                }
+              ]
+            }
           }
         ],
         quiz: { questions: [] }
@@ -329,15 +374,3 @@ const initialLearningModules: Module[] = [
     ]
   }
 ];
-
-const db = global.mockDb || {
-  users: initialUsers,
-  learningModules: initialLearningModules,
-};
-
-if (process.env.NODE_ENV !== 'production') {
-  global.mockDb = db;
-}
-
-export const users: User[] = db.users;
-export const learningModules: Module[] = db.learningModules;
