@@ -24,7 +24,7 @@ const QuestionSchema = z.object({
 });
 
 const GenerateQuizOutputSchema = z.object({
-  questions: z.array(QuestionSchema).min(5).max(10).describe('Uma lista de 5 a 10 perguntas para o questionário.'),
+  questions: z.array(QuestionSchema).min(30).max(40).describe('Um banco de 40 perguntas para o questionário.'),
 });
 export type GenerateQuizOutput = z.infer<typeof GenerateQuizOutputSchema>;
 
@@ -39,9 +39,9 @@ const prompt = ai.definePrompt({
   output: { schema: GenerateQuizOutputSchema },
   prompt: `Você é um especialista em design instrucional encarregado de criar conteúdo educacional para uma plataforma de e-learning corporativa.
 
-Sua tarefa é criar um questionário de múltipla escolha com base no conteúdo de um curso fornecido.
+Sua tarefa é criar um grande banco de questões de múltipla escolha com base no conteúdo de um curso fornecido.
 
-Gere um questionário relevante com 10 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados.
+Gere um banco de questões relevante com 40 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados.
 
 {{#if transcript}}
 Use a seguinte transcrição do vídeo como a fonte PRIMÁRIA de informação para criar as perguntas. O título e a descrição podem ser usados como contexto adicional.
