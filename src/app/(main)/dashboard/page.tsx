@@ -91,14 +91,14 @@ export default async function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <ProgressChart completed={completedCoursesCount} total={totalCourses} />
 
-            <Card>
+            <Card className="flex flex-col">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle>
                   Média Geral
                 </CardTitle>
                 <GaugeCircle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
-              <CardContent className="p-6 text-center">
+              <CardContent className="flex flex-1 flex-col justify-center p-6 text-center">
                 <div className="text-5xl font-bold tracking-tighter">{averageScore}%</div>
                 <p className="text-sm text-muted-foreground">
                   Média de todas as provas
