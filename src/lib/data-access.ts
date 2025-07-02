@@ -60,8 +60,6 @@ export function findNextCourseForUser(user: User, modules: Module[]): Course | n
 
 // Creates a course in-memory. The change persists for the lifetime of the dev server.
 export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; durationInSeconds?: number; }): Promise<Course> {
-    console.log('Creating course in-memory:', courseData);
-    
     let trackToUpdate: Track | undefined;
     let moduleToUpdate: Module | undefined;
 
@@ -88,25 +86,40 @@ export async function createCourse(courseData: { trackId: string; title: string;
     };
 
     trackToUpdate.courses.push(newCourse);
-    
-    console.log(`Course "${newCourse.title}" added to track "${trackToUpdate.title}". Current courses in track: ${trackToUpdate.courses.length}`);
 
     return Promise.resolve(newCourse);
 }
 
 // Updates a course in-memory. The change persists for the lifetime of the dev server.
 export async function updateCourse(courseId: string, courseData: Partial<Omit<Course, 'id' | 'trackId' | 'moduleId'>>): Promise<void> {
-    console.log(`Updating course ${courseId} in-memory with:`, courseData);
-
-    const result = findCourseById(courseId);
+    const result = findCourseById(courseId, allModules);
     if (!result) {
         throw new Error(`Course with ID ${courseId} not found for update.`);
     }
 
-    // Update the course object. In JS, this modifies the object in the `allModules` array by reference.
-    Object.assign(result.course, courseData);
+    const { track, module } = result;
 
-    console.log(`Course "${result.course.title}" updated.`);
+    const moduleIndex = allModules.findIndex(m => m.id === module.id);
+    if (moduleIndex === -1) {
+        throw new Error(`Module not found during update.`);
+    }
+
+    const trackIndex = allModules[moduleIndex].tracks.findIndex(t => t.id === track.id);
+    if (trackIndex === -1) {
+        throw new Error(`Track not found during update.`);
+    }
+
+    const courseIndex = allModules[moduleIndex].tracks[trackIndex].courses.findIndex(c => c.id === courseId);
+    if (courseIndex === -1) {
+        throw new Error(`Course not found in its track during update.`);
+    }
+
+    // Explicitly update the object in the array by creating a new object
+    const originalCourse = allModules[moduleIndex].tracks[trackIndex].courses[courseIndex];
+    allModules[moduleIndex].tracks[trackIndex].courses[courseIndex] = {
+        ...originalCourse,
+        ...courseData
+    };
 
     return Promise.resolve();
 }
