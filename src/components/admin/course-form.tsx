@@ -1,8 +1,8 @@
 'use client';
 
 import type { Course, Module } from '@/lib/types';
-import { useFormStatus, useFormState as useActionState } from 'react-dom';
-import { useEffect } from 'react';
+import { useFormStatus } from 'react-dom';
+import { useEffect, useActionState } from 'react';
 import { saveCourse } from '@/actions/course-actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
