@@ -29,6 +29,18 @@ function SubmitButton({ isNew }: { isNew: boolean }) {
     );
 }
 
+// Helper function to format seconds into "hh:mm:ss"
+const formatSecondsToHHMMSS = (totalSeconds: number | undefined) => {
+    if (totalSeconds === undefined || totalSeconds === null || totalSeconds < 0) return '';
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    const pad = (num: number) => num.toString().padStart(2, '0');
+
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+};
+
 
 export function CourseForm({ course, modules }: CourseFormProps) {
   const isNew = course === null;
@@ -39,14 +51,13 @@ export function CourseForm({ course, modules }: CourseFormProps) {
   const [state, dispatch] = useActionState(saveCourse, initialState);
 
   useEffect(() => {
-    console.log("Form state changed:", state);
     if (state.success) {
       toast({
         title: "Sucesso!",
         description: state.message,
       });
       router.push('/admin/courses');
-    } else if (state.message && !state.success && state.errors) {
+    } else if (state.message && !state.success && state.errors && Object.keys(state.errors).length > 0) {
        toast({
         variant: "destructive",
         title: "Erro de Validação",
@@ -128,15 +139,15 @@ export function CourseForm({ course, modules }: CourseFormProps) {
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="durationInSeconds">Duração (segundos)</Label>
+        <Label htmlFor="duration">Duração (hh:mm:ss)</Label>
         <Input 
-          id="durationInSeconds" 
-          name="durationInSeconds"
-          type="number"
-          defaultValue={course?.durationInSeconds || ''}
-          placeholder="Ex: 300"
+          id="duration" 
+          name="duration"
+          type="text"
+          defaultValue={formatSecondsToHHMMSS(course?.durationInSeconds)}
+          placeholder="Ex: 00:05:00"
         />
-        {state.errors?.durationInSeconds && <p className="text-sm text-destructive">{state.errors.durationInSeconds[0]}</p>}
+        {state.errors?.duration && <p className="text-sm text-destructive">{state.errors.duration[0]}</p>}
       </div>
 
 

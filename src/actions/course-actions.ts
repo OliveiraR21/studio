@@ -10,7 +10,16 @@ const courseFormSchema = z.object({
   title: z.string().min(3, 'O título precisa ter pelo menos 3 caracteres.'),
   description: z.string().min(10, 'A descrição precisa ter pelo menos 10 caracteres.'),
   videoUrl: z.string().url('Por favor, insira uma URL válida.'),
-  durationInSeconds: z.coerce.number().int().positive().optional(),
+  duration: z.string().optional()
+    .refine((val) => {
+        if (!val || val.trim() === '') return true; // Allow empty string
+        return /^\d{1,2}:\d{2}:\d{2}$/.test(val);
+    }, { message: "Formato de duração inválido. Use hh:mm:ss." })
+    .refine((val) => {
+        if (!val || val.trim() === '') return true;
+        const parts = val.split(':').map(Number);
+        return parts[1] < 60 && parts[2] < 60;
+    }, { message: "Minutos e segundos devem ser menores que 60." }),
   trackId: z.string().optional(),
 }).refine(data => {
     // If id is not present (new course), trackId must be present.
@@ -27,11 +36,22 @@ export type CourseFormState = {
     title?: string[];
     description?: string[];
     videoUrl?: string[];
-    durationInSeconds?: string[];
+    duration?: string[];
     trackId?: string[];
   };
   success: boolean;
 };
+
+// Helper to convert 'hh:mm:ss' to seconds
+function timeStringToSeconds(timeString: string | null | undefined): number | undefined {
+  if (!timeString || timeString.trim() === '') return undefined;
+  const parts = timeString.split(':').map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) {
+    return undefined;
+  }
+  return (parts[0] * 3600) + (parts[1] * 60) + parts[2];
+}
+
 
 export async function saveCourse(
   prevState: CourseFormState,
@@ -43,7 +63,7 @@ export async function saveCourse(
     title: formData.get('title'),
     description: formData.get('description'),
     videoUrl: formData.get('videoUrl'),
-    durationInSeconds: formData.get('durationInSeconds') || undefined,
+    duration: formData.get('duration'),
     trackId: formData.get('trackId') || undefined,
   };
 
@@ -57,15 +77,21 @@ export async function saveCourse(
     };
   }
 
-  const { id, trackId, ...courseDetails } = validatedFields.data;
+  const { id, trackId, duration, ...courseDetails } = validatedFields.data;
+
+  const courseDataWithSeconds = {
+    ...courseDetails,
+    durationInSeconds: timeStringToSeconds(duration),
+  };
+
 
   try {
     if (id) {
       // For updates, we don't change the trackId, so it's not passed.
-      await updateCourse(id, courseDetails);
+      await updateCourse(id, courseDataWithSeconds);
     } else {
       // The schema refinement ensures trackId is present for new courses.
-      await createCourse({ trackId: trackId!, ...courseDetails });
+      await createCourse({ trackId: trackId!, ...courseDataWithSeconds });
     }
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
@@ -74,6 +100,7 @@ export async function saveCourse(
 
   revalidatePath('/admin/courses');
   revalidatePath('/admin/tracks');
+  revalidatePath('/dashboard');
   
   return { success: true, message: `Curso "${validatedFields.data.title}" salvo com sucesso!` };
 }
