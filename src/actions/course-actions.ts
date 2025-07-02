@@ -10,7 +10,7 @@ const courseFormSchema = z.object({
   title: z.string().min(3, 'O título precisa ter pelo menos 3 caracteres.'),
   description: z.string().min(10, 'A descrição precisa ter pelo menos 10 caracteres.'),
   videoUrl: z.string().url('Por favor, insira uma URL válida.'),
-  durationInMinutes: z.coerce.number().int().positive().optional(),
+  durationInSeconds: z.coerce.number().int().positive().optional(),
   trackId: z.string().optional(),
 }).refine(data => {
     // If id is not present (new course), trackId must be present.
@@ -27,7 +27,7 @@ export type CourseFormState = {
     title?: string[];
     description?: string[];
     videoUrl?: string[];
-    durationInMinutes?: string[];
+    durationInSeconds?: string[];
     trackId?: string[];
   };
   success: boolean;
@@ -43,7 +43,7 @@ export async function saveCourse(
     title: formData.get('title'),
     description: formData.get('description'),
     videoUrl: formData.get('videoUrl'),
-    durationInMinutes: formData.get('durationInMinutes') || undefined,
+    durationInSeconds: formData.get('durationInSeconds') || undefined,
     trackId: formData.get('trackId') || undefined,
   };
 

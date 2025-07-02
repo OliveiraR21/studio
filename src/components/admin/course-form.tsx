@@ -1,8 +1,8 @@
 'use client';
 
 import type { Course, Module } from '@/lib/types';
-import { useFormStatus } from 'react-dom';
-import { useActionState, useEffect } from 'react';
+import { useFormStatus, useFormState as useActionState } from 'react-dom';
+import { useEffect } from 'react';
 import { saveCourse } from '@/actions/course-actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -39,6 +39,7 @@ export function CourseForm({ course, modules }: CourseFormProps) {
   const [state, dispatch] = useActionState(saveCourse, initialState);
 
   useEffect(() => {
+    console.log("Form state changed:", state);
     if (state.success) {
       toast({
         title: "Sucesso!",
@@ -127,15 +128,15 @@ export function CourseForm({ course, modules }: CourseFormProps) {
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="durationInMinutes">Duração (minutos)</Label>
+        <Label htmlFor="durationInSeconds">Duração (segundos)</Label>
         <Input 
-          id="durationInMinutes" 
-          name="durationInMinutes"
+          id="durationInSeconds" 
+          name="durationInSeconds"
           type="number"
-          defaultValue={course?.durationInMinutes || ''}
-          placeholder="Ex: 15"
+          defaultValue={course?.durationInSeconds || ''}
+          placeholder="Ex: 300"
         />
-        {state.errors?.durationInMinutes && <p className="text-sm text-destructive">{state.errors.durationInMinutes[0]}</p>}
+        {state.errors?.durationInSeconds && <p className="text-sm text-destructive">{state.errors.durationInSeconds[0]}</p>}
       </div>
 
 

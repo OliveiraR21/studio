@@ -22,7 +22,7 @@ export interface Course {
   title: string;
   description: string;
   videoUrl: string;
-  durationInMinutes?: number;
+  durationInSeconds?: number;
   // A course can optionally have a quiz.
   quiz?: Quiz;
 }

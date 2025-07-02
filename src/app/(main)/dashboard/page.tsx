@@ -17,19 +17,16 @@ import { UserNotFound } from "@/components/layout/user-not-found";
 
 const PASSING_SCORE = 90;
 
-// Helper function to format minutes into "Xh Ym"
-const formatDuration = (totalMinutes: number) => {
-    if (!totalMinutes || totalMinutes === 0) return "0m";
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    let result = '';
-    if (hours > 0) {
-        result += `${hours}h `;
-    }
-    if (minutes > 0 || hours === 0) {
-        result += `${minutes}m`;
-    }
-    return result.trim();
+// Helper function to format seconds into "hh:mm:ss"
+const formatDuration = (totalSeconds: number) => {
+    if (!totalSeconds || totalSeconds < 0) totalSeconds = 0;
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    const pad = (num: number) => num.toString().padStart(2, '0');
+
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 };
 
 export default async function DashboardPage() {
@@ -75,9 +72,9 @@ export default async function DashboardPage() {
   const nextCourse = findNextCourseForUser(currentUser, learningModules);
 
   // Calculate training hours
-  const totalDuration = allCourses.reduce((acc, course) => acc + (course.durationInMinutes || 0), 0);
+  const totalDuration = allCourses.reduce((acc, course) => acc + (course.durationInSeconds || 0), 0);
   const completedCourses = allCourses.filter(course => currentUser.completedCourses.includes(course.id));
-  const completedDuration = completedCourses.reduce((acc, course) => acc + (course.durationInMinutes || 0), 0);
+  const completedDuration = completedCourses.reduce((acc, course) => acc + (course.durationInSeconds || 0), 0);
   const pendingDuration = totalDuration - completedDuration;
 
   return (

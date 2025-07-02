@@ -59,7 +59,7 @@ export function findNextCourseForUser(user: User, modules: Module[]): Course | n
 // --- Mutation Functions (Simulated) ---
 
 // Creates a course in-memory. The change persists for the lifetime of the dev server.
-export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; durationInMinutes?: number; }): Promise<Course> {
+export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; durationInSeconds?: number; }): Promise<Course> {
     console.log('Creating course in-memory:', courseData);
     
     let trackToUpdate: Track | undefined;
@@ -84,7 +84,7 @@ export async function createCourse(courseData: { trackId: string; title: string;
         title: courseData.title,
         description: courseData.description,
         videoUrl: courseData.videoUrl,
-        durationInMinutes: courseData.durationInMinutes || 0,
+        durationInSeconds: courseData.durationInSeconds || 0,
     };
 
     trackToUpdate.courses.push(newCourse);
