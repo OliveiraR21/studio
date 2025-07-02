@@ -14,6 +14,7 @@ import { User, Settings } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { User as UserType } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function UserNav() {
   const [user, setUser] = useState<UserType | null>(null);
@@ -29,7 +30,9 @@ export function UserNav() {
   }, [])
 
 
-  if (!user) return null;
+  if (!user) {
+    return <Skeleton className="h-9 w-9 rounded-full" />
+  }
 
   return (
     <DropdownMenu>
