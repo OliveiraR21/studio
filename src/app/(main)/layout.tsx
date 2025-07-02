@@ -94,7 +94,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <ThemeToggle />
           <UserNav />
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-muted/20">
+        <div className="p-4 lg:p-6 bg-muted/20">
           {children}
         </div>
       </SidebarInset>
