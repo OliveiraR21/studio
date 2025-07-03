@@ -149,7 +149,7 @@ export default async function DashboardPage() {
               </CardContent>
             </Card>
             
-            <Card className="flex flex-col bg-primary/10 border-primary/20">
+            <Card className="flex flex-col">
               <CardHeader>
                 <CardTitle>Acesso Rápido</CardTitle>
                 <CardDescription>
