@@ -1,4 +1,4 @@
-import type { User, Module, Track, Course } from './types';
+import type { User, Module, Track, Course, UserRole } from './types';
 import { learningModules as allModules, users as allUsers } from './mock-data';
 
 // --- Data Fetching Functions ---
@@ -124,4 +124,22 @@ export async function updateCourse(courseId: string, courseData: Partial<Omit<Co
     };
 
     return Promise.resolve();
+}
+
+
+// Creates a user in-memory. The change persists for the lifetime of the dev server.
+export async function createUser(userData: { name: string; email: string; role: UserRole; area?: string; supervisor?: string; coordenador?: string; gerente?: string; diretor?: string; }): Promise<User> {
+    const newUser: User = {
+        id: `user-${Date.now()}`,
+        avatarUrl: `https://placehold.co/100x100.png`,
+        completedCourses: [],
+        completedTracks: [],
+        courseScores: [],
+        trackScores: [],
+        ...userData
+    };
+
+    allUsers.push(newUser);
+
+    return Promise.resolve(newUser);
 }
