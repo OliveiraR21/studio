@@ -83,6 +83,8 @@ export async function createCourse(courseData: { trackId: string; title: string;
         description: courseData.description,
         videoUrl: courseData.videoUrl,
         durationInSeconds: courseData.durationInSeconds || 0,
+        likes: 0,
+        dislikes: 0,
     };
 
     trackToUpdate.courses.push(newCourse);

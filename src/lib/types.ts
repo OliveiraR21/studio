@@ -25,6 +25,8 @@ export interface Course {
   durationInSeconds?: number;
   // A course can optionally have a quiz.
   quiz?: Quiz;
+  likes?: number;
+  dislikes?: number;
 }
 
 export interface Quiz {

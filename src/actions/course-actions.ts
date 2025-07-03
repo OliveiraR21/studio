@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createCourse, updateCourse } from '@/lib/data-access';
+import { createCourse, updateCourse, findCourseById } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
 import type { Course, Quiz } from '@/lib/types';
 
@@ -123,4 +123,35 @@ export async function saveQuiz(courseId: string, quiz: Quiz): Promise<{ success:
   revalidatePath(`/admin/courses/${courseId}/edit`);
   
   return { success: true, message: 'Questionário salvo com sucesso!' };
+}
+
+export async function recordCourseFeedback(courseId: string, feedbackType: 'like' | 'dislike'): Promise<{ success: boolean; message: string }> {
+  if (!courseId) {
+    return { success: false, message: "ID do curso não fornecido." };
+  }
+
+  const result = findCourseById(courseId);
+  if (!result) {
+    return { success: false, message: `Curso com ID ${courseId} não encontrado.` };
+  }
+  const { course } = result;
+  
+  const currentLikes = course.likes || 0;
+  const currentDislikes = course.dislikes || 0;
+
+  const updateData = feedbackType === 'like' 
+    ? { likes: currentLikes + 1 }
+    : { dislikes: currentDislikes + 1 };
+
+  try {
+    await updateCourse(courseId, updateData);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
+    return { success: false, message: `Falha ao registrar o feedback: ${errorMessage}` };
+  }
+
+  revalidatePath(`/admin/courses`);
+  revalidatePath(`/courses/${courseId}`);
+  
+  return { success: true, message: 'Feedback registrado com sucesso!' };
 }

@@ -6,9 +6,10 @@ import { Quiz as QuizComponent } from "@/components/course/quiz";
 import { notFound, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, Lightbulb, Video, ThumbsUp, ThumbsDown, AlertCircle, CheckCircle } from "lucide-react";
+import { ArrowLeft, Lightbulb, Video, ThumbsUp, ThumbsDown, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import type { Course, Track } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { recordCourseFeedback } from "@/actions/course-actions";
 
 const PASSING_SCORE = 90;
 
@@ -25,6 +26,7 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
   const [quizFinished, setQuizFinished] = useState(false);
   const [lastScore, setLastScore] = useState<number | null>(null);
   const [completionStep, setCompletionStep] = useState<'in_progress' | 'awaiting_feedback' | 'feedback_given'>('in_progress');
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
 
   if (!course || !track) {
@@ -49,17 +51,30 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
     setCompletionStep('awaiting_feedback');
   };
 
-  const handleFeedbackSubmit = () => {
-    setCompletionStep('feedback_given');
-    toast({
-      title: "Obrigado!",
-      description: "Seu feedback foi registrado com sucesso.",
-    });
+  const handleCourseFeedback = async (feedbackType: 'like' | 'dislike') => {
+    if (isSubmittingFeedback) return;
+    setIsSubmittingFeedback(true);
 
-    // Redirect after a short delay
-    setTimeout(() => {
-      router.push('/dashboard');
-    }, 2000);
+    const result = await recordCourseFeedback(course.id, feedbackType);
+
+    if (result.success) {
+        setCompletionStep('feedback_given');
+        toast({
+            title: "Obrigado!",
+            description: "Seu feedback foi registrado com sucesso.",
+        });
+        // Redirect after a short delay
+        setTimeout(() => {
+            router.push('/dashboard');
+        }, 2000);
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Erro",
+            description: result.message,
+        });
+        setIsSubmittingFeedback(false);
+    }
   };
 
   const handleStartQuiz = () => {
@@ -135,10 +150,10 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
                   <CardDescription>Seu feedback é anônimo e nos ajuda a melhorar.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex justify-center gap-6">
-                  <Button variant="outline" size="icon" className="h-20 w-20" onClick={handleFeedbackSubmit}>
-                    <ThumbsUp className="h-10 w-10" />
+                  <Button variant="outline" size="icon" className="h-20 w-20" disabled={isSubmittingFeedback} onClick={() => handleCourseFeedback('like')}>
+                    {isSubmittingFeedback ? <Loader2 className="h-10 w-10 animate-spin" /> : <ThumbsUp className="h-10 w-10" />}
                   </Button>
-                  <Button variant="outline" size="icon" className="h-20 w-20" onClick={handleFeedbackSubmit}>
+                  <Button variant="outline" size="icon" className="h-20 w-20" disabled={isSubmittingFeedback} onClick={() => handleCourseFeedback('dislike')}>
                     <ThumbsDown className="h-10 w-10" />
                   </Button>
                 </CardContent>

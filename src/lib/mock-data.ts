@@ -154,7 +154,9 @@ export const learningModules: Module[] = [
             title: 'Treinamento Portal | BRS',
             description: 'Aprenda a navegar e utilizar o portal BRS para gerenciar o ciclo de pedidos de forma eficiente, desde a criação até o acompanhamento da entrega.',
             videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
-            durationInSeconds: 300
+            durationInSeconds: 300,
+            likes: 0,
+            dislikes: 0,
           }
         ],
         quiz: { questions: [] }
