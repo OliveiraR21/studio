@@ -158,7 +158,7 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent className="flex flex-1 flex-col justify-center">
                 {nextCourse ? (
-                    <Button asChild size="lg" className="font-semibold text-sm">
+                    <Button asChild size="lg" className="font-semibold text-xs">
                         <Link href={`/courses/${nextCourse.id}`}>
                             <Play className="mr-2 h-4 w-4"/>
                             Continuar de onde parou
