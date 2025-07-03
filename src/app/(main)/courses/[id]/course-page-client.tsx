@@ -5,11 +5,12 @@ import { CoursePlayer } from "@/components/course/course-player";
 import { Quiz as QuizComponent } from "@/components/course/quiz";
 import { notFound, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { ArrowLeft, Lightbulb, Video, ThumbsUp, ThumbsDown, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import type { Course, Track } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { recordCourseFeedback } from "@/actions/course-actions";
+import { Textarea } from "@/components/ui/textarea";
 
 const PASSING_SCORE = 90;
 
@@ -25,8 +26,9 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
   const [view, setView] = useState<'video' | 'quiz'>(course.quiz ? 'video' : 'video');
   const [quizFinished, setQuizFinished] = useState(false);
   const [lastScore, setLastScore] = useState<number | null>(null);
-  const [completionStep, setCompletionStep] = useState<'in_progress' | 'awaiting_feedback' | 'feedback_given'>('in_progress');
+  const [completionStep, setCompletionStep] = useState<'in_progress' | 'awaiting_feedback' | 'awaiting_dislike_reason' | 'feedback_given'>('in_progress');
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [feedbackText, setFeedbackText] = useState("");
 
 
   if (!course || !track) {
@@ -53,9 +55,16 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
 
   const handleCourseFeedback = async (feedbackType: 'like' | 'dislike') => {
     if (isSubmittingFeedback) return;
-    setIsSubmittingFeedback(true);
+    
+    // If dislike is clicked, show the feedback form instead of submitting
+    if (feedbackType === 'dislike') {
+        setCompletionStep('awaiting_dislike_reason');
+        return;
+    }
 
-    const result = await recordCourseFeedback(course.id, feedbackType);
+    // If 'like' is clicked, submit immediately
+    setIsSubmittingFeedback(true);
+    const result = await recordCourseFeedback(course.id, 'like');
 
     if (result.success) {
         setCompletionStep('feedback_given');
@@ -64,6 +73,31 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
             description: "Seu feedback foi registrado com sucesso.",
         });
         // Redirect after a short delay
+        setTimeout(() => {
+            router.push('/dashboard');
+        }, 2000);
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Erro",
+            description: result.message,
+        });
+        setIsSubmittingFeedback(false);
+    }
+  };
+  
+  const handleSubmitDislikeFeedback = async () => {
+    if (isSubmittingFeedback) return;
+    setIsSubmittingFeedback(true);
+    
+    const result = await recordCourseFeedback(course.id, 'dislike', feedbackText);
+
+    if (result.success) {
+        setCompletionStep('feedback_given');
+        toast({
+            title: "Obrigado!",
+            description: "Seu feedback foi registrado com sucesso.",
+        });
         setTimeout(() => {
             router.push('/dashboard');
         }, 2000);
@@ -159,6 +193,33 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
                 </CardContent>
               </Card>
             )}
+
+            {completionStep === 'awaiting_dislike_reason' && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Conte-nos mais</CardTitle>
+                  <CardDescription>
+                    Seu feedback nos ajuda a melhorar. O que podemos fazer diferente? (Opcional)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Textarea 
+                        placeholder="Descreva sua experiência..."
+                        value={feedbackText}
+                        onChange={(e) => setFeedbackText(e.target.value)}
+                        rows={4}
+                    />
+                </CardContent>
+                <CardFooter className="justify-end gap-2">
+                    <Button variant="ghost" onClick={() => setCompletionStep('awaiting_feedback')} disabled={isSubmittingFeedback}>Voltar</Button>
+                    <Button onClick={handleSubmitDislikeFeedback} disabled={isSubmittingFeedback}>
+                        {isSubmittingFeedback && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Enviar Feedback
+                    </Button>
+                </CardFooter>
+              </Card>
+            )}
+
 
             {completionStep === 'feedback_given' && (
               <Card className="flex flex-col items-center justify-center text-center p-8 bg-green-500/10 border-green-500/20">

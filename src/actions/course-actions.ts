@@ -49,7 +49,7 @@ function timeStringToSeconds(timeString: string | null | undefined): number | un
   if (parts.length !== 3 || parts.some(isNaN)) {
     return undefined;
   }
-  return (parts[0] * 3600) + (parts[1] * 60) + parts[2];
+  return (parts[0] * 3600) + (parts[1] * 60) + (parts[2]);
 }
 
 
@@ -125,7 +125,11 @@ export async function saveQuiz(courseId: string, quiz: Quiz): Promise<{ success:
   return { success: true, message: 'Questionário salvo com sucesso!' };
 }
 
-export async function recordCourseFeedback(courseId: string, feedbackType: 'like' | 'dislike'): Promise<{ success: boolean; message: string }> {
+export async function recordCourseFeedback(
+  courseId: string, 
+  feedbackType: 'like' | 'dislike',
+  feedbackText?: string
+): Promise<{ success: boolean; message: string }> {
   if (!courseId) {
     return { success: false, message: "ID do curso não fornecido." };
   }
@@ -145,6 +149,12 @@ export async function recordCourseFeedback(courseId: string, feedbackType: 'like
 
   try {
     await updateCourse(courseId, updateData);
+    if (feedbackType === 'dislike' && feedbackText && feedbackText.trim() !== '') {
+        // In a real application, you'd save this to a database.
+        // For this simulation, we'll just log it to the server console.
+        console.log(`\n[Feedback Recebido] Curso ID: ${courseId}`);
+        console.log(`Motivo: "${feedbackText}"\n`);
+    }
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
     return { success: false, message: `Falha ao registrar o feedback: ${errorMessage}` };
