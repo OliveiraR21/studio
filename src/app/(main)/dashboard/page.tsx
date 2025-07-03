@@ -129,7 +129,7 @@ export default async function DashboardPage() {
               </CardHeader>
               <CardContent className="flex flex-1 flex-col justify-between p-6">
                   <div className="text-center">
-                      <div className="text-4xl font-bold tracking-tighter">{currentUser.completedTracks.length}</div>
+                      <div className="text-5xl font-bold tracking-tighter">{currentUser.completedTracks.length}</div>
                       <p className="text-sm text-muted-foreground">
                         de {learningModules.flatMap(m => m.tracks).length} no total
                       </p>
