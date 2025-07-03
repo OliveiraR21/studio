@@ -156,14 +156,16 @@ export default async function DashboardPage() {
                   Continue sua jornada de aprendizado.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex flex-1 flex-col items-center justify-center">
+              <CardContent className="flex flex-1 flex-col justify-center">
                 {nextCourse ? (
-                    <Button asChild size="lg">
-                        <Link href={`/courses/${nextCourse.id}`}>
-                            <Play className="mr-2 h-5 w-5"/>
-                            Continuar de onde parou
-                        </Link>
-                    </Button>
+                    <div className="flex justify-center">
+                        <Button asChild size="lg">
+                            <Link href={`/courses/${nextCourse.id}`}>
+                                <Play className="mr-2 h-5 w-5"/>
+                                Continuar de onde parou
+                            </Link>
+                        </Button>
+                    </div>
                 ) : (
                     <div className="text-center">
                         <Trophy className="h-10 w-10 text-amber-500 mx-auto mb-2" />
