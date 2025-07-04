@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { QuizGenerator } from "@/components/admin/quiz-generator";
 import type { Course, Module } from "@/lib/types";
+import { QuizViewer } from "@/components/admin/quiz-viewer";
 
 export default async function EditCoursePage({ params }: { params: { id: string } }) {
   const isNew = params.id === 'new';
@@ -45,11 +46,16 @@ export default async function EditCoursePage({ params }: { params: { id: string 
         </CardContent>
       </Card>
 
+      {!isNew && course?.quiz && (
+        <QuizViewer quiz={course.quiz} courseTitle={course.title!} />
+      )}
+
       {!isNew && course && (
         <QuizGenerator 
             courseId={course.id}
             title={course.title}
-            description={course.description} 
+            description={course.description}
+            hasExistingQuiz={!!course.quiz} 
         />
       )}
     </div>

@@ -19,15 +19,18 @@ import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useRouter } from 'next/navigation';
 
 interface QuizGeneratorProps {
   courseId: string;
   title: string;
   description: string;
+  hasExistingQuiz: boolean;
 }
 
-export function QuizGenerator({ courseId, title, description }: QuizGeneratorProps) {
+export function QuizGenerator({ courseId, title, description, hasExistingQuiz }: QuizGeneratorProps) {
   const { toast } = useToast();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
@@ -70,6 +73,8 @@ export function QuizGenerator({ courseId, title, description }: QuizGeneratorPro
           title: "Sucesso!",
           description: result.message,
         });
+        setGeneratedQuiz(null); // Clear the generated form
+        router.refresh(); // Refresh the page to show the saved quiz
       } else {
         toast({
           variant: "destructive",
@@ -98,7 +103,10 @@ export function QuizGenerator({ courseId, title, description }: QuizGeneratorPro
             <div>
                 <CardTitle>Gerador de Questionário com IA</CardTitle>
                 <CardDescription>
-                Crie um questionário automaticamente com base no título e descrição do curso, ou forneça uma transcrição para maior precisão.
+                  {hasExistingQuiz
+                    ? 'Gere um novo questionário para substituir o existente. '
+                    : 'Crie um questionário automaticamente com base nos detalhes do curso. '}
+                  Forneça uma transcrição para maior precisão.
                 </CardDescription>
             </div>
         </div>
@@ -127,7 +135,7 @@ export function QuizGenerator({ courseId, title, description }: QuizGeneratorPro
                 </div>
                 <Button onClick={handleGenerate} className="mt-4">
                     <Wand2 className="mr-2 h-4 w-4" />
-                    Gerar Questionário
+                    {hasExistingQuiz ? 'Gerar Novo Questionário' : 'Gerar Questionário'}
                 </Button>
             </div>
         )}
