@@ -2,44 +2,33 @@ import type { User, Module, Track, Course, UserRole } from './types';
 import { learningModules as initialModules, users as initialUsers } from './mock-data';
 
 // --- In-Memory Data Store for Development ---
-// The mock data is now loaded fresh on each hot-reload to ensure changes
-// in mock-data.ts are always reflected immediately.
-let allUsers: User[] = [];
-let allModules: Module[] = [];
-
-function loadData() {
-    allUsers = JSON.parse(JSON.stringify(initialUsers));
-    allModules = JSON.parse(JSON.stringify(initialModules));
-}
-
-// Initial data load
-loadData();
+// IMPORTANT: This is an in-memory data store.
+// Mutations (create, update) will persist only until the development server is restarted.
+// Changes made directly to `src/lib/mock-data.ts` will also require a server restart to be reflected.
+let allUsers: User[] = JSON.parse(JSON.stringify(initialUsers));
+let allModules: Module[] = JSON.parse(JSON.stringify(initialModules));
 
 
 // --- Data Fetching Functions ---
 
 // Fetch all learning modules and their nested tracks/courses from mock data
 export async function getLearningModules(): Promise<Module[]> {
-    loadData();
     return Promise.resolve(allModules);
 }
 
 // Fetch all users from mock data
 export async function getUsers(): Promise<User[]> {
-    loadData();
     return Promise.resolve(allUsers);
 }
 
 // Fetch a single user by ID from mock data
 export async function getUserById(userId: string): Promise<User | null> {
-    loadData();
     const user = allUsers.find(u => u.id === userId);
     return Promise.resolve(user || null);
 }
 
 // Fetch a single user by Email from mock data
 export async function findUserByEmail(email: string): Promise<User | null> {
-    loadData();
     const user = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
     return Promise.resolve(user || null);
 }
@@ -61,7 +50,7 @@ export function findCourseById(courseId: string, modules?: Module[]): { course: 
 
 // Find a course and its parent track by the course ID
 export async function findCourseByIdWithTrack(courseId: string): Promise<{ course: Course, track: Track } | null> {
-    const result = findCourseById(courseId);
+    const result = findCourseById(courseId, allModules);
     if (result) {
         return { course: result.course, track: result.track };
     }
