@@ -129,6 +129,44 @@ export const users: User[] = [
 
 export const learningModules: Module[] = [
   {
+    id: 'module-integration',
+    title: 'Integração',
+    description: 'Vídeos de integração para novos colaboradores da Br Supply.',
+    tracks: [
+      {
+        id: 'track-integration-main',
+        moduleId: 'module-integration',
+        title: 'Integração de Novos Colaboradores',
+        description: 'Conheça a cultura e os processos comerciais da Br Supply.',
+        courses: [
+          {
+            id: 'course-culture-intro',
+            moduleId: 'module-integration',
+            trackId: 'track-integration-main',
+            title: 'Apresentação Cultura Br Supply',
+            description: 'Uma introdução à cultura, valores e missão da Br Supply.',
+            videoUrl: 'https://app.heygen.com/embeds/603bafc3779141ec87c7eb529ce6452d',
+            durationInSeconds: 180,
+            likes: 0,
+            dislikes: 0,
+          },
+          {
+            id: 'course-commercial-intro',
+            moduleId: 'module-integration',
+            trackId: 'track-integration-main',
+            title: 'Integração Comercial',
+            description: 'Visão geral dos processos e estratégias da área comercial.',
+            videoUrl: 'https://app.heygen.com/embeds/4a2fc4bc9d834679afa3a4c046731c2a',
+            durationInSeconds: 180,
+            likes: 0,
+            dislikes: 0,
+          },
+        ],
+        quiz: { questions: [] }
+      },
+    ]
+  },
+  {
     id: 'module-hs',
     title: 'Hard Skills',
     description: 'Desenvolva competências técnicas e operacionais essenciais para sua função.',
