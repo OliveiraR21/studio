@@ -49,12 +49,19 @@ export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps)
       <CardFooter className="p-4 pt-0">
          <div className="flex justify-between items-center w-full">
             {course.quiz ? <Badge variant="outline">Prova</Badge> : <div />}
-            <Button size="sm" asChild disabled={!isUnlocked}>
-                <Link href={`/courses/${course.id}`}>
-                    <Play className="mr-2 h-4 w-4"/>
-                    {isCompleted ? 'Revisar' : 'Iniciar'}
-                </Link>
-            </Button>
+            {isUnlocked ? (
+                <Button size="sm" asChild>
+                    <Link href={`/courses/${course.id}`}>
+                        <Play className="mr-2 h-4 w-4"/>
+                        {isCompleted ? 'Revisar' : 'Iniciar'}
+                    </Link>
+                </Button>
+            ) : (
+                <Button size="sm" disabled>
+                    <Lock className="mr-2 h-4 w-4"/>
+                    Bloqueado
+                </Button>
+            )}
          </div>
       </CardFooter>
     </Card>

@@ -16,12 +16,6 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'www.brsupply.com.br',
-        port: '',
-        pathname: '/**',
-      }
     ],
   },
 };
