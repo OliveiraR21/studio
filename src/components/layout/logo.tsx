@@ -9,7 +9,7 @@ export function Logo() {
     >
       <BookOpen className="h-6 w-6 shrink-0 text-primary" />
       <span className="truncate group-data-[collapsible=icon]:hidden">
-        Br Supply Academia
+        <span className="text-primary">Br</span> Supply | Academia
       </span>
     </Link>
   );
