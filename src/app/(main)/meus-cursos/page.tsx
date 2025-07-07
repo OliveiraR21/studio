@@ -49,19 +49,10 @@ export default async function MyCoursesPage() {
 
   const isCourseUnlocked = (course: Course, isParentTrackUnlocked: boolean, previousCourse?: Course) => {
     if (!isParentTrackUnlocked) return false;
-    if (!previousCourse) return true; // First course in a track is always unlocked.
+    if (!previousCourse) return true; // First course in a track is unlocked if the track is.
     
-    const isPreviousCourseCompleted = isCourseCompleted(previousCourse.id);
-    if (isPreviousCourseCompleted) return true;
-
-    // If previous course had a quiz, check score.
-    if (previousCourse.quiz) {
-      const previousCourseScore = currentUser.courseScores?.find(s => s.courseId === previousCourse.id)?.score ?? 0;
-      return previousCourseScore >= PASSING_SCORE;
-    }
-    
-    // If no quiz, just being marked complete is enough (handled above)
-    return isPreviousCourseCompleted;
+    // The single source of truth is whether the previous course is in the completed list.
+    return isCourseCompleted(previousCourse.id);
   }
 
   return (

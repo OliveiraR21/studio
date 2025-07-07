@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createCourse, updateCourse, findCourseById } from '@/lib/data-access';
+import { createCourse, updateCourse, findCourseById, getUserById, updateUser } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
 import type { Course, Quiz } from '@/lib/types';
 
@@ -164,4 +164,34 @@ export async function recordCourseFeedback(
   revalidatePath(`/courses/${courseId}`);
   
   return { success: true, message: 'Feedback registrado com sucesso!' };
+}
+
+export async function completeCourseForUser(
+  courseId: string
+): Promise<{ success: boolean; message: string }> {
+  // In a real app, this would come from a secure session.
+  const userId = '1'; 
+  
+  try {
+    const user = await getUserById(userId);
+    if (!user) {
+      throw new Error(`Usuário com ID ${userId} não encontrado.`);
+    }
+
+    if (!user.completedCourses.includes(courseId)) {
+        const updatedCompletedCourses = [...user.completedCourses, courseId];
+        await updateUser(userId, { completedCourses: updatedCompletedCourses });
+    }
+
+    // Revalidate all paths where progress is shown
+    revalidatePath('/dashboard');
+    revalidatePath('/meus-cursos');
+    revalidatePath(`/courses/${courseId}`);
+
+    return { success: true, message: "Progresso salvo com sucesso!" };
+
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
+    return { success: false, message: `Falha ao salvar progresso: ${errorMessage}` };
+  }
 }

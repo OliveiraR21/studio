@@ -143,3 +143,20 @@ export async function createUser(userData: { name: string; email: string; role: 
 
     return Promise.resolve(newUser);
 }
+
+// Updates a user in-memory. The change persists for the lifetime of the dev server.
+export async function updateUser(userId: string, userData: Partial<Omit<User, 'id'>>): Promise<User> {
+    const userIndex = allUsers.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
+        throw new Error(`User with ID ${userId} not found for update.`);
+    }
+
+    const updatedUser = {
+        ...allUsers[userIndex],
+        ...userData
+    };
+
+    allUsers[userIndex] = updatedUser;
+
+    return Promise.resolve(updatedUser);
+}

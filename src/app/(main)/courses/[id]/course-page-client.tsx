@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { ArrowLeft, Lightbulb, Video, ThumbsUp, ThumbsDown, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import type { Course, Track } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { recordCourseFeedback } from "@/actions/course-actions";
+import { recordCourseFeedback, completeCourseForUser } from "@/actions/course-actions";
 import { Textarea } from "@/components/ui/textarea";
 
 const PASSING_SCORE = 90;
@@ -40,7 +40,7 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
     
     if (score >= PASSING_SCORE) {
       setQuizFinished(true);
-      // In a real app, you would also mark the course as "completed" in the user's progress.
+      // User must now click "Finalizar Curso" to proceed to feedback and completion.
       console.log(`Quiz for course ${course.id} passed. Awaiting feedback.`);
     } else {
       setQuizFinished(false);
@@ -62,25 +62,26 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
         return;
     }
 
-    // If 'like' is clicked, submit immediately
     setIsSubmittingFeedback(true);
-    const result = await recordCourseFeedback(course.id, 'like');
+    // Bundle completion and feedback recording
+    const completionResult = await completeCourseForUser(course.id);
+    const feedbackResult = await recordCourseFeedback(course.id, 'like');
 
-    if (result.success) {
+    if (completionResult.success && feedbackResult.success) {
         setCompletionStep('feedback_given');
         toast({
             title: "Obrigado!",
-            description: "Seu feedback foi registrado com sucesso.",
+            description: "Seu progresso e feedback foram registrados com sucesso.",
         });
-        // Redirect after a short delay
+        // Redirect to the course list to see unlocked content
         setTimeout(() => {
-            router.push('/dashboard');
+            router.push('/meus-cursos');
         }, 2000);
     } else {
         toast({
             variant: "destructive",
             title: "Erro",
-            description: result.message,
+            description: !completionResult.success ? completionResult.message : feedbackResult.message,
         });
         setIsSubmittingFeedback(false);
     }
@@ -90,22 +91,24 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
     if (isSubmittingFeedback) return;
     setIsSubmittingFeedback(true);
     
-    const result = await recordCourseFeedback(course.id, 'dislike', feedbackText);
+    // Bundle completion and feedback recording
+    const completionResult = await completeCourseForUser(course.id);
+    const feedbackResult = await recordCourseFeedback(course.id, 'dislike', feedbackText);
 
-    if (result.success) {
+    if (completionResult.success && feedbackResult.success) {
         setCompletionStep('feedback_given');
         toast({
             title: "Obrigado!",
-            description: "Seu feedback foi registrado com sucesso.",
+            description: "Seu progresso e feedback foram registrados com sucesso.",
         });
         setTimeout(() => {
-            router.push('/dashboard');
+            router.push('/meus-cursos');
         }, 2000);
     } else {
         toast({
             variant: "destructive",
             title: "Erro",
-            description: result.message,
+            description: !completionResult.success ? completionResult.message : feedbackResult.message,
         });
         setIsSubmittingFeedback(false);
     }
