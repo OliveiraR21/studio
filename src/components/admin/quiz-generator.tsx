@@ -50,11 +50,14 @@ export function QuizGenerator({ courseId, title, description, hasExistingQuiz }:
       });
     } catch (error) {
       console.error('AI quiz generation failed:', error);
+      let description = 'Não foi possível gerar o questionário. Tente novamente.';
+      if (error instanceof Error && (error.message.includes('503') || error.message.toLowerCase().includes('overloaded'))) {
+        description = 'O serviço de IA está sobrecarregado no momento. Por favor, aguarde alguns instantes e tente novamente.';
+      }
       toast({
         variant: 'destructive',
-        title: 'Ocorreu um erro',
-        description:
-          'Não foi possível gerar o questionário. Tente novamente.',
+        title: 'Ocorreu um erro na Geração',
+        description: description,
       });
     } finally {
       setIsLoading(false);
