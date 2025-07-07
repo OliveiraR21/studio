@@ -248,6 +248,20 @@ export function CourseForm({ course, modules }: CourseFormProps) {
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor="thumbnailUrl">URL da Capa (Opcional)</Label>
+        <Input
+          id="thumbnailUrl"
+          name="thumbnailUrl"
+          type="url"
+          defaultValue={course?.thumbnailUrl || ''}
+          placeholder="https://exemplo.com/imagem-da-capa.png"
+        />
+        {state.errors?.thumbnailUrl && (
+          <p className="text-sm text-destructive">{state.errors.thumbnailUrl[0]}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="duration">Duração (hh:mm:ss)</Label>
         <Input
           id="duration"

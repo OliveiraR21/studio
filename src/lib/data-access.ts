@@ -80,7 +80,7 @@ export function findNextCourseForUser(user: User, modules: Module[]): Course | n
 // --- Mutation Functions (Simulated) ---
 
 // Creates a course in-memory. The change persists for the lifetime of the dev server.
-export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; durationInSeconds?: number; }): Promise<Course> {
+export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; thumbnailUrl?: string; durationInSeconds?: number; }): Promise<Course> {
     let trackToUpdate: Track | undefined;
     let moduleToUpdate: Module | undefined;
 
@@ -103,6 +103,7 @@ export async function createCourse(courseData: { trackId: string; title: string;
         title: courseData.title,
         description: courseData.description,
         videoUrl: courseData.videoUrl,
+        thumbnailUrl: courseData.thumbnailUrl,
         durationInSeconds: courseData.durationInSeconds || 0,
         likes: 0,
         dislikes: 0,

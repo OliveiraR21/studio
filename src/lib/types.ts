@@ -22,6 +22,7 @@ export interface Course {
   title: string;
   description: string;
   videoUrl: string;
+  thumbnailUrl?: string;
   durationInSeconds?: number;
   // A course can optionally have a quiz.
   quiz?: Quiz;

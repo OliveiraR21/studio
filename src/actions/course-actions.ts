@@ -10,6 +10,7 @@ const courseFormSchema = z.object({
   title: z.string().min(3, 'O título precisa ter pelo menos 3 caracteres.'),
   description: z.string().min(10, 'A descrição precisa ter pelo menos 10 caracteres.'),
   videoUrl: z.string().url('Por favor, insira uma URL válida.'),
+  thumbnailUrl: z.string().url('Por favor, insira uma URL de capa válida.').optional().or(z.literal('')),
   duration: z.string().optional()
     .refine((val) => {
         if (!val || val.trim() === '') return true; // Allow empty string
@@ -36,6 +37,7 @@ export type CourseFormState = {
     title?: string[];
     description?: string[];
     videoUrl?: string[];
+    thumbnailUrl?: string[];
     duration?: string[];
     trackId?: string[];
   };
@@ -63,6 +65,7 @@ export async function saveCourse(
     title: formData.get('title'),
     description: formData.get('description'),
     videoUrl: formData.get('videoUrl'),
+    thumbnailUrl: formData.get('thumbnailUrl'),
     duration: formData.get('duration'),
     trackId: formData.get('trackId') || undefined,
   };
@@ -101,6 +104,7 @@ export async function saveCourse(
   revalidatePath('/admin/courses');
   revalidatePath('/admin/tracks');
   revalidatePath('/dashboard');
+  revalidatePath('/meus-cursos');
   
   return { success: true, message: `Curso "${validatedFields.data.title}" salvo com sucesso!` };
 }
