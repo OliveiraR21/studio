@@ -21,7 +21,7 @@ export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps)
           <img
             src={course.thumbnailUrl || "https://placehold.co/600x400.png"}
             alt={course.title}
-            className={`w-full h-full object-cover transition-transform duration-300 ease-in-out ${isUnlocked ? 'group-hover:scale-105' : ''} ${!isUnlocked ? 'grayscale' : ''}`}
+            className={`w-full h-full object-contain p-4 transition-transform duration-300 ease-in-out ${isUnlocked ? 'group-hover:scale-105' : ''} ${!isUnlocked ? 'grayscale' : ''}`}
             data-ai-hint="course thumbnail"
           />
           {!isUnlocked && (
