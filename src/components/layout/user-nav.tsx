@@ -15,15 +15,16 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { User as UserType } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SIMULATED_USER_ID } from "@/lib/auth";
 
 export function UserNav() {
   const [user, setUser] = useState<UserType | null>(null);
 
   useEffect(() => {
-    // In a real app, user ID would come from an auth session.
-    // We simulate fetching the Admin user.
+    // In a real app, user ID would come from a secure session.
+    // For the prototype, we use a simulated user ID from a central file.
     async function fetchUser() {
-      const fetchedUser = await getUserById('1');
+      const fetchedUser = await getUserById(SIMULATED_USER_ID);
       setUser(fetchedUser);
     }
     fetchUser();

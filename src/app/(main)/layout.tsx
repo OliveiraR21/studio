@@ -9,6 +9,7 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 import { Logo } from '@/components/layout/logo';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
@@ -25,11 +26,22 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import type { UserRole } from '@/lib/types';
+import { getUserById } from '@/lib/data-access';
+import { SIMULATED_USER_ID } from '@/lib/auth';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  // In a real app, user role would come from an auth session.
-  // We simulate an 'Admin' to show all navigation items.
-  const userRole = 'Admin';
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+
+  useEffect(() => {
+    async function fetchUserRole() {
+      // In a real app, user role would come from a secure session.
+      // Here, we simulate it by fetching the user based on a predefined ID.
+      const user = await getUserById(SIMULATED_USER_ID);
+      setUserRole(user?.role || null);
+    }
+    fetchUserRole();
+  }, []);
 
   const baseNavItems = [
     { href: '/dashboard', icon: Home, label: 'Meu Painel' },
@@ -52,15 +64,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const allNavItems = [...baseNavItems];
 
   // Add "Minha Equipe" for managers and admin
-  if (managerRoles.includes(userRole) || userRole === 'Admin') {
+  if (userRole && (managerRoles.includes(userRole) || userRole === 'Admin')) {
     allNavItems.push(teamNavItem);
   }
 
   // Add Admin items only for Admin
-  if (userRole === 'Admin') {
+  if (userRole && userRole === 'Admin') {
     allNavItems.push(...adminNavItems);
   }
 
+  // Render a null state or a loading skeleton while the user role is being determined.
+  // This prevents a flash of incorrect navigation items.
+  if (!userRole) {
+    return null;
+  }
+  
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">

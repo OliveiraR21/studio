@@ -4,10 +4,12 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { getUserById } from "@/lib/data-access";
 import { User as UserIcon, Mail, Briefcase, Building2 } from "lucide-react";
 import { UserNotFound } from "@/components/layout/user-not-found";
+import { SIMULATED_USER_ID } from "@/lib/auth";
 
 export default async function ProfilePage() {
   // In a real app, this would be the logged-in user from a session.
-  const currentUser = await getUserById('1'); // Simulating Admin login
+  // For the prototype, we use a simulated user ID from a central file.
+  const currentUser = await getUserById(SIMULATED_USER_ID);
 
   if (!currentUser) {
     return <UserNotFound />;

@@ -14,6 +14,7 @@ import type { Track, Course } from "@/lib/types";
 import { ProgressChart } from "@/components/dashboard/progress-chart";
 import { Separator } from "@/components/ui/separator";
 import { UserNotFound } from "@/components/layout/user-not-found";
+import { SIMULATED_USER_ID } from "@/lib/auth";
 
 const PASSING_SCORE = 90;
 
@@ -31,8 +32,9 @@ const formatDuration = (totalSeconds: number) => {
 
 export default async function DashboardPage() {
   // In a real app, this would be the logged-in user from a session.
+  // For the prototype, we use a simulated user ID from a central file.
   const allUsers = await getUsers();
-  const currentUser = allUsers.find(u => u.id === '1'); // Simulating Admin login
+  const currentUser = allUsers.find(u => u.id === SIMULATED_USER_ID); 
   const learningModules = await getLearningModules();
 
   if (!currentUser) {
