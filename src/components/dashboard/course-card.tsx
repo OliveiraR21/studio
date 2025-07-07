@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,12 +18,10 @@ export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps)
     >
       <CardHeader className="p-0">
         <div className="relative w-full h-40 overflow-hidden">
-          <Image
+          <img
             src={course.thumbnailUrl || "https://placehold.co/600x400.png"}
             alt={course.title}
-            fill
-            unoptimized={true}
-            className={`object-cover transition-transform duration-300 ease-in-out ${isUnlocked ? 'group-hover:scale-105' : ''} ${!isUnlocked ? 'grayscale' : ''}`}
+            className={`w-full h-full object-cover transition-transform duration-300 ease-in-out ${isUnlocked ? 'group-hover:scale-105' : ''} ${!isUnlocked ? 'grayscale' : ''}`}
             data-ai-hint="course thumbnail"
           />
           {!isUnlocked && (
