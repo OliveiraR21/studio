@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { createCourse, updateCourse, findCourseById, getUserById, updateUser } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
 import type { Course, Quiz } from '@/lib/types';
-import { SIMULATED_USER_ID } from '@/lib/auth';
+import { getSimulatedUserId } from '@/lib/auth';
 
 const courseFormSchema = z.object({
   id: z.string().optional(),
@@ -175,7 +175,7 @@ export async function completeCourseForUser(
   courseId: string
 ): Promise<{ success: boolean; message: string }> {
   // Use the simulated user ID for the prototype.
-  const userId = SIMULATED_USER_ID; 
+  const userId = getSimulatedUserId(); 
   
   try {
     const user = await getUserById(userId);
