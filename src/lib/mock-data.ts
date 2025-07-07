@@ -159,6 +159,25 @@ export const learningModules: Module[] = [
             durationInSeconds: 180,
             likes: 0,
             dislikes: 0,
+            quiz: {
+              questions: [
+                {
+                  text: "Qual é um dos principais valores da Br Supply mencionados na apresentação?",
+                  options: ["Inovação", "Individualismo", "Burocracia", "Estagnação"],
+                  correctAnswer: "Inovação"
+                },
+                {
+                  text: "Qual é a missão principal da Br Supply?",
+                  options: ["Vender o máximo possível", "Simplificar o processo de compras corporativas", "Ser a maior empresa do setor", "Apenas distribuir produtos"],
+                  correctAnswer: "Simplificar o processo de compras corporativas"
+                },
+                {
+                  text: "O que a cultura da Br Supply mais valoriza em seus colaboradores?",
+                  options: ["Seguir ordens sem questionar", "Proatividade e colaboração", "Competição interna", "Trabalho isolado"],
+                  correctAnswer: "Proatividade e colaboração"
+                }
+              ]
+            }
           },
           {
             id: 'course-commercial-intro',
