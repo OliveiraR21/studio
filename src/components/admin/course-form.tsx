@@ -115,7 +115,7 @@ export function CourseForm({ course, modules }: CourseFormProps) {
   return (
     <form action={dispatch} className="space-y-6">
       {!isNew && <input type="hidden" name="id" value={course.id} />}
-      {isNew && <input type="hidden" name="trackId" value={selectedTrackId} />}
+      {isNew && <input type="hidden" name="trackId" value={selectedTrackId || ''} />}
 
       {isNew && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
