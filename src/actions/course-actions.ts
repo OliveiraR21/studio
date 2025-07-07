@@ -126,6 +126,7 @@ export async function saveQuiz(courseId: string, quiz: Quiz): Promise<{ success:
   // Revalidate paths to ensure the UI updates with the new quiz data
   revalidatePath(`/admin/courses`);
   revalidatePath(`/admin/courses/${courseId}/edit`);
+  revalidatePath(`/courses/${courseId}`);
   
   return { success: true, message: 'Questionário salvo com sucesso!' };
 }
