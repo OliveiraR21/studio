@@ -12,10 +12,8 @@ export default async function CoursePage({ params }: { params: { id: string } })
   }
 
   const { course, track } = result;
-  
-  // A simple way to pass data to client components without serializing complex types
-  const coursePlain = JSON.parse(JSON.stringify(course));
-  const trackPlain = JSON.parse(JSON.stringify(track));
 
-  return <CoursePageClient course={coursePlain} track={trackPlain} />;
+  // By passing the raw data objects, we ensure Next.js handles serialization
+  // correctly on each dynamic render, preventing stale data from being shown.
+  return <CoursePageClient course={course} track={track} />;
 }
