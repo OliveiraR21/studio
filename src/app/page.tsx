@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,10 +24,22 @@ export default function LoginPage() {
     <div className="w-full min-h-screen flex items-center justify-center bg-background p-4">
       <div className="mx-auto grid w-[380px] gap-6">
         <div className="grid gap-2 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">Br Supply Academy</h1>
-          </div>
+            <div className="flex justify-center mb-4">
+                {/* Light mode logo */}
+                <img
+                    src="/BrSupply.png"
+                    alt="Br Supply Academy Logo"
+                    className="h-12 block dark:hidden"
+                    data-ai-hint="logo"
+                />
+                {/* Dark mode logo */}
+                <img
+                    src="/br-supply-logo.png"
+                    alt="Br Supply Academy Logo"
+                    className="h-12 hidden dark:block"
+                    data-ai-hint="logo"
+                />
+            </div>
         </div>
         <Card>
           <CardHeader>
