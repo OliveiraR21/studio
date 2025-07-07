@@ -9,6 +9,8 @@ import { QuizGenerator } from "@/components/admin/quiz-generator";
 import type { Course, Module } from "@/lib/types";
 import { QuizViewer } from "@/components/admin/quiz-viewer";
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditCoursePage({ params }: { params: { id: string } }) {
   const isNew = params.id === 'new';
   let course: Course | null = null;
