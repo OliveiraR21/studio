@@ -9,6 +9,8 @@ const userFormSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(3, 'O nome precisa ter pelo menos 3 caracteres.'),
   email: z.string().email('Por favor, insira um e-mail válido.'),
+  password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres.'),
+  confirmPassword: z.string(),
   role: z.enum(['Admin', 'Diretor', 'Gerente', 'Coordenador', 'Supervisor', 'Analista', 'Assistente'], {
     errorMap: () => ({ message: "Por favor, selecione um cargo válido." })
   }),
@@ -18,6 +20,9 @@ const userFormSchema = z.object({
   gerente: z.string().optional(),
   diretor: z.string().optional(),
   avatarUrl: z.string().url().optional(),
+}).refine(data => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
 });
 
 
@@ -26,6 +31,8 @@ export type UserFormState = {
   errors?: {
     name?: string[];
     email?: string[];
+    password?: string[];
+    confirmPassword?: string[];
     role?: string[];
     area?: string[];
   };
@@ -38,16 +45,7 @@ export async function saveUser(
   formData: FormData
 ): Promise<UserFormState> {
     
-  const rawData = {
-    name: formData.get('name'),
-    email: formData.get('email'),
-    role: formData.get('role'),
-    area: formData.get('area'),
-    supervisor: formData.get('supervisor'),
-    coordenador: formData.get('coordenador'),
-    gerente: formData.get('gerente'),
-    diretor: formData.get('diretor'),
-  };
+  const rawData = Object.fromEntries(formData.entries());
 
   const validatedFields = userFormSchema.safeParse(rawData);
 
@@ -60,8 +58,9 @@ export async function saveUser(
   }
   
   try {
+    const { confirmPassword, ...userData } = validatedFields.data;
     // For now, we only support creation. id check would go here.
-    await createUser(validatedFields.data);
+    await createUser(userData);
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
     return { success: false, message: `Falha ao salvar o usuário: ${errorMessage}`, errors: {} };

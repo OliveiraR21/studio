@@ -4,27 +4,46 @@ import { learningModules as initialModules, users as initialUsers } from './mock
 // --- In-Memory Data Store for Development ---
 // The mock data is now loaded fresh on each hot-reload to ensure changes
 // in mock-data.ts are always reflected immediately.
-const allUsers: User[] = JSON.parse(JSON.stringify(initialUsers));
-const allModules: Module[] = JSON.parse(JSON.stringify(initialModules));
+let allUsers: User[] = [];
+let allModules: Module[] = [];
+
+function loadData() {
+    allUsers = JSON.parse(JSON.stringify(initialUsers));
+    allModules = JSON.parse(JSON.stringify(initialModules));
+}
+
+// Initial data load
+loadData();
 
 
 // --- Data Fetching Functions ---
 
 // Fetch all learning modules and their nested tracks/courses from mock data
 export async function getLearningModules(): Promise<Module[]> {
+    loadData();
     return Promise.resolve(allModules);
 }
 
 // Fetch all users from mock data
 export async function getUsers(): Promise<User[]> {
+    loadData();
     return Promise.resolve(allUsers);
 }
 
 // Fetch a single user by ID from mock data
 export async function getUserById(userId: string): Promise<User | null> {
+    loadData();
     const user = allUsers.find(u => u.id === userId);
     return Promise.resolve(user || null);
 }
+
+// Fetch a single user by Email from mock data
+export async function findUserByEmail(email: string): Promise<User | null> {
+    loadData();
+    const user = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+    return Promise.resolve(user || null);
+}
+
 
 // Find a course by its ID within the mock data structure
 export function findCourseById(courseId: string, modules?: Module[]): { course: Course, track: Track, module: Module } | null {
@@ -136,7 +155,12 @@ export async function updateCourse(courseId: string, courseData: Partial<Omit<Co
 
 
 // Creates a user in-memory. The change persists for the lifetime of the dev server.
-export async function createUser(userData: { name: string; email: string; role: UserRole; area?: string; supervisor?: string; coordenador?: string; gerente?: string; diretor?: string; }): Promise<User> {
+export async function createUser(userData: { name: string; email: string; password?: string; role: UserRole; area?: string; supervisor?: string; coordenador?: string; gerente?: string; diretor?: string; }): Promise<User> {
+    const existingUser = await findUserByEmail(userData.email);
+    if (existingUser) {
+        throw new Error('E-mail já cadastrado.');
+    }
+    
     const newUser: User = {
         id: `user-${Date.now()}`,
         avatarUrl: `https://placehold.co/100x100.png`,
@@ -144,13 +168,16 @@ export async function createUser(userData: { name: string; email: string; role: 
         completedTracks: [],
         courseScores: [],
         trackScores: [],
-        ...userData
+        ...userData,
+        // In a real app, hash this!
+        password: userData.password,
     };
 
     allUsers.push(newUser);
 
     return Promise.resolve(newUser);
 }
+
 
 // Updates a user in-memory. The change persists for the lifetime of the dev server.
 export async function updateUser(userId: string, userData: Partial<Omit<User, 'id'>>): Promise<User> {

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { KeyRound } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -7,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { SignupForm } from "@/components/auth/signup-form";
 
 export default function SignupPage() {
   return (
@@ -18,19 +18,18 @@ export default function SignupPage() {
             </h1>
         </div>
         <Card>
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <KeyRound className="h-10 w-10 text-muted-foreground" />
-            </div>
-            <CardTitle className="text-2xl">Acesso via SSO</CardTitle>
-            <CardDescription className="mt-2">
-              Sua conta é criada automaticamente. Utilize o login com suas credenciais corporativas para acessar a plataforma.
+          <CardHeader>
+            <CardTitle className="text-2xl">Criar Conta</CardTitle>
+            <CardDescription>
+              Preencha os campos abaixo para criar sua conta.
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <SignupForm />
             <div className="mt-4 text-center text-sm">
+              Já tem uma conta?{" "}
               <Link href="/" className="underline">
-                Voltar para a página de Login
+                Fazer login
               </Link>
             </div>
           </CardContent>

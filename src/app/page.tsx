@@ -1,6 +1,9 @@
-import Link from "next/link";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import {
   Card,
   CardContent,
@@ -8,18 +11,21 @@ import {
   CardTitle,
   CardDescription
 } from "@/components/ui/card";
-
-const MicrosoftIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 23" width="23" height="23" {...props}>
-        <path d="M1 1h10v10H1z" fill="#f25022" />
-        <path d="M12 1h10v10H12z" fill="#7fba00" />
-        <path d="M1 12h10v10H1z" fill="#00a4ef" />
-        <path d="M12 12h10v10H12z" fill="#ffb900" />
-    </svg>
-);
-
+import { LoginForm } from "@/components/auth/login-form";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (searchParams.get('message') === 'signup_success') {
+      toast({
+        title: "Conta Criada com Sucesso!",
+        description: "Agora você pode fazer login com seu e-mail e senha.",
+      });
+    }
+  }, [searchParams, toast]);
+
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-background p-4">
       <div className="mx-auto grid w-[380px] gap-6">
@@ -32,22 +38,15 @@ export default function LoginPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
-              Utilize sua conta corporativa para acessar a plataforma.
+              Digite seu e-mail e senha para acessar a plataforma.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4">
-              <Button type="submit" className="w-full" asChild>
-                <Link href="/dashboard">
-                   <MicrosoftIcon className="mr-2 h-5 w-5" />
-                   Entrar com Microsoft (SSO)
-                </Link>
-              </Button>
-            </div>
+            <LoginForm />
             <div className="mt-4 text-center text-sm">
-              Problemas para acessar?{" "}
-              <Link href="#" className="underline">
-                Contate o suporte de TI
+              Não tem uma conta?{" "}
+              <Link href="/signup" className="underline">
+                Cadastre-se
               </Link>
             </div>
           </CardContent>

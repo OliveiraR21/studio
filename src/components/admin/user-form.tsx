@@ -104,6 +104,18 @@ export function UserForm({ allUsers }: UserFormProps) {
             <Label htmlFor="area">Área / Departamento</Label>
             <Input id="area" name="area" placeholder="Ex: Comercial" />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">Senha</Label>
+            <Input id="password" name="password" type="password" required />
+             {state.errors?.password && <p className="text-sm text-destructive">{state.errors.password[0]}</p>}
+          </div>
+
+           <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+            <Input id="confirmPassword" name="confirmPassword" type="password" required />
+             {state.errors?.confirmPassword && <p className="text-sm text-destructive">{state.errors.confirmPassword[0]}</p>}
+          </div>
       </div>
 
       <div className="space-y-4 pt-4 border-t">
