@@ -8,7 +8,7 @@ import {
   CardFooter
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trophy, GaugeCircle, AlertTriangle, BookCheck, Play } from "lucide-react";
+import { Trophy, GaugeCircle, AlertTriangle, BookCheck, Play, Info } from "lucide-react";
 import Link from "next/link";
 import type { Track, Course } from "@/lib/types";
 import { ProgressChart } from "@/components/dashboard/progress-chart";
@@ -213,6 +213,29 @@ export default async function DashboardPage() {
                         <p className="text-sm text-muted-foreground">Nenhuma pendência encontrada. Ótimo trabalho!</p>
                     </div>
                 )}
+            </CardContent>
+        </Card>
+        
+        <Card className="border-blue-500/50 bg-blue-500/5">
+            <CardHeader>
+                <div className="flex items-center gap-3">
+                    <Info className="h-6 w-6 text-blue-600" />
+                    <div>
+                        <CardTitle>Ambiente de Desenvolvimento</CardTitle>
+                        <CardDescription>
+                            Esta é uma versão de protótipo. Nenhuma ação aqui gera custos reais.
+                        </CardDescription>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent className="text-sm text-muted-foreground">
+                <p>
+                    O aplicativo está rodando com dados fictícios e em um ambiente local gratuito. Custos reais só seriam aplicáveis em um ambiente de produção ao:
+                </p>
+                <ul className="list-disc pl-5 mt-2 space-y-1">
+                    <li>Utilizar funcionalidades de IA que consomem APIs (ex: Google AI).</li>
+                    <li>Hospedar o aplicativo em um serviço como o Firebase App Hosting.</li>
+                </ul>
             </CardContent>
         </Card>
     </div>
