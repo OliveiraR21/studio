@@ -18,10 +18,18 @@ export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps)
     >
       <CardHeader className="p-0">
         <div className="relative w-full h-40 overflow-hidden">
+          {/* Light mode logo */}
           <img
-            src={course.thumbnailUrl || "/br-supply-logo.png"}
+            src="/BrSupply.png"
             alt={course.title}
-            className={`w-full h-full object-contain p-4 transition-transform duration-300 ease-in-out ${isUnlocked ? 'group-hover:scale-105' : ''} ${!isUnlocked ? 'grayscale' : ''}`}
+            className={`w-full h-full object-contain p-4 transition-transform duration-300 ease-in-out block dark:hidden ${isUnlocked ? 'group-hover:scale-105' : ''} ${!isUnlocked ? 'grayscale' : ''}`}
+            data-ai-hint="course thumbnail"
+          />
+          {/* Dark mode logo */}
+          <img
+            src="/br-supply-logo.png"
+            alt={course.title}
+            className={`w-full h-full object-contain p-4 transition-transform duration-300 ease-in-out hidden dark:block ${isUnlocked ? 'group-hover:scale-105' : ''} ${!isUnlocked ? 'grayscale' : ''}`}
             data-ai-hint="course thumbnail"
           />
           {!isUnlocked && (
