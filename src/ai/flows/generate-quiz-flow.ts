@@ -63,7 +63,31 @@ const generateQuizFlow = ai.defineFlow(
     outputSchema: GenerateQuizOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
-    return output!;
+    const maxRetries = 3;
+    let lastError: Error | undefined;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const { output } = await prompt(input);
+        return output!;
+      } catch (error: any) {
+        lastError = error;
+        const isOverloaded =
+          error.message?.includes('503') ||
+          error.message?.toLowerCase().includes('overloaded');
+        
+        if (isOverloaded && attempt < maxRetries) {
+          console.log(
+            `AI service overloaded. Retrying attempt ${attempt} of ${maxRetries} in ${attempt}s...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+        } else {
+          // Re-throw the error if it's not a 503 or if we've run out of retries
+          throw error;
+        }
+      }
+    }
+    // This should not be reachable if the logic is correct, but as a fallback:
+    throw lastError || new Error('Failed to generate quiz after multiple retries.');
   }
 );
