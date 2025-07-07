@@ -19,7 +19,7 @@ export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps)
       <CardHeader className="p-0">
         <div className="relative w-full h-40 overflow-hidden">
           <img
-            src={course.thumbnailUrl || "https://placehold.co/600x400.png"}
+            src={course.thumbnailUrl || "/br-supply-logo.png"}
             alt={course.title}
             className={`w-full h-full object-contain p-4 transition-transform duration-300 ease-in-out ${isUnlocked ? 'group-hover:scale-105' : ''} ${!isUnlocked ? 'grayscale' : ''}`}
             data-ai-hint="course thumbnail"
