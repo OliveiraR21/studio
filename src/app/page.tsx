@@ -57,14 +57,14 @@ export default function LoginPage() {
             <img
                 src="/BrSupply.png"
                 alt="Br Supply Logo"
-                className="h-16 block dark:hidden"
+                className="h-20 block dark:hidden"
                 data-ai-hint="logo"
             />
             {/* Dark mode logo */}
             <img
                 src="/br-supply-logo.png"
                 alt="Br Supply Logo"
-                className="h-16 hidden dark:block"
+                className="h-20 hidden dark:block"
                 data-ai-hint="logo"
             />
         </div>
