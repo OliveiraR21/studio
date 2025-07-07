@@ -146,7 +146,7 @@ export const learningModules: Module[] = [
             title: 'Apresentação Cultura Br Supply',
             description: 'Uma introdução à cultura, valores e missão da Br Supply.',
             videoUrl: 'https://app.heygen.com/embeds/603bafc3779141ec87c7eb529ce6452d',
-            thumbnailUrl: 'https://brsupply.sharepoint.com/sites/Marketing/Fotos/BR%20Supply/BR%20Supply%20-%20Marca%20e%20Identidade/BRS-logo-extenso-laranja-fundo-transp.png',
+            thumbnailUrl: 'https://www.brsupply.com.br/wp-content/uploads/2021/08/logo-br-supply.png',
             durationInSeconds: 180,
             likes: 0,
             dislikes: 0,

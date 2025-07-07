@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'brsupply.sharepoint.com',
+        hostname: 'www.brsupply.com.br',
         port: '',
         pathname: '/**',
       }
