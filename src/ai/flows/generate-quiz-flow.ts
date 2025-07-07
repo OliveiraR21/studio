@@ -69,7 +69,12 @@ const generateQuizFlow = ai.defineFlow(
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const { output } = await prompt(input);
-        return output!;
+        // If the call succeeds with valid output, return immediately.
+        if (output) {
+          return output;
+        }
+        // If output is null/undefined, treat it as an error to trigger a retry.
+        throw new Error('A IA retornou uma resposta vazia.');
       } catch (error: any) {
         lastError = error;
         const isOverloaded =
@@ -77,17 +82,21 @@ const generateQuizFlow = ai.defineFlow(
           error.message?.toLowerCase().includes('overloaded');
         
         if (isOverloaded && attempt < maxRetries) {
+          // Use exponential backoff for retries: 1s, 2s
+          const delay = 1000 * (2 ** (attempt - 1));
           console.log(
-            `AI service overloaded. Retrying attempt ${attempt} of ${maxRetries} in ${attempt}s...`
+            `Tentativa ${attempt}/${maxRetries} falhou por sobrecarga. Tentando novamente em ${delay / 1000}s...`
           );
-          await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
+          await new Promise((resolve) => setTimeout(resolve, delay));
         } else {
-          // Re-throw the error if it's not a 503 or if we've run out of retries
+          // Re-throw the error if it's not recoverable or if we've run out of retries.
+          console.error(`Geração do questionário falhou após ${attempt} tentativas. Erro final:`, error);
           throw error;
         }
       }
     }
-    // This should not be reachable if the logic is correct, but as a fallback:
-    throw lastError || new Error('Failed to generate quiz after multiple retries.');
+    
+    // This fallback should ideally not be reached.
+    throw lastError || new Error('Falha ao gerar o questionário após múltiplas tentativas.');
   }
 );
