@@ -109,15 +109,31 @@ export async function createCourse(courseData: { trackId: string; title: string;
     return Promise.resolve(newCourse);
 }
 
-// Updates a course in-memory.
+// Updates a course in-memory. This version iterates through the data source to
+// find and update the course object directly, ensuring data persistence.
 export async function updateCourse(courseId: string, courseData: Partial<Omit<Course, 'id' | 'trackId' | 'moduleId'>>): Promise<void> {
-    const result = findCourseById(courseId, a_learningModules);
-    if (!result) {
+    let courseFound = false;
+    for (const module of a_learningModules) {
+        for (const track of module.tracks) {
+            const courseIndex = track.courses.findIndex(c => c.id === courseId);
+            if (courseIndex !== -1) {
+                // Found the course, update it directly in the main array.
+                track.courses[courseIndex] = {
+                    ...track.courses[courseIndex],
+                    ...courseData
+                };
+                courseFound = true;
+                break; // Exit inner loop
+            }
+        }
+        if (courseFound) {
+            break; // Exit outer loop
+        }
+    }
+
+    if (!courseFound) {
         throw new Error(`Course with ID ${courseId} not found for update.`);
     }
-    
-    // This now modifies the persistent in-memory object
-    Object.assign(result.course, courseData);
 
     return Promise.resolve();
 }
