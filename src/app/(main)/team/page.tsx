@@ -1,9 +1,9 @@
 import { TeamManagementClient } from "@/components/team/team-management-client";
-import { getUsers, getUserById } from "@/lib/data-access";
+import { getUsers } from "@/lib/data-access";
 import type { User } from "@/lib/types";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { UserNotFound } from "@/components/layout/user-not-found";
-import { SIMULATED_USER_ID } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 
 // This function recursively finds all subordinates for a given manager.
 const getSubordinates = (managerName: string, allUsers: User[]): User[] => {
@@ -26,10 +26,8 @@ const getSubordinates = (managerName: string, allUsers: User[]): User[] => {
 };
 
 export default async function TeamManagementPage() {
-  // In a real app, this would be the logged-in user from a session.
-  // For the prototype, we use a simulated user ID from a central file.
   const allUsers = await getUsers();
-  const currentUser = allUsers.find(u => u.id === SIMULATED_USER_ID);
+  const currentUser = await getCurrentUser();
   
   if (!currentUser) {
     return <UserNotFound />;

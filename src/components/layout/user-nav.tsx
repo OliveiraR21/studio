@@ -9,27 +9,13 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { getUserById } from "@/lib/data-access";
-import { User, Settings } from "lucide-react";
+import { User, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import type { User as UserType } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SIMULATED_USER_ID } from "@/lib/auth";
+import { logout } from "@/actions/auth-actions";
 
-export function UserNav() {
-  const [user, setUser] = useState<UserType | null>(null);
-
-  useEffect(() => {
-    // In a real app, user ID would come from a secure session.
-    // For the prototype, we use a simulated user ID from a central file.
-    async function fetchUser() {
-      const fetchedUser = await getUserById(SIMULATED_USER_ID);
-      setUser(fetchedUser);
-    }
-    fetchUser();
-  }, [])
-
+export function UserNav({ user }: { user: UserType | null }) {
 
   if (!user) {
     return <Skeleton className="h-9 w-9 rounded-full" />
@@ -68,9 +54,14 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/">Sair</Link>
-        </DropdownMenuItem>
+        <form action={logout} className="w-full">
+            <DropdownMenuItem asChild>
+                 <button type="submit" className="w-full cursor-pointer justify-start flex items-center">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
+                </button>
+            </DropdownMenuItem>
+        </form>
       </DropdownMenuContent>
     </DropdownMenu>
   );

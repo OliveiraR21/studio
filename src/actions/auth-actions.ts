@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { findUserByEmail, createUser } from '@/lib/data-access';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 
 // --- Login Action ---
 
@@ -39,8 +40,12 @@ export async function login(prevState: AuthFormState, formData: FormData): Promi
       return { success: false, message: 'E-mail ou senha inválidos.' };
     }
     
-    // In a real app, you would set a session cookie here.
-    // For this prototype, we just redirect.
+    // Set the user ID in a cookie to simulate a session
+    cookies().set('simulated_user_id', user.id, {
+        httpOnly: true,
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7, // 1 week
+    });
     
   } catch (error) {
     return { success: false, message: 'Ocorreu um erro no servidor. Tente novamente.' };
@@ -48,6 +53,12 @@ export async function login(prevState: AuthFormState, formData: FormData): Promi
 
   // Redirect to dashboard on successful login
   redirect('/dashboard');
+}
+
+// --- Logout Action ---
+export async function logout() {
+    cookies().delete('simulated_user_id');
+    redirect('/');
 }
 
 

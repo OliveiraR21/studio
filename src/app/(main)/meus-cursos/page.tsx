@@ -1,4 +1,4 @@
-import { getUsers, getLearningModules } from "@/lib/data-access";
+import { getLearningModules } from "@/lib/data-access";
 import { 
   Tabs, 
   TabsContent, 
@@ -19,15 +19,12 @@ import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
 import { UserNotFound } from "@/components/layout/user-not-found";
 import { TrackFinalActions } from "@/components/course/track-final-actions";
-import { SIMULATED_USER_ID } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 
 const PASSING_SCORE = 90;
 
 export default async function MyCoursesPage() {
-  // In a real app, this would be the logged-in user from a session.
-  // For the prototype, we use a simulated user ID from a central file.
-  const allUsers = await getUsers();
-  const currentUser = allUsers.find(u => u.id === SIMULATED_USER_ID);
+  const currentUser = await getCurrentUser();
   const learningModules = await getLearningModules();
 
   if (!currentUser) {

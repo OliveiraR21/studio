@@ -1,15 +1,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { getUserById } from "@/lib/data-access";
 import { User as UserIcon, Mail, Briefcase, Building2 } from "lucide-react";
 import { UserNotFound } from "@/components/layout/user-not-found";
-import { SIMULATED_USER_ID } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 
 export default async function ProfilePage() {
-  // In a real app, this would be the logged-in user from a session.
-  // For the prototype, we use a simulated user ID from a central file.
-  const currentUser = await getUserById(SIMULATED_USER_ID);
+  const currentUser = await getCurrentUser();
 
   if (!currentUser) {
     return <UserNotFound />;

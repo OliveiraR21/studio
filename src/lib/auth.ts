@@ -1,15 +1,26 @@
+import { cookies } from 'next/headers'
+import { getUserById } from './data-access';
+import type { User } from './types';
+
+// The default user to show if no one is logged in (e.g., first visit).
+// This is user 'John Doe' (Analista).
+const DEFAULT_USER_ID = '6';
+
 /**
- * This file simulates the currently logged-in user for the prototype.
- * By changing the ID here and reloading, you can view the application
- * as different users.
- *
- * Available User IDs:
- * '1': Admin (Admin)
- * '2': Carlos Diretor (Diretor)
- * '3': Beatriz Gerente (Gerente)
- * '4': Fernanda Coordenadora (Coordenador)
- * '5': Ricardo Supervisor (Supervisor)
- * '6': John Doe (Analista)
- * '7': Jane Smith (Assistente)
+ * Gets the ID of the currently logged-in user from the session cookie.
+ * @returns The user ID string, or a default ID if not logged in.
  */
-export const SIMULATED_USER_ID = '6';
+export function getSimulatedUserId(): string {
+  const cookieStore = cookies();
+  return cookieStore.get('simulated_user_id')?.value || DEFAULT_USER_ID;
+}
+
+/**
+ * Fetches the complete data for the currently logged-in user.
+ * @returns The user object, or null if not found.
+ */
+export async function getCurrentUser(): Promise<User | null> {
+    const userId = getSimulatedUserId();
+    const user = await getUserById(userId);
+    return user;
+}
