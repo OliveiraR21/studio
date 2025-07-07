@@ -1,5 +1,5 @@
 import { TeamManagementClient } from "@/components/team/team-management-client";
-import { getUsers } from "@/lib/data-access";
+import { getUsers, getLearningModules } from "@/lib/data-access";
 import type { User } from "@/lib/types";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { UserNotFound } from "@/components/layout/user-not-found";
@@ -28,10 +28,14 @@ const getSubordinates = (managerName: string, allUsers: User[]): User[] => {
 export default async function TeamManagementPage() {
   const allUsers = await getUsers();
   const currentUser = await getCurrentUser();
+  const learningModules = await getLearningModules();
   
   if (!currentUser) {
     return <UserNotFound />;
   }
+
+  const allCourses = learningModules.flatMap(module => module.tracks.flatMap(track => track.courses));
+  const totalCourses = allCourses.length;
 
   // For an Admin, show all users except the admin themselves.
   // For a Manager, get their subordinates.
@@ -47,7 +51,7 @@ export default async function TeamManagementPage() {
                 Visualize o progresso e o desempenho dos membros da sua equipe. Use a busca para filtrar por nome.
             </p>
         </div>
-        <TeamManagementClient teamMembers={teamMembers} allCoursesCount={0} />
+        <TeamManagementClient teamMembers={teamMembers} allCoursesCount={totalCourses} />
     </div>
   );
 }
