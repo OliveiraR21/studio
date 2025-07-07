@@ -3,8 +3,8 @@ import { getUserById } from './data-access';
 import type { User } from './types';
 
 // The default user to show if no one is logged in (e.g., first visit).
-// This is user 'John Doe' (Analista).
-const DEFAULT_USER_ID = '6';
+// This is user 'Admin'.
+const DEFAULT_USER_ID = '1';
 
 /**
  * Gets the ID of the currently logged-in user from the session cookie.
