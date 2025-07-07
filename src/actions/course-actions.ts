@@ -116,16 +116,17 @@ export async function saveQuiz(courseId: string, quiz: Quiz): Promise<{ success:
   }
   
   try {
-    // updateCourse updates a course in-memory.
     await updateCourse(courseId, { quiz });
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
     return { success: false, message: `Falha ao salvar o questionário: ${errorMessage}` };
   }
 
-  // Revalidate paths to ensure the UI updates with the new quiz data
-  revalidatePath(`/admin/courses`);
+  // Revalidate all paths where course/quiz data is displayed to ensure UI consistency
+  revalidatePath('/admin/courses');
   revalidatePath(`/admin/courses/${courseId}/edit`);
+  revalidatePath('/dashboard');
+  revalidatePath('/meus-cursos');
   revalidatePath(`/courses/${courseId}`);
   
   return { success: true, message: 'Questionário salvo com sucesso!' };
