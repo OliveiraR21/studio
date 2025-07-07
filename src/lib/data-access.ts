@@ -2,49 +2,42 @@ import type { User, Module, Track, Course, UserRole } from './types';
 import { learningModules as initialModules, users as initialUsers } from './mock-data';
 
 // --- In-Memory Data Store for Development ---
-// IMPORTANT: To prevent stubborn caching issues with Next.js's Fast Refresh,
-// we create fresh deep copies of the mock data in each function.
-// This ensures that changes to mock-data.ts are always reflected.
+// This acts as a simple in-memory database. Changes will persist until the
+// server is restarted. This is more reliable for development than constantly
+// creating deep copies, which was causing data persistence issues.
 
-function getFreshUsers(): User[] {
-    return JSON.parse(JSON.stringify(initialUsers));
-}
-
-function getFreshModules(): Module[] {
-    return JSON.parse(JSON.stringify(initialModules));
-}
+let a_users: User[] = JSON.parse(JSON.stringify(initialUsers));
+let a_learningModules: Module[] = JSON.parse(JSON.stringify(initialModules));
 
 
 // --- Data Fetching Functions ---
 
-// Fetch all learning modules and their nested tracks/courses from mock data
+// Fetch all learning modules and their nested tracks/courses
 export async function getLearningModules(): Promise<Module[]> {
-    return Promise.resolve(getFreshModules());
+    return Promise.resolve(a_learningModules);
 }
 
-// Fetch all users from mock data
+// Fetch all users
 export async function getUsers(): Promise<User[]> {
-    return Promise.resolve(getFreshUsers());
+    return Promise.resolve(a_users);
 }
 
-// Fetch a single user by ID from mock data
+// Fetch a single user by ID
 export async function getUserById(userId: string): Promise<User | null> {
-    const allUsers = getFreshUsers();
-    const user = allUsers.find(u => u.id === userId);
+    const user = a_users.find(u => u.id === userId);
     return Promise.resolve(user || null);
 }
 
-// Fetch a single user by Email from mock data
+// Fetch a single user by Email
 export async function findUserByEmail(email: string): Promise<User | null> {
-    const allUsers = getFreshUsers();
-    const user = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const user = a_users.find(u => u.email.toLowerCase() === email.toLowerCase());
     return Promise.resolve(user || null);
 }
 
 
-// Find a course by its ID within the mock data structure
+// Find a course by its ID
 export function findCourseById(courseId: string, modules?: Module[]): { course: Course, track: Track, module: Module } | null {
-    const allModulesToSearch = modules || getFreshModules();
+    const allModulesToSearch = modules || a_learningModules; // Use the in-memory store
     for (const module of allModulesToSearch) {
         for (const track of module.tracks) {
             const course = track.courses.find(c => c.id === courseId);
@@ -58,8 +51,7 @@ export function findCourseById(courseId: string, modules?: Module[]): { course: 
 
 // Find a course and its parent track by the course ID
 export async function findCourseByIdWithTrack(courseId: string): Promise<{ course: Course, track: Track } | null> {
-    const allModules = getFreshModules();
-    const result = findCourseById(courseId, allModules);
+    const result = findCourseById(courseId, a_learningModules);
     if (result) {
         return { course: result.course, track: result.track };
     }
@@ -81,17 +73,14 @@ export function findNextCourseForUser(user: User, modules: Module[]): Course | n
 }
 
 // --- Mutation Functions (Simulated) ---
-// IMPORTANT: These mutations will NOT persist if the dev server is restarted,
-// as they modify a temporary copy of the data. To make permanent changes,
-// edit src/lib/mock-data.ts directly and restart the server.
+// These mutations modify the in-memory "database" and will persist until the server restarts.
 
 // Creates a course in-memory.
 export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; thumbnailUrl?: string; durationInSeconds?: number; }): Promise<Course> {
-    const allModules = getFreshModules(); // This is a temporary copy
     let trackToUpdate: Track | undefined;
     let moduleToUpdate: Module | undefined;
 
-    for (const module of allModules) {
+    for (const module of a_learningModules) {
         trackToUpdate = module.tracks.find(t => t.id === courseData.trackId);
         if (trackToUpdate) {
             moduleToUpdate = module;
@@ -117,22 +106,17 @@ export async function createCourse(courseData: { trackId: string; title: string;
     };
 
     trackToUpdate.courses.push(newCourse);
-    // Note: This change happens on a copy and won't be reflected in subsequent calls
-    // unless we were to write it back to the file system, which we are not.
-
     return Promise.resolve(newCourse);
 }
 
 // Updates a course in-memory.
 export async function updateCourse(courseId: string, courseData: Partial<Omit<Course, 'id' | 'trackId' | 'moduleId'>>): Promise<void> {
-    const allModules = getFreshModules(); // Temporary copy
-    const result = findCourseById(courseId, allModules);
+    const result = findCourseById(courseId, a_learningModules);
     if (!result) {
         throw new Error(`Course with ID ${courseId} not found for update.`);
     }
     
-    // As this is a mock, we will just simulate success without actual persistence
-    // across server reloads. The original findCourseById result object can be modified.
+    // This now modifies the persistent in-memory object
     Object.assign(result.course, courseData);
 
     return Promise.resolve();
@@ -141,8 +125,7 @@ export async function updateCourse(courseId: string, courseData: Partial<Omit<Co
 
 // Creates a user in-memory.
 export async function createUser(userData: { name: string; email: string; password?: string; role: UserRole; area?: string; supervisor?: string; coordenador?: string; gerente?: string; diretor?: string; }): Promise<User> {
-    const allUsers = getFreshUsers();
-    const existingUser = allUsers.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
+    const existingUser = a_users.find(u => u.email.toLowerCase() === userData.email.toLowerCase());
     if (existingUser) {
         throw new Error('E-mail já cadastrado.');
     }
@@ -158,7 +141,7 @@ export async function createUser(userData: { name: string; email: string; passwo
         password: userData.password,
     };
 
-    allUsers.push(newUser);
+    a_users.push(newUser);
     
     return Promise.resolve(newUser);
 }
@@ -166,18 +149,17 @@ export async function createUser(userData: { name: string; email: string; passwo
 
 // Updates a user in-memory.
 export async function updateUser(userId: string, userData: Partial<Omit<User, 'id'>>): Promise<User> {
-    const allUsers = getFreshUsers();
-    const userIndex = allUsers.findIndex(u => u.id === userId);
+    const userIndex = a_users.findIndex(u => u.id === userId);
     if (userIndex === -1) {
         throw new Error(`User with ID ${userId} not found for update.`);
     }
 
     const updatedUser = {
-        ...allUsers[userIndex],
+        ...a_users[userIndex],
         ...userData
     };
 
-    allUsers[userIndex] = updatedUser;
+    a_users[userIndex] = updatedUser;
 
     return Promise.resolve(updatedUser);
 }
