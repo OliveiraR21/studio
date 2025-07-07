@@ -1,5 +1,26 @@
 import type { User, Module, Track, Course, UserRole } from './types';
-import { learningModules as allModules, users as allUsers } from './mock-data';
+import { learningModules as initialModules, users as initialUsers } from './mock-data';
+
+// --- In-Memory Data Store for Development ---
+
+// This setup uses the 'global' object to store mock data in development.
+// It prevents data from being reset on every hot-reload, which is a common
+// issue with in-memory data persistence in a Next.js dev environment.
+const globalForData = global as unknown as {
+    _mockUsers: User[] | undefined;
+    _mockModules: Module[] | undefined;
+};
+
+// Use existing global data if available, otherwise initialize from mock-data.ts
+const allUsers: User[] = globalForData._mockUsers ?? JSON.parse(JSON.stringify(initialUsers));
+const allModules: Module[] = globalForData._mockModules ?? JSON.parse(JSON.stringify(initialModules));
+
+// In development, we assign the data to the global object.
+if (process.env.NODE_ENV !== 'production') {
+  globalForData._mockUsers = allUsers;
+  globalForData._mockModules = allModules;
+}
+
 
 // --- Data Fetching Functions ---
 
