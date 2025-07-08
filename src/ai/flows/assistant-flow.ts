@@ -45,6 +45,9 @@ const assistantFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async ({ question, history }) => {
+    const maxRetries = 3;
+    let lastError: Error | undefined;
+
     const modules = await getLearningModules();
     const courseCatalog = formatCourseCatalog(modules);
 
@@ -70,19 +73,47 @@ ${courseCatalog}
 Pergunta Atual do Usuário:
 ${question}
 `;
-
-    const { output } = await ai.generate({
-      prompt: prompt,
-      history: history?.map(h => ({
-        role: 'user',
-        parts: [{ text: h.user }]
-      }, {
-        role: 'model',
-        parts: [{ text: h.model }]
-      })).flat() || [],
-    });
     
-    return output as string;
+    const generateConfig = {
+        prompt: prompt,
+        history: history?.map(h => ({
+            role: 'user',
+            parts: [{ text: h.user }]
+        }, {
+            role: 'model',
+            parts: [{ text: h.model }]
+        })).flat() || [],
+    };
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const { output } = await ai.generate(generateConfig);
+            
+            if (output) {
+                return output as string;
+            }
+            throw new Error('A IA retornou uma resposta vazia.');
+
+        } catch (error: any) {
+            lastError = error;
+            const isOverloaded =
+              error.message?.includes('503') ||
+              error.message?.toLowerCase().includes('overloaded');
+            
+            if (isOverloaded && attempt < maxRetries) {
+              const delay = 1000 * (2 ** (attempt - 1));
+              console.log(
+                `Tentativa do assistente ${attempt}/${maxRetries} falhou por sobrecarga. Tentando novamente em ${delay / 1000}s...`
+              );
+              await new Promise((resolve) => setTimeout(resolve, delay));
+            } else {
+              console.error(`Geração do assistente falhou após ${attempt} tentativas. Erro final:`, error);
+              throw error;
+            }
+        }
+    }
+    
+    throw lastError || new Error('Falha ao gerar resposta do assistente após múltiplas tentativas.');
   }
 );
 
