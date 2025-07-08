@@ -24,7 +24,7 @@ const QuestionSchema = z.object({
 });
 
 const GenerateQuizOutputSchema = z.object({
-  questions: z.array(QuestionSchema).describe('Um banco de questões com aproximadamente 15 perguntas para o questionário.'),
+  questions: z.array(QuestionSchema).describe('Um banco de questões com aproximadamente 40 perguntas para o questionário.'),
 });
 export type GenerateQuizOutput = z.infer<typeof GenerateQuizOutputSchema>;
 
@@ -41,7 +41,7 @@ const prompt = ai.definePrompt({
 
 Sua tarefa é criar um grande banco de questões de múltipla escolha com base no conteúdo de um curso fornecido.
 
-Gere um banco de questões relevante com 15 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados.
+Gere um banco de questões relevante com 40 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados.
 
 {{#if transcript}}
 Use a seguinte transcrição do vídeo como a fonte PRIMÁRIA de informação para criar as perguntas. O título e a descrição podem ser usados como contexto adicional.
@@ -63,40 +63,11 @@ const generateQuizFlow = ai.defineFlow(
     outputSchema: GenerateQuizOutputSchema,
   },
   async (input) => {
-    const maxRetries = 3;
-    let lastError: Error | undefined;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const { output } = await prompt(input);
-        // If the call succeeds with valid output, return immediately.
-        if (output) {
-          return output;
-        }
-        // If output is null/undefined, treat it as an error to trigger a retry.
-        throw new Error('A IA retornou uma resposta vazia.');
-      } catch (error: any) {
-        lastError = error;
-        const isOverloaded =
-          error.message?.includes('503') ||
-          error.message?.toLowerCase().includes('overloaded');
-        
-        if (isOverloaded && attempt < maxRetries) {
-          // Use exponential backoff for retries: 1s, 2s
-          const delay = 1000 * (2 ** (attempt - 1));
-          console.log(
-            `Tentativa ${attempt}/${maxRetries} falhou por sobrecarga. Tentando novamente em ${delay / 1000}s...`
-          );
-          await new Promise((resolve) => setTimeout(resolve, delay));
-        } else {
-          // Re-throw the error if it's not recoverable or if we've run out of retries.
-          console.error(`Geração do questionário falhou após ${attempt} tentativas. Erro final:`, error);
-          throw error;
-        }
-      }
+    // Revertendo para a implementação mais simples que estava funcionando originalmente.
+    const { output } = await prompt(input);
+    if (!output) {
+      throw new Error('A IA não retornou um questionário. A resposta pode ter sido bloqueada ou estar vazia. Tente novamente com um conteúdo diferente.');
     }
-    
-    // This fallback should ideally not be reached.
-    throw lastError || new Error('Falha ao gerar o questionário após múltiplas tentativas.');
+    return output;
   }
 );
