@@ -6,6 +6,7 @@ import { useEffect, useActionState, useMemo, useState } from 'react';
 import { saveCourse } from '@/actions/course-actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import ReactPlayer from 'react-player/lazy';
 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -51,11 +52,11 @@ function SubmitButton({ isNew }: { isNew: boolean }) {
 
 // Helper function to format seconds into "hh:mm:ss"
 const formatSecondsToHHMMSS = (totalSeconds: number | undefined) => {
-  if (totalSeconds === undefined || totalSeconds === null || totalSeconds < 0)
+  if (totalSeconds === undefined || totalSeconds === null || totalSeconds < 0 || isNaN(totalSeconds))
     return '';
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
+  const seconds = Math.floor(totalSeconds % 60);
 
   const pad = (num: number) => num.toString().padStart(2, '0');
 
@@ -79,11 +80,21 @@ export function CourseForm({ course, modules }: CourseFormProps) {
   );
   const [popoverOpen, setPopoverOpen] = useState(false);
 
+  // State for controlled inputs to enable auto-duration fetching
+  const [videoUrl, setVideoUrl] = useState(course?.videoUrl || '');
+  const [duration, setDuration] = useState(formatSecondsToHHMMSS(course?.durationInSeconds));
+
+
   const availableTracks = useMemo(() => {
     if (!selectedModuleId) return [];
     const selectedModule = modules.find((m) => m.id === selectedModuleId);
     return selectedModule ? selectedModule.tracks : [];
   }, [selectedModuleId, modules]);
+  
+  const handleDurationFetch = (seconds: number) => {
+    setDuration(formatSecondsToHHMMSS(seconds));
+  };
+
 
   useEffect(() => {
     if (state.success) {
@@ -238,7 +249,8 @@ export function CourseForm({ course, modules }: CourseFormProps) {
           id="videoUrl"
           name="videoUrl"
           type="url"
-          defaultValue={course?.videoUrl}
+          value={videoUrl}
+          onChange={(e) => setVideoUrl(e.target.value)}
           placeholder="https://exemplo.com/video"
           required
         />
@@ -263,16 +275,23 @@ export function CourseForm({ course, modules }: CourseFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="duration">Duração (hh:mm:ss)</Label>
+        <p className="text-xs text-muted-foreground">Preenchido automaticamente para URLs compatíveis (YouTube, Vimeo, etc.).</p>
         <Input
           id="duration"
           name="duration"
           type="text"
-          defaultValue={formatSecondsToHHMMSS(course?.durationInSeconds)}
+          value={duration}
+          onChange={(e) => setDuration(e.target.value)}
           placeholder="Ex: 00:05:00"
         />
         {state.errors?.duration && (
           <p className="text-sm text-destructive">{state.errors.duration[0]}</p>
         )}
+      </div>
+
+      {/* Hidden player to fetch duration */}
+      <div className='hidden'>
+        <ReactPlayer url={videoUrl} onDuration={handleDurationFetch} />
       </div>
 
       <div className="flex justify-end gap-4">
