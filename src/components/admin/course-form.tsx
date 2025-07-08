@@ -233,14 +233,14 @@ export function CourseForm({ course, modules }: CourseFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="videoUrl">URL do Vídeo</Label>
-        <Input
+        <Label htmlFor="videoUrl">URL do Vídeo ou Código de Incorporação</Label>
+        <Textarea
           id="videoUrl"
           name="videoUrl"
-          type="url"
           defaultValue={course?.videoUrl || ''}
-          placeholder="https://exemplo.com/video"
+          placeholder="Cole a URL do vídeo (ex: https://...) ou o código de incorporação do iframe aqui."
           required
+          rows={4}
         />
         {state.errors?.videoUrl && (
           <p className="text-sm text-destructive">{state.errors.videoUrl[0]}</p>

@@ -6,11 +6,17 @@ import { revalidatePath } from 'next/cache';
 import type { Course, Quiz } from '@/lib/types';
 import { getSimulatedUserId } from '@/lib/auth';
 
+// Helper to extract src from iframe
+function extractSrcFromIframe(embedCode: string): string | null {
+    const match = embedCode.match(/src="([^"]+)"/);
+    return match ? match[1] : null;
+}
+
 const courseFormSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(3, 'O título precisa ter pelo menos 3 caracteres.'),
   description: z.string().min(10, 'A descrição precisa ter pelo menos 10 caracteres.'),
-  videoUrl: z.string().url('Por favor, insira uma URL válida.'),
+  videoUrl: z.string().min(1, "A URL do vídeo ou código de incorporação é obrigatório."),
   thumbnailUrl: z.string().url('Por favor, insira uma URL de capa válida.').optional().or(z.literal('')),
   duration: z.string().optional()
     .refine((val) => {
@@ -81,10 +87,38 @@ export async function saveCourse(
     };
   }
 
-  const { id, trackId, duration, ...courseDetails } = validatedFields.data;
+  const { id, trackId, duration, videoUrl: videoUrlOrEmbed, ...courseDetails } = validatedFields.data;
 
-  const courseDataWithSeconds = {
+  let finalVideoUrl: string;
+  const trimmedInput = (videoUrlOrEmbed || '').trim();
+
+  if (trimmedInput.startsWith('<iframe')) {
+    const extractedUrl = extractSrcFromIframe(trimmedInput);
+    if (!extractedUrl) {
+      return {
+        success: false,
+        errors: { videoUrl: ['Código de incorporação inválido. Não foi possível encontrar a URL (src) do vídeo.'] },
+        message: 'Erro de validação. Verifique o código de incorporação.',
+      };
+    }
+    finalVideoUrl = extractedUrl;
+  } else {
+    finalVideoUrl = trimmedInput;
+  }
+  
+  const urlValidationResult = z.string().url({ message: "A URL do vídeo fornecida ou extraída não é válida." }).safeParse(finalVideoUrl);
+  if (!urlValidationResult.success) {
+      return {
+          success: false,
+          errors: { videoUrl: urlValidationResult.error.flatten().formErrors },
+          message: 'Erro de validação. A URL do vídeo não é válida.'
+      }
+  }
+
+
+  const courseData = {
     ...courseDetails,
+    videoUrl: urlValidationResult.data, // Use validated and cleaned URL
     durationInSeconds: timeStringToSeconds(duration),
   };
 
@@ -92,10 +126,10 @@ export async function saveCourse(
   try {
     if (id) {
       // For updates, we don't change the trackId, so it's not passed.
-      await updateCourse(id, courseDataWithSeconds);
+      await updateCourse(id, courseData);
     } else {
       // The schema refinement ensures trackId is present for new courses.
-      await createCourse({ trackId: trackId!, ...courseDataWithSeconds });
+      await createCourse({ trackId: trackId!, ...courseData });
     }
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
