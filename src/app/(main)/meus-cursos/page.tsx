@@ -1,4 +1,4 @@
-import { getLearningModules } from "@/lib/data-access";
+import { getLearningModules, findNextCourseForUser } from "@/lib/data-access";
 import { 
   Tabs, 
   TabsContent, 
@@ -30,6 +30,9 @@ export default async function MyCoursesPage() {
   if (!currentUser) {
     return <UserNotFound />
   }
+
+  const nextCourse = await findNextCourseForUser(currentUser);
+  const defaultOpenTrackId = nextCourse?.trackId || learningModules[0]?.tracks[0]?.id;
 
   const isCourseCompleted = (courseId: string) => {
     return currentUser.completedCourses.includes(courseId);
@@ -72,7 +75,7 @@ export default async function MyCoursesPage() {
 
         {learningModules.map(module => (
           <TabsContent key={module.id} value={module.id}>
-            <Accordion type="single" collapsible className="w-full space-y-4" defaultValue={`track-${module.tracks[0]?.id}`}>
+            <Accordion type="single" collapsible className="w-full space-y-4" defaultValue={defaultOpenTrackId ? `track-${defaultOpenTrackId}` : undefined}>
               {module.tracks.map((track, trackIndex) => {
                  // Determine if the current track is unlocked
                  let isUnlocked = true; // First track is always unlocked
@@ -98,13 +101,16 @@ export default async function MyCoursesPage() {
                  const allCoursesInTrackCompleted = progress === 100 || (track.courses.length === 0);
                  const trackCompleted = currentUser.completedTracks.includes(track.id);
                  const hasQuiz = track.quiz && track.quiz.questions.length > 0;
+                 const isCompletedEmptyTrack = trackCompleted && track.courses.length === 0 && !hasQuiz;
 
                  return (
                   <Card key={track.id} className={!unlocked ? 'bg-muted/50' : ''}>
                     <AccordionItem value={`track-${track.id}`} className="border-b-0">
                       <AccordionTrigger className={`p-6 hover:no-underline ${!unlocked ? 'cursor-not-allowed' : ''}`} disabled={!unlocked}>
                         <div className="flex items-center gap-4 w-full">
-                          {trackCompleted ? (
+                          {isCompletedEmptyTrack ? (
+                              <NotebookText className="h-8 w-8 text-muted-foreground flex-shrink-0" />
+                          ) : trackCompleted ? (
                              <CheckCircle className="h-8 w-8 text-green-500 flex-shrink-0" />
                           ) : unlocked ? (
                             <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg flex-shrink-0">{trackIndex + 1}</div>
@@ -125,23 +131,27 @@ export default async function MyCoursesPage() {
                       </AccordionTrigger>
                       <AccordionContent className="px-6 pb-6">
                         <div className="border-t pt-6">
-                           <h4 className="text-md font-semibold mb-4">Cursos da Trilha</h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                            {track.courses.map((course, courseIndex) => {
-                                const previousCourse = courseIndex > 0 ? track.courses[courseIndex - 1] : undefined;
-                                const courseUnlocked = isCourseUnlocked(course, unlocked, previousCourse);
-                                const completed = isCourseCompleted(course.id);
-                                
-                                return (
-                                  <CourseCard 
-                                    key={course.id} 
-                                    course={course}
-                                    isUnlocked={courseUnlocked}
-                                    isCompleted={completed}
-                                  />
-                                )
-                            })}
-                          </div>
+                          {track.courses.length > 0 && (
+                            <>
+                              <h4 className="text-md font-semibold mb-4">Cursos da Trilha</h4>
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                                {track.courses.map((course, courseIndex) => {
+                                    const previousCourse = courseIndex > 0 ? track.courses[courseIndex - 1] : undefined;
+                                    const courseUnlocked = isCourseUnlocked(course, unlocked, previousCourse);
+                                    const completed = isCourseCompleted(course.id);
+                                    
+                                    return (
+                                      <CourseCard 
+                                        key={course.id} 
+                                        course={course}
+                                        isUnlocked={courseUnlocked}
+                                        isCompleted={completed}
+                                      />
+                                    )
+                                })}
+                              </div>
+                            </>
+                          )}
                           
                           <Separator className="my-6" />
 

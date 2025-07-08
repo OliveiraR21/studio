@@ -122,9 +122,9 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
 
   return (
     <div className="container mx-auto py-6">
-        <Button variant="ghost" onClick={() => router.push('/dashboard')} className="mb-4">
+        <Button variant="ghost" onClick={() => router.push('/meus-cursos')} className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Voltar para a Trilha: {track.title}
+            Voltar para Meus Cursos
         </Button>
       <div className="grid lg:grid-cols-3 gap-8">
 
