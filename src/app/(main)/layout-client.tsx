@@ -27,6 +27,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import type { User, UserRole } from '@/lib/types';
+import { FloatingChat } from '@/components/chat/floating-chat';
 
 export function MainLayoutClient({
   user,
@@ -105,6 +106,7 @@ export function MainLayoutClient({
         <div className="flex-1 p-4 lg:p-6 bg-muted/20">
           {children}
         </div>
+        <FloatingChat />
       </SidebarInset>
     </SidebarProvider>
   );
