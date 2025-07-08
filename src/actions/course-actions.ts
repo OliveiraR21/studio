@@ -141,7 +141,7 @@ export async function recordCourseFeedback(
     return { success: false, message: "ID do curso não fornecido." };
   }
 
-  const result = findCourseById(courseId);
+  const result = await findCourseById(courseId);
   if (!result) {
     return { success: false, message: `Curso com ID ${courseId} não encontrado.` };
   }
