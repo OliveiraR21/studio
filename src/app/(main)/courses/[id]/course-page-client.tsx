@@ -75,7 +75,7 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
         });
         // Redirect to the course list to see unlocked content
         setTimeout(() => {
-            router.push('/meus-cursos');
+            router.push(`/meus-cursos?openTrack=${track.id}`);
         }, 2000);
     } else {
         toast({
@@ -102,7 +102,7 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
             description: "Seu progresso e feedback foram registrados com sucesso.",
         });
         setTimeout(() => {
-            router.push('/meus-cursos');
+            router.push(`/meus-cursos?openTrack=${track.id}`);
         }, 2000);
     } else {
         toast({
@@ -122,7 +122,7 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
 
   return (
     <div className="container mx-auto py-6">
-        <Button variant="ghost" onClick={() => router.push('/meus-cursos')} className="mb-4">
+        <Button variant="ghost" onClick={() => router.push(`/meus-cursos?openTrack=${track.id}`)} className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Voltar para Meus Cursos
         </Button>

@@ -23,7 +23,11 @@ import { getCurrentUser } from "@/lib/auth";
 
 const PASSING_SCORE = 90;
 
-export default async function MyCoursesPage() {
+export default async function MyCoursesPage({
+  searchParams,
+}: {
+  searchParams?: { openTrack?: string };
+}) {
   const currentUser = await getCurrentUser();
   const learningModules = await getLearningModules();
 
@@ -32,7 +36,7 @@ export default async function MyCoursesPage() {
   }
 
   const nextCourse = await findNextCourseForUser(currentUser);
-  const defaultOpenTrackId = nextCourse?.trackId || learningModules[0]?.tracks[0]?.id;
+  const defaultOpenTrackId = searchParams?.openTrack || nextCourse?.trackId || learningModules[0]?.tracks[0]?.id;
 
   const isCourseCompleted = (courseId: string) => {
     return currentUser.completedCourses.includes(courseId);
