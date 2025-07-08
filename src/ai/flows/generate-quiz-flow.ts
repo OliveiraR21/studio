@@ -37,7 +37,7 @@ const prompt = ai.definePrompt({
   name: 'generateQuizPrompt',
   input: { schema: GenerateQuizInputSchema },
   output: { schema: GenerateQuizOutputSchema },
-  model: 'googleai/gemini-1.5-pro-latest',
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `Você é um especialista em design instrucional encarregado de criar conteúdo educacional para uma plataforma de e-learning corporativa.
 
 Sua tarefa é criar um banco de questões de múltipla escolha com base no conteúdo de um curso fornecido.
@@ -64,10 +64,31 @@ const generateQuizFlow = ai.defineFlow(
     outputSchema: GenerateQuizOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
-    if (!output) {
-      throw new Error('A IA não retornou um questionário. A resposta pode ter sido bloqueada ou estar vazia. Tente novamente com um conteúdo diferente.');
+    // This retry logic is necessary to handle transient API errors like 503 or 429.
+    const maxRetries = 3;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const { output } = await prompt(input);
+        // If the call succeeds with valid output, return immediately.
+        if (output) {
+          return output;
+        }
+      } catch (e: any) {
+        // Log the error for debugging.
+        console.error(`Attempt ${attempt} failed:`, e.message);
+
+        // If it's the last attempt, throw a final, user-friendly error.
+        if (attempt === maxRetries) {
+          throw new Error('A IA não conseguiu gerar o questionário após várias tentativas. O serviço pode estar sobrecarregado. Por favor, tente novamente mais tarde.');
+        }
+
+        // Exponential backoff: wait 1s, then 2s.
+        const delay = Math.pow(2, attempt - 1) * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
     }
-    return output;
+    
+    // This part should be unreachable if the loop is correct, but it's a safeguard.
+    throw new Error('A IA não retornou um questionário. A resposta pode ter sido bloqueada ou estar vazia. Tente novamente com um conteúdo diferente.');
   }
 );
