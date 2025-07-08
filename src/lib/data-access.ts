@@ -73,12 +73,12 @@ export async function findCourseByIdWithTrack(courseId: string): Promise<{ cours
 }
 
 // Finds the very first course that is not marked as completed for a given user.
-export async function findNextCourseForUser(user: User): Promise<Course | null> {
+export async function findNextCourseForUser(user: User): Promise<(Course & {trackId: string}) | null> {
     for (const module of global.a_modules) {
         for (const track of module.tracks) {
             for (const course of track.courses) {
                 if (!user.completedCourses.includes(course.id)) {
-                    return Promise.resolve(course);
+                    return Promise.resolve({...course, trackId: track.id});
                 }
             }
         }
@@ -138,6 +138,28 @@ export async function updateCourse(courseId: string, courseData: Partial<Omit<Co
     }
 
     return Promise.resolve();
+}
+
+// Deletes a course from the in-memory store.
+export async function deleteCourse(courseId: string): Promise<boolean> {
+    let courseFoundAndDeleted = false;
+    for (const mod of global.a_modules) {
+        for (const track of mod.tracks) {
+            const courseIndex = track.courses.findIndex(c => c.id === courseId);
+            if (courseIndex !== -1) {
+                track.courses.splice(courseIndex, 1);
+                courseFoundAndDeleted = true;
+                break;
+            }
+        }
+        if (courseFoundAndDeleted) break;
+    }
+
+    if (!courseFoundAndDeleted) {
+        throw new Error(`Course with ID ${courseId} not found for deletion.`);
+    }
+
+    return Promise.resolve(true);
 }
 
 

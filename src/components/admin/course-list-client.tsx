@@ -1,6 +1,7 @@
 "use client";
 
 import type { Course, Module } from "@/lib/types";
+import { useTransition } from "react";
 import {
   Table,
   TableBody,
@@ -9,6 +10,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -20,9 +32,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Edit, Trash2, FileText, ThumbsUp } from "lucide-react";
+import { Edit, Trash2, FileText, ThumbsUp, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { deleteCourseAction } from "@/actions/course-actions";
 
 interface CourseListClientProps {
     modules: Module[];
@@ -30,6 +43,7 @@ interface CourseListClientProps {
 
 export function CourseListClient({ modules }: CourseListClientProps) {
   const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
   
   const allCourses: (Course & { trackTitle: string })[] = [];
   modules.forEach(module => {
@@ -40,11 +54,21 @@ export function CourseListClient({ modules }: CourseListClientProps) {
     });
   });
 
-  const handleDeleteClick = () => {
-    toast({
-      variant: "destructive",
-      title: "Funcionalidade em desenvolvimento",
-      description: "A exclusão de dados ainda não foi implementada.",
+  const handleDelete = (courseId: string) => {
+    startTransition(async () => {
+      const result = await deleteCourseAction(courseId);
+      if (result.success) {
+        toast({
+          title: "Sucesso!",
+          description: result.message,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: result.message,
+        });
+      }
     });
   };
 
@@ -141,10 +165,29 @@ export function CourseListClient({ modules }: CourseListClientProps) {
                           <span className="sr-only">Editar</span>
                       </Link>
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={handleDeleteClick}>
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Excluir</span>
-                  </Button>
+                  <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" disabled={isPending}>
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Excluir</span>
+                          </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                          <AlertDialogHeader>
+                              <AlertDialogTitle>Você tem certeza absoluta?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                  Essa ação não pode ser desfeita. Isso excluirá permanentemente o curso "{course.title}" e removerá seus dados de nossos servidores.
+                              </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDelete(course.id)} disabled={isPending}>
+                                  {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                  Sim, excluir curso
+                              </AlertDialogAction>
+                          </AlertDialogFooter>
+                      </AlertDialogContent>
+                  </AlertDialog>
                 </TableCell>
               </TableRow>
             )

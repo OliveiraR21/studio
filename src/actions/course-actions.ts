@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createCourse, updateCourse, findCourseById, getUserById, updateUser } from '@/lib/data-access';
+import { createCourse, updateCourse, findCourseById, getUserById, updateUser, deleteCourse } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
 import type { Course, Quiz } from '@/lib/types';
 import { getSimulatedUserId } from '@/lib/auth';
@@ -201,4 +201,21 @@ export async function completeCourseForUser(
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
     return { success: false, message: `Falha ao salvar progresso: ${errorMessage}` };
   }
+}
+
+export async function deleteCourseAction(courseId: string): Promise<{ success: boolean; message: string }> {
+  if (!courseId) {
+    return { success: false, message: "ID do curso não fornecido." };
+  }
+
+  try {
+    await deleteCourse(courseId);
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
+    return { success: false, message: `Falha ao excluir o curso: ${errorMessage}` };
+  }
+
+  revalidatePath('/admin/courses');
+  
+  return { success: true, message: 'Curso excluído com sucesso!' };
 }
