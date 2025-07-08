@@ -53,19 +53,21 @@ export function FloatingChat() {
     setInputValue('');
     setIsLoading(true);
 
-    const history = messages
-      .slice(1) // Remove initial greeting
-      .reduce((acc, msg, i) => {
-        if (i % 2 === 0 && messages[i + 1]) {
-          acc.push({ user: msg.content, model: messages[i + 1].content });
+    // The history for the API call should be based on the state *before* adding the new user message.
+    // It must be a clean, alternating sequence of user and model messages.
+    const conversation = messages.slice(1); // Remove initial greeting.
+    const historyForApi = conversation.reduce((acc, msg, i) => {
+        // We look for pairs of (user, assistant) messages to form the history.
+        if (msg.role === 'user' && conversation[i + 1]?.role === 'assistant') {
+            acc.push({ user: msg.content, model: conversation[i + 1].content });
         }
         return acc;
-      }, [] as { user: string; model: string }[]);
+    }, [] as { user: string; model: string }[]);
 
     try {
       const assistantResponse = await askAssistant({
         question: userMessage.content,
-        history,
+        history: historyForApi,
       });
       setMessages((prev) => [
         ...prev,
@@ -113,7 +115,7 @@ export function FloatingChat() {
       </div>
 
       {isOpen && (
-        <Card className="fixed bottom-24 right-6 z-50 w-full max-w-[360px] flex flex-col shadow-2xl">
+        <Card className="fixed bottom-24 right-6 z-50 w-full max-w-[360px] flex flex-col shadow-2xl h-[480px]">
           <CardHeader className="flex-shrink-0">
             <CardTitle className="flex items-center gap-2">
               <Bot className="text-primary" /> Assistente Brill
@@ -123,7 +125,7 @@ export function FloatingChat() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex-grow overflow-hidden p-0">
-            <ScrollArea className="h-80 w-full p-6" ref={scrollAreaRef}>
+            <ScrollArea className="h-full w-full p-6" ref={scrollAreaRef}>
               <div className="space-y-4">
                 {messages.map((message, index) => (
                   <div
