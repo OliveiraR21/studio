@@ -23,6 +23,14 @@ const QuestionSchema = z.object({
     correctAnswer: z.string().describe('A resposta correta, que deve ser uma das strings no array de opções.'),
 });
 
+type Question = z.infer<typeof QuestionSchema>;
+
+// Schema for the smaller, batched response from the LLM.
+const GeneratePartialQuizOutputSchema = z.object({
+  questions: z.array(QuestionSchema).describe('Um banco de 10 perguntas de múltipla escolha para o questionário.'),
+});
+
+// Final output schema for the user-facing function, containing all questions.
 const GenerateQuizOutputSchema = z.object({
   questions: z.array(QuestionSchema).describe('Um banco de questões com aproximadamente 40 perguntas para o questionário.'),
 });
@@ -33,17 +41,17 @@ export async function generateQuiz(input: GenerateQuizInput): Promise<GenerateQu
   return generateQuizFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'generateQuizPrompt',
+// This prompt asks for a smaller batch of 10 questions to avoid timeouts.
+const batchPrompt = ai.definePrompt({
+  name: 'generateQuizBatchPrompt',
   input: { schema: GenerateQuizInputSchema },
-  output: { schema: GenerateQuizOutputSchema },
-  // Using a more powerful model for this complex generation task to improve reliability.
+  output: { schema: GeneratePartialQuizOutputSchema },
   model: 'googleai/gemini-1.5-pro-latest',
   prompt: `Você é um especialista em design instrucional encarregado de criar conteúdo educacional para uma plataforma de e-learning corporativa.
 
-Sua tarefa é criar um grande banco de questões de múltipla escolha com base no conteúdo de um curso fornecido.
+Sua tarefa é criar um banco de questões de múltipla escolha com base no conteúdo de um curso fornecido.
 
-Gere um banco de questões relevante com 40 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados.
+Gere um conjunto relevante de 10 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados. Para garantir variedade, evite repetir perguntas que seriam geradas a partir do mesmo conteúdo se você fosse chamado várias vezes.
 
 {{#if transcript}}
 Use a seguinte transcrição do vídeo como a fonte PRIMÁRIA de informação para criar as perguntas. O título e a descrição podem ser usados como contexto adicional.
@@ -65,26 +73,32 @@ const generateQuizFlow = ai.defineFlow(
     outputSchema: GenerateQuizOutputSchema,
   },
   async (input) => {
-    // Implement retry logic with exponential backoff for more stability against transient errors like 503s.
-    const maxRetries = 3;
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const allQuestions: Question[] = [];
+    const numberOfBatches = 4; // 4 batches * 10 questions = 40
+
+    for (let i = 0; i < numberOfBatches; i++) {
       try {
-        const { output } = await prompt(input);
-        if (output) {
-          return output;
+        const { output } = await batchPrompt(input);
+        if (output?.questions) {
+          allQuestions.push(...output.questions);
+        } else {
+          // If a batch returns no questions, something is wrong. Fail fast.
+          throw new Error(`O lote ${i + 1} não retornou nenhuma pergunta.`);
         }
       } catch (error) {
-        console.error(`AI quiz generation attempt ${attempt} failed:`, error);
-        if (attempt === maxRetries) {
-          // After the last attempt, re-throw a user-friendly error.
-          throw new Error('A IA não conseguiu gerar o questionário após várias tentativas. O serviço pode estar sobrecarregado. Por favor, tente novamente mais tarde.');
-        }
-        // Exponential backoff: wait 2s, then 4s, etc.
-        const delay = Math.pow(2, attempt) * 1000;
-        await new Promise(res => setTimeout(res, delay));
+        console.error(`Erro ao gerar o lote de questionário ${i + 1}:`, error);
+        // If any batch fails, we throw a user-friendly error for the whole process.
+        throw new Error('A IA não conseguiu gerar o questionário completo. O serviço pode estar sobrecarregado ou encontrou um erro. Por favor, tente novamente.');
       }
     }
-    // This should not be reached, but is a fallback.
-    throw new Error('A geração do questionário falhou inesperadamente.');
+
+    if (allQuestions.length === 0) {
+        throw new Error('A IA não conseguiu gerar nenhuma pergunta.');
+    }
+    
+    // De-duplicate questions, just in case the model repeats itself on different batches.
+    const uniqueQuestions = Array.from(new Map(allQuestions.map(q => [q.text, q])).values());
+
+    return { questions: uniqueQuestions };
   }
 );
