@@ -12,8 +12,14 @@ declare global {
   var a_modules: Module[];
 }
 
-if (!global.a_users) {
-  // Deep copy to avoid modifying the original mock data during runtime.
+if (process.env.NODE_ENV === 'production') {
+  // In production, initialize only once.
+  if (!global.a_users) {
+    global.a_users = JSON.parse(JSON.stringify(mockUsers));
+    global.a_modules = JSON.parse(JSON.stringify(mockModules));
+  }
+} else {
+  // In development, always re-initialize to reflect changes in mock-data.ts on hot reload.
   global.a_users = JSON.parse(JSON.stringify(mockUsers));
   global.a_modules = JSON.parse(JSON.stringify(mockModules));
 }
