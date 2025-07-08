@@ -35,8 +35,8 @@ export default async function MyCoursesPage() {
     return currentUser.completedCourses.includes(courseId);
   }
 
-  const getTrackProgress = (track: Track) => {
-    if (track.courses.length === 0) return 100;
+  const getTrackProgress = (track: Track): number | null => {
+    if (track.courses.length === 0) return null;
     const completedCount = track.courses.filter(c => isCourseCompleted(c.id)).length;
     return (completedCount / track.courses.length) * 100;
   }
@@ -95,7 +95,7 @@ export default async function MyCoursesPage() {
                  const unlocked = isUnlocked;
 
                  const progress = getTrackProgress(track);
-                 const allCoursesInTrackCompleted = progress === 100;
+                 const allCoursesInTrackCompleted = progress === 100 || (track.courses.length === 0);
                  const trackCompleted = currentUser.completedTracks.includes(track.id);
                  const hasQuiz = track.quiz && track.quiz.questions.length > 0;
 
@@ -114,10 +114,12 @@ export default async function MyCoursesPage() {
                           <div className="flex-grow text-left">
                               <h3 className="text-xl font-semibold">{track.title}</h3>
                               <p className="text-sm text-muted-foreground">{track.description}</p>
-                              <div className="flex items-center gap-2 mt-2">
-                                <Progress value={progress} className="w-full max-w-xs h-2" />
-                                <span className="text-xs font-semibold text-muted-foreground">{Math.round(progress)}%</span>
-                              </div>
+                              {progress !== null && (
+                                <div className="flex items-center gap-2 mt-2">
+                                  <Progress value={progress} className="w-full max-w-xs h-2" />
+                                  <span className="text-xs font-semibold text-muted-foreground">{Math.round(progress)}%</span>
+                                </div>
+                              )}
                           </div>
                         </div>
                       </AccordionTrigger>
@@ -149,6 +151,7 @@ export default async function MyCoursesPage() {
                             allCoursesInTrackCompleted={allCoursesInTrackCompleted}
                             trackCompleted={trackCompleted}
                             hasQuiz={hasQuiz}
+                            courseCount={track.courses.length}
                           />
                         </div>
                       </AccordionContent>

@@ -14,9 +14,10 @@ interface TrackFinalActionsProps {
     allCoursesInTrackCompleted: boolean;
     trackCompleted: boolean;
     trackTitle: string;
+    courseCount: number;
 }
 
-export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted, trackCompleted, trackTitle }: TrackFinalActionsProps) {
+export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted, trackCompleted, trackTitle, courseCount }: TrackFinalActionsProps) {
     const { toast } = useToast();
     const router = useRouter();
     const [isCompleting, setIsCompleting] = useState(false);
@@ -53,8 +54,13 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
         );
     }
     
-    // If track is completed, show feedback options.
+    // If track is completed, show feedback options (only if there was content).
     if (trackCompleted) {
+        // If there's no content to give feedback on, render nothing.
+        if (courseCount === 0 && !hasQuiz) {
+            return null;
+        }
+
         if (feedbackState === 'awaiting_feedback') {
             return (
                 <Card className="bg-muted/50">
