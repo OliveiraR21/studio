@@ -204,6 +204,17 @@ export const learningModules: Module[] = [
             thumbnailUrl: '/br-supply-logo.png',
             likes: 0,
             dislikes: 0,
+          },
+          {
+            id: 'course-heygen-test',
+            moduleId: 'module-hs',
+            trackId: 'track-hs-cp',
+            title: 'Teste de Vídeo HeyGen',
+            description: 'Um vídeo de teste para verificar a incorporação de conteúdo do HeyGen.',
+            videoUrl: 'https://app.heygen.com/embeds/f00a79bb4ca1483ebf0898a6a24f562c',
+            thumbnailUrl: '/br-supply-logo.png',
+            likes: 0,
+            dislikes: 0,
           }
         ],
         quiz: { questions: [] }
