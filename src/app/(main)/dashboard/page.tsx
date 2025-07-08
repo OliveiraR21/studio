@@ -1,3 +1,4 @@
+
 import { getLearningModules, findCourseById, findNextCourseForUser, getUsers } from "@/lib/data-access";
 import { 
   Card, 
@@ -45,12 +46,14 @@ export default async function DashboardPage() {
   const allScores = [...(currentUser.courseScores ?? []).map(s => s.score), ...(currentUser.trackScores ?? []).map(s => s.score)];
   const averageScore = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
 
-  const coursesToRetake = (currentUser.courseScores ?? [])
+  const coursesToRetakePromises = (currentUser.courseScores ?? [])
     .filter(scoreInfo => scoreInfo.score < PASSING_SCORE)
-    .map(scoreInfo => {
-        const courseDetails = findCourseById(scoreInfo.courseId, learningModules);
+    .map(async scoreInfo => {
+        const courseDetails = await findCourseById(scoreInfo.courseId);
         return courseDetails ? { ...courseDetails.course, score: scoreInfo.score } : null;
-    })
+    });
+
+  const coursesToRetake = (await Promise.all(coursesToRetakePromises))
     .filter((course): course is Course & { score: number } => course !== null);
 
   const trackPerformance = (currentUser.trackScores ?? [])
@@ -68,7 +71,7 @@ export default async function DashboardPage() {
     .filter((track): track is Track & { score: number } => track !== null)
     .reverse(); // Newest first
 
-  const nextCourse = findNextCourseForUser(currentUser, learningModules);
+  const nextCourse = await findNextCourseForUser(currentUser);
 
   // Calculate training hours
   const totalDuration = allCourses.reduce((acc, course) => acc + (course.durationInSeconds || 0), 0);

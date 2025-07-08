@@ -1,3 +1,4 @@
+
 import { findCourseById, getLearningModules } from "@/lib/data-access";
 import { CourseForm } from "@/components/admin/course-form";
 import { notFound } from "next/navigation";
@@ -17,7 +18,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
   const modules = await getLearningModules();
 
   if (!isNew) {
-    const result = findCourseById(params.id, modules);
+    const result = await findCourseById(params.id);
     if (!result) {
       notFound();
     }
