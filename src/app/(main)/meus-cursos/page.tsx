@@ -36,14 +36,9 @@ export default async function MyCoursesPage() {
   }
 
   const getTrackProgress = (track: Track) => {
-    if (track.courses.length === 0) return 0;
+    if (track.courses.length === 0) return 100;
     const completedCount = track.courses.filter(c => isCourseCompleted(c.id)).length;
     return (completedCount / track.courses.length) * 100;
-  }
-
-  const isTrackUnlocked = (track: Track, previousTrack?: Track) => {
-    if (!previousTrack) return true; // The first track is always unlocked.
-    return currentUser.completedTracks.includes(previousTrack.id);
   }
 
   const isCourseUnlocked = (course: Course, isParentTrackUnlocked: boolean, previousCourse?: Course) => {
@@ -79,11 +74,30 @@ export default async function MyCoursesPage() {
           <TabsContent key={module.id} value={module.id}>
             <Accordion type="single" collapsible className="w-full space-y-4" defaultValue={`track-${module.tracks[0]?.id}`}>
               {module.tracks.map((track, trackIndex) => {
-                 const previousTrack = trackIndex > 0 ? module.tracks[trackIndex - 1] : undefined;
-                 const unlocked = isTrackUnlocked(track, previousTrack);
+                 // Determine if the current track is unlocked
+                 let isUnlocked = true; // First track is always unlocked
+                 if (trackIndex > 0) {
+                    // Find the most recent, non-skippable prerequisite track
+                    let prerequisiteTrack: Track | undefined;
+                    for (let i = trackIndex - 1; i >= 0; i--) {
+                        const pt = module.tracks[i];
+                        const isSkippable = pt.courses.length === 0 && (!pt.quiz || pt.quiz.questions.length === 0);
+                        if (!isSkippable) {
+                            prerequisiteTrack = pt;
+                            break;
+                        }
+                    }
+                    // If a prerequisite was found, the user must have completed it
+                    if (prerequisiteTrack) {
+                        isUnlocked = currentUser.completedTracks.includes(prerequisiteTrack.id);
+                    }
+                 }
+                 const unlocked = isUnlocked;
+
                  const progress = getTrackProgress(track);
                  const allCoursesInTrackCompleted = progress === 100;
                  const trackCompleted = currentUser.completedTracks.includes(track.id);
+                 const hasQuiz = track.quiz && track.quiz.questions.length > 0;
 
                  return (
                   <Card key={track.id} className={!unlocked ? 'bg-muted/50' : ''}>
@@ -130,9 +144,11 @@ export default async function MyCoursesPage() {
                           <Separator className="my-6" />
 
                           <TrackFinalActions
+                            trackId={track.id}
                             trackTitle={track.title}
                             allCoursesInTrackCompleted={allCoursesInTrackCompleted}
                             trackCompleted={trackCompleted}
+                            hasQuiz={hasQuiz}
                           />
                         </div>
                       </AccordionContent>
