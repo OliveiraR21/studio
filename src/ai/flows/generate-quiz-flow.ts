@@ -37,6 +37,8 @@ const prompt = ai.definePrompt({
   name: 'generateQuizPrompt',
   input: { schema: GenerateQuizInputSchema },
   output: { schema: GenerateQuizOutputSchema },
+  // Using a more powerful model for this complex generation task to improve reliability.
+  model: 'googleai/gemini-1.5-pro-latest',
   prompt: `Você é um especialista em design instrucional encarregado de criar conteúdo educacional para uma plataforma de e-learning corporativa.
 
 Sua tarefa é criar um grande banco de questões de múltipla escolha com base no conteúdo de um curso fornecido.
@@ -63,11 +65,26 @@ const generateQuizFlow = ai.defineFlow(
     outputSchema: GenerateQuizOutputSchema,
   },
   async (input) => {
-    // Revertendo para a implementação mais simples que estava funcionando originalmente.
-    const { output } = await prompt(input);
-    if (!output) {
-      throw new Error('A IA não retornou um questionário. A resposta pode ter sido bloqueada ou estar vazia. Tente novamente com um conteúdo diferente.');
+    // Implement retry logic with exponential backoff for more stability against transient errors like 503s.
+    const maxRetries = 3;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const { output } = await prompt(input);
+        if (output) {
+          return output;
+        }
+      } catch (error) {
+        console.error(`AI quiz generation attempt ${attempt} failed:`, error);
+        if (attempt === maxRetries) {
+          // After the last attempt, re-throw a user-friendly error.
+          throw new Error('A IA não conseguiu gerar o questionário após várias tentativas. O serviço pode estar sobrecarregado. Por favor, tente novamente mais tarde.');
+        }
+        // Exponential backoff: wait 2s, then 4s, etc.
+        const delay = Math.pow(2, attempt) * 1000;
+        await new Promise(res => setTimeout(res, delay));
+      }
     }
-    return output;
+    // This should not be reached, but is a fallback.
+    throw new Error('A geração do questionário falhou inesperadamente.');
   }
 );
