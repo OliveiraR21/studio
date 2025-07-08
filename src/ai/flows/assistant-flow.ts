@@ -51,6 +51,8 @@ const assistantFlow = ai.defineFlow(
     const modules = await getLearningModules();
     const courseCatalog = formatCourseCatalog(modules);
 
+    // The prompt now only contains the core instructions and the course catalog.
+    // The conversation history is passed separately in the `history` parameter.
     const prompt = `Você é "Brill", um assistente de IA amigável e prestativo para a plataforma de e-learning "Br Supply Academy Stream".
 
 Seu objetivo principal é responder às perguntas dos usuários com base no conteúdo de treinamento disponível e guiá-los para os cursos corretos.
@@ -59,13 +61,7 @@ Você tem acesso ao catálogo completo de todos os módulos, trilhas e cursos di
 
 Quando um usuário pedir uma recomendação ou perguntar sobre um tópico, encontre o(s) curso(s) mais relevante(s) do catálogo e sugira-os. Ao sugerir um curso, você DEVE fornecer um link para ele no formato Markdown, assim: [Título do Curso](/courses/id-do-curso).
 
-Mantenha suas respostas concisas e profissionais.
-
-Histórico da Conversa:
-{{#each history}}
-Usuário: {{this.user}}
-Assistente: {{this.model}}
-{{/each}}
+Mantenha suas respostas concisas e profissionais. O histórico da conversa é fornecido separadamente para contexto.
 
 Catálogo de Cursos:
 ${courseCatalog}
@@ -76,13 +72,10 @@ ${question}
     
     const generateConfig = {
         prompt: prompt,
-        history: history?.map(h => ({
-            role: 'user',
-            parts: [{ text: h.user }]
-        }, {
-            role: 'model',
-            parts: [{ text: h.model }]
-        })).flat() || [],
+        history: history?.map(h => ([
+            { role: 'user' as const, parts: [{ text: h.user }] },
+            { role: 'model' as const, parts: [{ text: h.model }] }
+        ])).flat() || [],
     };
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
