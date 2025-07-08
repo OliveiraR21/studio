@@ -25,8 +25,6 @@ export function CoursePlayer({ videoUrl, title }: CoursePlayerProps) {
           controls={true}
           width="100%"
           height="100%"
-          light={true}
-          playing={true}
         />
       ) : (
         <Skeleton className="w-full h-full" />
