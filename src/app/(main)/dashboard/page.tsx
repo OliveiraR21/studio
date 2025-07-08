@@ -79,6 +79,9 @@ export default async function DashboardPage() {
   const completedDuration = completedCourses.reduce((acc, course) => acc + (course.durationInSeconds || 0), 0);
   const pendingDuration = totalDuration - completedDuration;
 
+  const completedTimePercentage = totalDuration > 0 ? Math.round((completedDuration / totalDuration) * 100) : 0;
+  const pendingTimePercentage = 100 - completedTimePercentage;
+
   return (
     <div className="container mx-auto py-2 space-y-8">
        <div className="mb-6">
@@ -139,13 +142,19 @@ export default async function DashboardPage() {
                   
                   <div className="space-y-1 text-xs text-muted-foreground pt-4">
                       <Separator className="mb-2" />
-                      <div className="flex justify-between w-full">
+                      <div className="flex justify-between w-full items-baseline">
                           <span>Horas Concluídas:</span>
-                          <span className="font-semibold text-foreground">{formatDuration(completedDuration)}</span>
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="font-semibold text-foreground">{formatDuration(completedDuration)}</span>
+                            <span>({completedTimePercentage}%)</span>
+                          </div>
                       </div>
-                      <div className="flex justify-between w-full">
+                      <div className="flex justify-between w-full items-baseline">
                           <span>Horas Pendentes:</span>
-                          <span className="font-semibold text-foreground">{formatDuration(pendingDuration)}</span>
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="font-semibold text-foreground">{formatDuration(pendingDuration)}</span>
+                            <span>({pendingTimePercentage}%)</span>
+                          </div>
                       </div>
                   </div>
               </CardContent>
