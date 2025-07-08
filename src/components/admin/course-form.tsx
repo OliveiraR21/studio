@@ -6,7 +6,6 @@ import { useEffect, useActionState, useMemo, useState } from 'react';
 import { saveCourse } from '@/actions/course-actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import ReactPlayer from 'react-player/lazy';
 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -80,27 +79,12 @@ export function CourseForm({ course, modules }: CourseFormProps) {
   );
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  // State for controlled inputs to enable auto-duration fetching
-  const [videoUrl, setVideoUrl] = useState(course?.videoUrl || '');
-  const [duration, setDuration] = useState(formatSecondsToHHMMSS(course?.durationInSeconds));
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-
   const availableTracks = useMemo(() => {
     if (!selectedModuleId) return [];
     const selectedModule = modules.find((m) => m.id === selectedModuleId);
     return selectedModule ? selectedModule.tracks : [];
   }, [selectedModuleId, modules]);
   
-  const handleDurationFetch = (seconds: number) => {
-    setDuration(formatSecondsToHHMMSS(seconds));
-  };
-
-
   useEffect(() => {
     if (state.success) {
       toast({
@@ -254,8 +238,7 @@ export function CourseForm({ course, modules }: CourseFormProps) {
           id="videoUrl"
           name="videoUrl"
           type="url"
-          value={videoUrl}
-          onChange={(e) => setVideoUrl(e.target.value)}
+          defaultValue={course?.videoUrl || ''}
           placeholder="https://exemplo.com/video"
           required
         />
@@ -280,23 +263,17 @@ export function CourseForm({ course, modules }: CourseFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="duration">Duração (hh:mm:ss)</Label>
-        <p className="text-xs text-muted-foreground">Preenchido automaticamente para URLs compatíveis (YouTube, Vimeo, etc.).</p>
+        <p className="text-xs text-muted-foreground">Este campo deve ser preenchido manualmente.</p>
         <Input
           id="duration"
           name="duration"
           type="text"
-          value={duration}
-          onChange={(e) => setDuration(e.target.value)}
+          defaultValue={formatSecondsToHHMMSS(course?.durationInSeconds)}
           placeholder="Ex: 00:05:00"
         />
         {state.errors?.duration && (
           <p className="text-sm text-destructive">{state.errors.duration[0]}</p>
         )}
-      </div>
-
-      {/* Hidden player to fetch duration */}
-      <div className='hidden'>
-        {isClient && <ReactPlayer url={videoUrl} onDuration={handleDurationFetch} />}
       </div>
 
       <div className="flex justify-end gap-4">
