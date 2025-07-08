@@ -83,6 +83,11 @@ export function CourseForm({ course, modules }: CourseFormProps) {
   // State for controlled inputs to enable auto-duration fetching
   const [videoUrl, setVideoUrl] = useState(course?.videoUrl || '');
   const [duration, setDuration] = useState(formatSecondsToHHMMSS(course?.durationInSeconds));
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
 
   const availableTracks = useMemo(() => {
@@ -291,7 +296,7 @@ export function CourseForm({ course, modules }: CourseFormProps) {
 
       {/* Hidden player to fetch duration */}
       <div className='hidden'>
-        <ReactPlayer url={videoUrl} onDuration={handleDurationFetch} />
+        {isClient && <ReactPlayer url={videoUrl} onDuration={handleDurationFetch} />}
       </div>
 
       <div className="flex justify-end gap-4">
