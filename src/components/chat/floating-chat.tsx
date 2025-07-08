@@ -1,3 +1,4 @@
+
 'use client';
 
 import { askAssistant } from '@/ai/flows/assistant-flow';
@@ -112,7 +113,7 @@ export function FloatingChat() {
       </div>
 
       {isOpen && (
-        <Card className="fixed bottom-24 right-6 z-50 w-full max-w-sm flex flex-col shadow-2xl">
+        <Card className="fixed bottom-24 right-6 z-50 w-full max-w-[360px] flex flex-col shadow-2xl">
           <CardHeader className="flex-shrink-0">
             <CardTitle className="flex items-center gap-2">
               <Bot className="text-primary" /> Assistente Brill
@@ -122,7 +123,7 @@ export function FloatingChat() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex-grow overflow-hidden p-0">
-            <ScrollArea className="h-96 w-full p-6" ref={scrollAreaRef}>
+            <ScrollArea className="h-80 w-full p-6" ref={scrollAreaRef}>
               <div className="space-y-4">
                 {messages.map((message, index) => (
                   <div
