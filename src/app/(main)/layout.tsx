@@ -3,6 +3,8 @@ import { MainLayoutClient } from './layout-client';
 import type { User } from '@/lib/types';
 import { UserNotFound } from '@/components/layout/user-not-found';
 
+export const dynamic = 'force-dynamic';
+
 export default async function MainLayout({
   children,
 }: {

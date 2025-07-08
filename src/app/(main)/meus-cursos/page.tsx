@@ -36,7 +36,20 @@ export default async function MyCoursesPage({
   }
 
   const nextCourse = await findNextCourseForUser(currentUser);
+  
+  // Find the default track ID first based on the query param, next course, or the very first track.
   const defaultOpenTrackId = searchParams?.openTrack || nextCourse?.trackId || learningModules[0]?.tracks[0]?.id;
+
+  // Now, find the module that this track belongs to, to set the correct default Tab.
+  let defaultOpenModuleId = learningModules[0]?.id; // Fallback to the first module
+  if (defaultOpenTrackId) {
+      for (const module of learningModules) {
+          if (module.tracks.some(track => track.id === defaultOpenTrackId)) {
+              defaultOpenModuleId = module.id;
+              break;
+          }
+      }
+  }
 
   const isCourseCompleted = (courseId: string) => {
     return currentUser.completedCourses.includes(courseId);
@@ -64,8 +77,8 @@ export default async function MyCoursesPage({
               Explore suas trilhas de conhecimento e continue sua jornada de aprendizado.
           </p>
       </div>
-      <Tabs defaultValue={learningModules[0]?.id}>
-        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-4 h-auto">
+      <Tabs defaultValue={defaultOpenModuleId}>
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-4 h-auto">
           {learningModules.map(module => (
             <TabsTrigger key={module.id} value={module.id} className="h-full flex flex-col items-start p-4 text-left">
                <div className="flex items-center gap-3">
