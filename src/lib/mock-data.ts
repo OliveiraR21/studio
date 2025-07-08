@@ -205,17 +205,6 @@ export const learningModules: Module[] = [
             likes: 0,
             dislikes: 0,
           },
-          {
-            id: 'course-plataformas-terceiras',
-            moduleId: 'module-hs',
-            trackId: 'track-hs-cp',
-            title: 'Plataformas Terceiras',
-            description: 'Um guia sobre como utilizar plataformas de terceiros integradas ao nosso sistema.',
-            videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
-            thumbnailUrl: '/br-supply-logo.png',
-            likes: 0,
-            dislikes: 0,
-          }
         ],
         quiz: { questions: [] }
       },
