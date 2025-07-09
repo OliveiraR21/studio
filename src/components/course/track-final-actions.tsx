@@ -122,9 +122,9 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
                         {isDownloading ? 'Gerando...' : 'Baixar Certificado'}
                     </Button>
                     <Button 
-                        variant="outline"
                         size="lg"
                         onClick={handleShareOnLinkedIn}
+                        className="bg-[#0A66C2] hover:bg-[#004182]"
                     >
                         <Linkedin className="mr-2 h-5 w-5" />
                         Publicar no LinkedIn
