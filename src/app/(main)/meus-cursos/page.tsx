@@ -1,3 +1,4 @@
+
 import { getLearningModules, findNextCourseForUser } from "@/lib/data-access";
 import { 
   Tabs, 
@@ -125,7 +126,7 @@ export default async function MyCoursesPage({
                  const unlocked = isUnlocked;
 
                  const progress = getTrackProgress(track);
-                 const allCoursesInTrackCompleted = progress === 100 || (track.courses.length === 0);
+                 const allCoursesInTrackCompleted = progress === 100;
                  const trackCompleted = currentUser.completedTracks.includes(track.id);
                  const hasQuiz = track.quiz && track.quiz.questions.length > 0;
                  const isCompletedEmptyTrack = trackCompleted && track.courses.length === 0 && !hasQuiz;
