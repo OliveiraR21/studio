@@ -27,6 +27,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import type { User, UserRole } from '@/lib/types';
+import { NotificationBell } from '@/components/layout/notification-bell';
 
 export function MainLayoutClient({
   user,
@@ -99,6 +100,7 @@ export function MainLayoutClient({
           <div className="w-full flex-1">
             {/* Future search bar can go here */}
           </div>
+          <NotificationBell />
           <ThemeToggle />
           <UserNav user={user} />
         </header>

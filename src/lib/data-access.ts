@@ -1,7 +1,8 @@
 // In-memory data store
-import type { User, Module, Track, Course, UserRole } from './types';
+import type { User, Module, Track, Course, UserRole, Notification } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
 import { userHasCourseAccess } from './access-control';
+import { differenceInDays } from 'date-fns';
 
 // A simple in-memory database.
 // In a real app, you would use a database like Firestore or Prisma.
@@ -18,10 +19,27 @@ declare global {
 // persists across reloads, so we only initialize the data if it's not already there.
 // In production, this code runs only once when the server starts.
 if (!global.a_users) {
-  global.a_users = JSON.parse(JSON.stringify(mockUsers));
+  global.a_users = JSON.parse(JSON.stringify(mockUsers), (key, value) => {
+    // Reviver function to convert ISO date strings back to Date objects
+    if (key === 'createdAt' && typeof value === 'string') {
+        const date = new Date(value);
+        if (!isNaN(date.getTime())) {
+            return date;
+        }
+    }
+    return value;
+  });
 }
 if (!global.a_modules) {
-  global.a_modules = JSON.parse(JSON.stringify(mockModules));
+  global.a_modules = JSON.parse(JSON.stringify(mockModules), (key, value) => {
+    if (key === 'createdAt' && typeof value === 'string') {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    return value;
+  });
 }
 
 
@@ -120,6 +138,7 @@ export async function createCourse(courseData: { trackId: string; title: string;
         moduleId: parentModule.id,
         likes: 0,
         dislikes: 0,
+        createdAt: new Date(),
         ...courseData,
     };
     parentTrack.courses.push(newCourse);
@@ -203,4 +222,55 @@ export async function updateUser(userId: string, userData: Partial<Omit<User, 'i
     const updatedUser = { ...global.a_users[userIndex], ...userData };
     global.a_users[userIndex] = updatedUser;
     return Promise.resolve(updatedUser);
+}
+
+
+// --- Notification Functions ---
+
+export async function getNotificationsForUser(user: User): Promise<Notification[]> {
+    const notifications: Notification[] = [];
+    const allModules = await getLearningModules();
+    const today = new Date();
+
+    for (const module of allModules) {
+        for (const track of module.tracks) {
+            for (const course of track.courses) {
+                // Notify about new courses added in the last 7 days that the user has access to
+                if (differenceInDays(today, course.createdAt) <= 7) {
+                    if (userHasCourseAccess(user, course)) {
+                        notifications.push({
+                            id: `notif-new-${course.id}`,
+                            title: 'Novo curso disponível!',
+                            description: `O curso "${course.title}" foi adicionado à trilha "${track.title}".`,
+                            createdAt: course.createdAt,
+                            read: false, // For this demo, notifications are always unread initially
+                            href: `/courses/${course.id}`,
+                        });
+                    }
+                }
+            }
+        }
+    }
+    
+    // Notify about courses that need to be retaken
+    const PASSING_SCORE = 90;
+    const coursesToRetake = (user.courseScores ?? [])
+        .filter(scoreInfo => scoreInfo.score < PASSING_SCORE);
+    
+    for (const scoreInfo of coursesToRetake) {
+         const courseDetails = await findCourseById(scoreInfo.courseId);
+         if (courseDetails && userHasCourseAccess(user, courseDetails.course)) {
+             notifications.push({
+                id: `notif-retake-${scoreInfo.courseId}`,
+                title: 'Lembrete de estudo',
+                description: `Você ainda não atingiu a nota mínima no curso "${courseDetails.course.title}".`,
+                createdAt: new Date(), // Use current date for retake reminders
+                read: false,
+                href: `/courses/${scoreInfo.courseId}`,
+             });
+         }
+    }
+
+    // Sort notifications by date, newest first
+    return notifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }

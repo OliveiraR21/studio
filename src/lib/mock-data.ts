@@ -1,6 +1,13 @@
 
 import type { User, Module } from './types';
 
+const today = new Date();
+const fiveDaysAgo = new Date();
+fiveDaysAgo.setDate(today.getDate() - 5);
+const oneYearAgo = new Date();
+oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+
 export const users: User[] = [
   {
     id: '1',
@@ -157,6 +164,7 @@ export const learningModules: Module[] = [
             description: 'Uma introdução à cultura, valores e missão da Br Supply.',
             videoUrl: 'https://app.heygen.com/embeds/603bafc3779141ec87c7eb529ce6452d',
             thumbnailUrl: '/br-supply-logo.png',
+            createdAt: oneYearAgo,
             likes: 0,
             dislikes: 0,
           },
@@ -168,9 +176,10 @@ export const learningModules: Module[] = [
             description: 'Visão geral dos processos e estratégias da área comercial.',
             videoUrl: 'https://app.heygen.com/embeds/4a2fc4bc9d834679afa3a4c046731c2a',
             thumbnailUrl: '/br-supply-logo.png',
+            accessAreas: ['Comercial', 'Logística'],
+            createdAt: oneYearAgo,
             likes: 0,
             dislikes: 0,
-            accessAreas: ['Comercial', 'Logística'],
           },
         ],
         quiz: { questions: [] }
@@ -204,6 +213,7 @@ export const learningModules: Module[] = [
             description: 'Aprenda a navegar e utilizar o portal BRS para gerenciar o ciclo de pedidos de forma eficiente, desde a criação até o acompanhamento da entrega.',
             videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
             thumbnailUrl: '/br-supply-logo.png',
+            createdAt: fiveDaysAgo,
             likes: 0,
             dislikes: 0,
           },
@@ -213,11 +223,12 @@ export const learningModules: Module[] = [
             trackId: 'track-hs-cp',
             title: 'ERP Próprio',
             description: 'Aprenda sobre o funcionamento e as funcionalidades do nosso ERP interno.',
-            videoUrl: 'https://app.heygen.com/embeds/4a0496a306f649da864f402150d52ff7',
+            videoUrl: "https://app.heygen.com/embeds/4a0496a306f649da864f402150d52ff7",
             thumbnailUrl: '/br-supply-logo.png',
+            minimumRole: 'Supervisor',
+            createdAt: today,
             likes: 0,
             dislikes: 0,
-            minimumRole: 'Supervisor',
           },
         ],
         quiz: { questions: [] }

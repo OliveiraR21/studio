@@ -24,6 +24,7 @@ export interface Course {
   videoUrl: string;
   thumbnailUrl?: string;
   durationInSeconds?: number;
+  createdAt: Date;
   // A course can optionally have a quiz.
   quiz?: Quiz;
   likes?: number;
@@ -66,4 +67,14 @@ export interface User {
   // Track scores for both course and track quizzes.
   courseScores?: { courseId: string; score: number; attempts: number }[];
   trackScores?: { trackId: string; score: number; attempts: number }[];
+}
+
+
+export interface Notification {
+    id: string;
+    title: string;
+    description: string;
+    createdAt: Date;
+    read: boolean;
+    href?: string;
 }
