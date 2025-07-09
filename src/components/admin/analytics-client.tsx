@@ -17,8 +17,10 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { Clock, Users, AreaChart, AlertCircle } from "lucide-react";
+import { Clock, Users, AreaChart, AlertCircle, Download } from "lucide-react";
 import Link from 'next/link';
+import { Button } from "../ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface AnalyticsClientProps {
   data: AnalyticsData;
@@ -29,14 +31,21 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     const data = payload[0].payload;
     return (
       <div className="rounded-lg border bg-background p-2 shadow-sm max-w-sm">
-        <div className="grid grid-cols-2 gap-2">
-          <div className="flex flex-col space-y-1">
+        <div className="flex flex-col space-y-1 mb-2">
             <span className="text-[0.70rem] uppercase text-muted-foreground">
-              Curso
+                Curso
             </span>
             <Link href={`/courses/${data.courseId}`} className="font-bold text-primary hover:underline">
-              {data.courseTitle}
+                {data.courseTitle}
             </Link>
+        </div>
+        <p className="text-xs text-muted-foreground mb-2">{data.fullQuestion}</p>
+        <div className="grid grid-cols-2 gap-2 border-t pt-2">
+          <div className="flex flex-col space-y-1">
+            <span className="text-[0.70rem] uppercase text-muted-foreground">
+              Taxa de Acerto
+            </span>
+            <span className="font-bold text-green-600">{`${data.successRate}%`}</span>
           </div>
           <div className="flex flex-col space-y-1">
             <span className="text-[0.70rem] uppercase text-muted-foreground">
@@ -45,7 +54,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             <span className="font-bold text-destructive">{`${data.errorRate}%`}</span>
           </div>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">{data.fullQuestion}</p>
       </div>
     );
   }
@@ -54,18 +62,59 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function AnalyticsClient({ data }: AnalyticsClientProps) {
+  const { toast } = useToast();
   const { engagementStats, questionProficiency, totalUsers } = data;
 
   const chartData = questionProficiency.map(q => ({
     name: q.questionText.length > 50 ? `${q.questionText.substring(0, 50)}...` : q.questionText,
     fullQuestion: q.questionText,
     errorRate: q.errorRate,
+    successRate: 100 - q.errorRate,
     courseTitle: q.courseTitle,
     courseId: q.courseId,
   })).reverse(); // Reverse to have highest error rate at the top
 
+  const handleDownload = () => {
+    const headers = ["Questão", "Curso", "Taxa de Erro (%)"];
+    const rows = questionProficiency.map(q => [
+        `"${q.questionText.replace(/"/g, '""')}"`, // Escape double quotes
+        `"${q.courseTitle.replace(/"/g, '""')}"`,
+        q.errorRate
+    ]);
+
+    let csvContent = "data:text/csv;charset=utf-8," 
+        + headers.join(",") + "\n" 
+        + rows.map(e => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "relatorio_proficiencia_questoes.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Download Iniciado",
+      description: "O relatório de proficiência por questão foi baixado.",
+    });
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+            <div>
+                <h1 className="text-3xl font-bold">Relatórios e Análises</h1>
+                <p className="text-muted-foreground">
+                    Insights sobre o engajamento dos usuários e a eficácia do conteúdo.
+                </p>
+            </div>
+            <Button onClick={handleDownload} disabled={chartData.length === 0}>
+                <Download className="mr-2 h-4 w-4" />
+                Baixar Relatório de Proficiência
+            </Button>
+        </div>
+
       {/* Engagement Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -127,7 +176,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                <XAxis type="number" dataKey="errorRate" unit="%" />
+                <XAxis type="number" domain={[0, 100]} unit="%" />
                 <YAxis
                   type="category"
                   dataKey="name"
@@ -139,7 +188,8 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                   cursor={{ fill: 'hsl(var(--muted))' }}
                   content={<CustomTooltip />}
                 />
-                <Bar dataKey="errorRate" layout="vertical" fill="hsl(var(--destructive))" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="successRate" stackId="a" fill="#22c55e" />
+                <Bar dataKey="errorRate" stackId="a" fill="hsl(var(--destructive))" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
