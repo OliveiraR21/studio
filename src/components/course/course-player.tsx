@@ -8,8 +8,8 @@ interface CoursePlayerProps {
 export function CoursePlayer({ videoUrl, title }: CoursePlayerProps) {
   const getEmbedUrl = (url: string): string => {
     if (url && url.includes("heygen.com/")) {
-      // Handles both /video/ and /videos/ in the URL
-      return url.replace(/\/videos?\//, "/embeds/");
+      // Handles /videos/, /video/, and /guest/videos/ formats, converting them to the correct /embeds/ format.
+      return url.replace(/(\/guest)?\/videos?\//, "/embeds/");
     }
     return url;
   };
