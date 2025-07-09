@@ -1,8 +1,9 @@
+
 'use client';
 
 import type { User, UserRole } from '@/lib/types';
 import { useFormStatus } from 'react-dom';
-import { useEffect, useActionState } from 'react';
+import { useEffect, useActionState, useMemo, useState } from 'react';
 import { saveUser } from '@/actions/user-actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -10,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -18,6 +19,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { cn } from '@/lib/utils';
+
 
 interface UserFormProps {
   // Pass all users to populate manager dropdowns
@@ -47,6 +63,14 @@ export function UserForm({ allUsers }: UserFormProps) {
   const coordinators = allUsers.filter(u => u.role === 'Coordenador');
   const managers = allUsers.filter(u => u.role === 'Gerente');
   const directors = allUsers.filter(u => u.role === 'Diretor');
+  
+  const [areaValue, setAreaValue] = useState('');
+  const [areaPopoverOpen, setAreaPopoverOpen] = useState(false);
+
+  const uniqueAreas = useMemo(() => {
+    const areas = new Set(allUsers.map(u => u.area).filter((a): a is string => !!a));
+    return Array.from(areas).sort();
+  }, [allUsers]);
 
   useEffect(() => {
     if (state.success) {
@@ -102,7 +126,53 @@ export function UserForm({ allUsers }: UserFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="area">Área / Departamento</Label>
-            <Input id="area" name="area" placeholder="Ex: Comercial" />
+            <Input type="hidden" name="area" value={areaValue} />
+             <Popover open={areaPopoverOpen} onOpenChange={setAreaPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={areaPopoverOpen}
+                  className="w-full justify-between font-normal"
+                >
+                  {areaValue
+                    ? uniqueAreas.find((area) => area.toLowerCase() === areaValue.toLowerCase()) || areaValue
+                    : "Selecione ou crie uma área..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                <Command>
+                  <CommandInput 
+                    placeholder="Buscar ou criar área..."
+                    onValueChange={(searchValue) => setAreaValue(searchValue)}
+                  />
+                  <CommandList>
+                    <CommandEmpty>Nenhuma área encontrada. Digite para criar uma nova.</CommandEmpty>
+                    <CommandGroup>
+                      {uniqueAreas.map((area) => (
+                        <CommandItem
+                          key={area}
+                          value={area}
+                          onSelect={(currentValue) => {
+                            setAreaValue(currentValue === areaValue ? "" : currentValue);
+                            setAreaPopoverOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              areaValue.toLowerCase() === area.toLowerCase() ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {area}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="space-y-2">

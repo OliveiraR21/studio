@@ -1,9 +1,9 @@
 
 'use client';
 
-import type { Course, Module, UserRole } from '@/lib/types';
+import type { Course, Module, UserRole, User } from '@/lib/types';
 import { useFormStatus } from 'react-dom';
-import { useEffect, useActionState, useMemo, useState } from 'react';
+import { useEffect, useActionState, useMemo, useState, useCallback } from 'react';
 import { saveCourse } from '@/actions/course-actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -35,10 +35,12 @@ import {
 } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
+import { Badge } from '../ui/badge';
 
 interface CourseFormProps {
   course: Course | null;
   modules: Module[];
+  allUsers: User[];
 }
 
 const ALL_ROLES: UserRole[] = ['Assistente', 'Analista', 'Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin'];
@@ -66,7 +68,7 @@ const formatSecondsToHHMMSS = (totalSeconds: number | undefined) => {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 };
 
-export function CourseForm({ course, modules }: CourseFormProps) {
+export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
   const isNew = course === null;
   const router = useRouter();
   const { toast } = useToast();
@@ -82,6 +84,9 @@ export function CourseForm({ course, modules }: CourseFormProps) {
     isNew ? undefined : course.trackId
   );
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [areaPopoverOpen, setAreaPopoverOpen] = useState(false);
+  const [selectedAreas, setSelectedAreas] = useState<string[]>(course?.accessAreas || []);
+
 
   const availableTracks = useMemo(() => {
     if (!selectedModuleId) return [];
@@ -89,6 +94,19 @@ export function CourseForm({ course, modules }: CourseFormProps) {
     return selectedModule ? selectedModule.tracks : [];
   }, [selectedModuleId, modules]);
   
+  const uniqueAreas = useMemo(() => {
+    const areas = new Set(allUsers.map(u => u.area).filter((a): a is string => !!a));
+    return Array.from(areas).sort();
+  }, [allUsers]);
+
+  const toggleArea = useCallback((area: string) => {
+    setSelectedAreas(currentSelected =>
+      currentSelected.includes(area)
+        ? currentSelected.filter(a => a !== area)
+        : [...currentSelected, area]
+    );
+  }, []);
+
   useEffect(() => {
     if (state.success) {
       toast({
@@ -120,6 +138,8 @@ export function CourseForm({ course, modules }: CourseFormProps) {
     <form action={dispatch} className="space-y-6">
       {!isNew && <input type="hidden" name="id" value={course.id} />}
       {isNew && <input type="hidden" name="trackId" value={selectedTrackId || ''} />}
+      <input type="hidden" name="accessAreas" value={selectedAreas.join(',')} />
+
 
       {isNew && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -305,14 +325,57 @@ export function CourseForm({ course, modules }: CourseFormProps) {
               </div>
 
               <div className="space-y-2">
-                  <Label htmlFor="accessAreas">Áreas com Acesso</Label>
-                  <Input
-                      id="accessAreas"
-                      name="accessAreas"
-                      defaultValue={course?.accessAreas?.join(', ')}
-                      placeholder="Ex: Comercial, Logística, TI"
-                  />
-                  <p className="text-xs text-muted-foreground">Separe as áreas por vírgula. Se em branco, todas as áreas têm acesso.</p>
+                <Label>Áreas com Acesso</Label>
+                <Popover open={areaPopoverOpen} onOpenChange={setAreaPopoverOpen}>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant="outline"
+                            role="combobox"
+                            className="w-full justify-between font-normal"
+                        >
+                            <span className="flex-1 text-left truncate">
+                                {selectedAreas.length > 0 ? `${selectedAreas.length} área(s) selecionada(s)` : 'Selecione as áreas...'}
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                        <Command>
+                            <CommandInput placeholder="Buscar área..." />
+                            <CommandList>
+                                <CommandEmpty>Nenhuma área encontrada.</CommandEmpty>
+                                <CommandGroup>
+                                    {uniqueAreas.map((area) => (
+                                        <CommandItem
+                                            key={area}
+                                            value={area}
+                                            onSelect={() => toggleArea(area)}
+                                        >
+                                            <Check
+                                                className={cn(
+                                                    "mr-2 h-4 w-4",
+                                                    selectedAreas.includes(area) ? "opacity-100" : "opacity-0"
+                                                )}
+                                            />
+                                            {area}
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
+                 <div className="flex flex-wrap gap-1 pt-2">
+                    {selectedAreas.map(area => (
+                        <Badge key={area} variant="secondary">
+                            {area}
+                            <button type="button" onClick={() => toggleArea(area)} className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                            </button>
+                        </Badge>
+                    ))}
+                </div>
+                <p className="text-xs text-muted-foreground">Se nenhuma área for selecionada, todas as áreas terão acesso.</p>
               </div>
           </div>
           {state.errors?.minimumRole && <p className="text-sm text-destructive">{state.errors.minimumRole[0]}</p>}
