@@ -78,3 +78,23 @@ export interface Notification {
     read: boolean;
     href?: string;
 }
+
+export interface QuestionProficiency {
+  questionText: string;
+  courseTitle: string;
+  courseId: string;
+  errorRate: number; // as a percentage, e.g., 75
+}
+
+export interface EngagementStats {
+  avgSessionTime: string; // e.g., "25 min"
+  peakTime: string; // e.g., "14h - 16h"
+  completionRate: number; // e.g., 82
+}
+
+export interface AnalyticsData {
+  questionProficiency: QuestionProficiency[];
+  engagementStats: EngagementStats;
+  totalUsers: number;
+  totalCourses: number;
+}

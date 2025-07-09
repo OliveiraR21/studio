@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  BarChart,
   BookMarked,
   HelpCircle,
   Home,
@@ -90,6 +91,7 @@ export function MainLayoutClient({
       icon: BookMarked,
       label: 'Gerenciamento de Cursos',
     },
+    { href: '/admin/reports', icon: BarChart, label: 'Relatórios' },
   ];
 
   const isManager = userRole && managerRoles.includes(userRole);

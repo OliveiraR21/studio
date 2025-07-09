@@ -1,5 +1,5 @@
 // In-memory data store
-import type { User, Module, Track, Course, UserRole, Notification } from './types';
+import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
 import { userHasCourseAccess } from './access-control';
 import { differenceInDays } from 'date-fns';
@@ -273,4 +273,61 @@ export async function getNotificationsForUser(user: User): Promise<Notification[
 
     // Sort notifications by date, newest first
     return notifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+// --- Analytics Functions ---
+
+// NOTE: The data generated here is for demonstration purposes.
+// In a real application, this would be calculated from user interaction data.
+export async function getAnalyticsData(): Promise<AnalyticsData> {
+  const allModules = await getLearningModules();
+  const allUsers = await getUsers();
+
+  // 1. Calculate Question Proficiency (Simulated)
+  const allQuestions: { question: Question, course: Course }[] = [];
+  allModules.forEach(module => {
+    module.tracks.forEach(track => {
+      track.courses.forEach(course => {
+        if (course.quiz && course.quiz.questions.length > 0) {
+          course.quiz.questions.forEach(question => {
+            allQuestions.push({ question, course });
+          });
+        }
+      });
+    });
+  });
+
+  const questionProficiency: QuestionProficiency[] = allQuestions.map(({ question, course }) => {
+    // Simulate an error rate based on the question's text length and index.
+    // This provides stable but varied "mock" data.
+    const baseError = (question.text.length % 50) + 10; // Base error rate from 10 to 60
+    const complexityFactor = question.options.reduce((acc, opt) => acc + opt.length, 0) / 100; // Factor in option complexity
+    const errorRate = Math.min(95, baseError + complexityFactor); // Cap at 95%
+    
+    return {
+      questionText: question.text,
+      courseTitle: course.title,
+      courseId: course.id,
+      errorRate: Math.round(errorRate),
+    };
+  }).sort((a, b) => b.errorRate - a.errorRate) // Sort by highest error rate
+  .slice(0, 10); // Take top 10
+
+  // 2. Engagement Stats (Simulated)
+  const engagementStats: EngagementStats = {
+    avgSessionTime: "25 min",
+    peakTime: "14h - 16h",
+    completionRate: 82, // Percentage
+  };
+
+  // 3. Totals
+  const totalUsers = allUsers.length;
+  const totalCourses = allModules.flatMap(m => m.tracks.flatMap(t => t.courses)).length;
+  
+  return Promise.resolve({
+    questionProficiency,
+    engagementStats,
+    totalUsers,
+    totalCourses,
+  });
 }
