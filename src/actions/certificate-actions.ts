@@ -50,10 +50,11 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
         // Define colors based on the design
-        const darkBg = rgb(0.1, 0.1, 0.1);
+        const darkBg = rgb(0.12, 0.12, 0.12);
         const white = rgb(1, 1, 1);
         const lightGray = rgb(0.8, 0.8, 0.8);
-        const primaryOrange = rgb(1, 136 / 255, 46 / 255); // hsl(26 100% 59%)
+        const primaryOrange = rgb(1, 136 / 255, 46 / 255);
+        const borderColor = rgb(0.25, 0.25, 0.25);
 
         // Draw background
         page.drawRectangle({
@@ -64,11 +65,22 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
             color: darkBg,
         });
 
+        // Draw decorative border
+        const padding = 30;
+        page.drawRectangle({
+            x: padding,
+            y: padding,
+            width: width - padding * 2,
+            height: height - padding * 2,
+            borderColor: borderColor,
+            borderWidth: 1,
+        });
+
         // --- Logo Section (Top-Left) ---
         const logoPath = path.join(process.cwd(), 'public', 'br-supply-logo.png');
         const logoImageBytes = await fs.readFile(logoPath);
         const logoImage = await pdfDoc.embedPng(logoImageBytes);
-        const logoDims = logoImage.scale(0.10); // Drastically reduced logo size
+        const logoDims = logoImage.scale(0.10);
         
         page.drawImage(logoImage, {
             x: 60,
@@ -79,7 +91,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
 
 
         // --- Centered Text Section ---
-        let currentY = height - 160;
+        let currentY = height - 170; // Moved content block up
 
         // 1. Main Title
         const titleText = 'CERTIFICADO';
@@ -92,7 +104,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
             size: titleSize,
             color: white,
         });
-        currentY -= (titleSize + 30);
+        currentY -= (titleSize + 35);
 
         // 2. "Conferred to" Text
         const conferredText = 'CONFERIDO A';
@@ -106,7 +118,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
             color: lightGray,
             characterSpacing: 1,
         });
-        currentY -= (conferredSize + 25);
+        currentY -= (conferredSize + 20);
 
         // 3. User Name
         const userNameSize = 36;
@@ -119,7 +131,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
             size: userNameSize,
             color: primaryOrange,
         });
-        currentY -= (userNameSize + 40);
+        currentY -= (userNameSize + 35);
 
         // 4. "for successfully completing" Text
         const reasonText = 'POR CONCLUIR COM SUCESSO A TRILHA:';
@@ -133,7 +145,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
             color: lightGray,
             characterSpacing: 1,
         });
-        currentY -= (reasonSize + 25);
+        currentY -= (reasonSize + 20);
 
         // 5. Track Name (with wrapping)
         const trackNameSize = 24;
@@ -153,13 +165,24 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
             currentY -= lineHeight;
         }
 
-        // 6. Date (at the bottom)
+        // 6. Date and Location (at the bottom)
         const completionDate = format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+        const locationText = 'Rio Grande do Sul, Brasil';
         const dateText = `Concluído em ${completionDate}`;
+
+        const locationWidth = font.widthOfTextAtSize(locationText, 10);
+        page.drawText(locationText, {
+            x: width / 2 - locationWidth / 2,
+            y: 85,
+            font: font,
+            size: 10,
+            color: lightGray,
+        });
+
         const dateWidth = font.widthOfTextAtSize(dateText, 12);
         page.drawText(dateText, {
             x: width / 2 - dateWidth / 2,
-            y: 80,
+            y: 65,
             font: font,
             size: 12,
             color: lightGray,
