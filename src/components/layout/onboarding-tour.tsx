@@ -96,7 +96,7 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
         back: 'Voltar',
         close: 'Fechar',
         last: 'Finalizar',
-        next: 'Avançar',
+        next: 'Próximo',
         skip: 'Pular',
       }}
       styles={{
