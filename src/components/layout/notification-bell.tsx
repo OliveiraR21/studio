@@ -44,7 +44,7 @@ export function NotificationBell() {
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full border hover:bg-primary/10 hover:text-primary hover:border-primary focus-visible:ring-0 focus-visible:ring-offset-0">
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full border hover:bg-primary/10 text-foreground hover:text-primary hover:border-primary focus-visible:ring-0 focus-visible:ring-offset-0" data-tour-id="notification-bell">
                     <Bell className="h-[1.2rem] w-[1.2rem]" />
                     {unreadCount > 0 && (
                         <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-xs text-white">

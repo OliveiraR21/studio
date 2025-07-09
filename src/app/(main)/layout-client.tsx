@@ -30,6 +30,10 @@ import {
 } from '@/components/ui/sidebar';
 import type { User, UserRole } from '@/lib/types';
 import { NotificationBell } from '@/components/layout/notification-bell';
+import { OnboardingTour } from '@/components/layout/onboarding-tour';
+
+// Helper to create a slug for data attributes
+const toSlug = (str: string) => str.toLowerCase().replace(/\s+/g, '-');
 
 export function MainLayoutClient({
   user,
@@ -89,7 +93,7 @@ export function MainLayoutClient({
               const isActive = pathname.startsWith(item.href);
               return (
                 <SidebarMenuItem key={item.label}>
-                  <SidebarMenuButton asChild tooltip={item.label} isActive={isActive}>
+                  <SidebarMenuButton asChild tooltip={item.label} isActive={isActive} data-tour-id={toSlug(item.label)}>
                     <Link href={item.href}>
                       <item.icon />
                       <span>{item.label}</span>
@@ -115,6 +119,7 @@ export function MainLayoutClient({
           <UserNav user={user} />
         </header>
         <div className="flex-1 p-4 lg:p-6 bg-muted/20">
+          <OnboardingTour user={user} />
           {children}
         </div>
       </SidebarInset>
