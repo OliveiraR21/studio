@@ -77,7 +77,7 @@ export default function LoginPage() {
         {/* Coluna da Direita: Mascote */}
         <div className="hidden lg:flex justify-start items-center [perspective:1000px]">
           <img
-            src="https://placehold.co/500x500.png"
+            src="/mascote.png"
             alt="Mascote da Plataforma"
             className="w-full max-w-md h-auto rounded-lg transition-transform duration-700 ease-out transform-gpu [transform:rotateY(20deg)_rotateX(-10deg)] hover:[transform:rotateY(-5deg)_rotateX(5deg)_scale(1.05)] animate-float drop-shadow-2xl"
             data-ai-hint="friendly robot mascot"
