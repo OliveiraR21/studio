@@ -6,6 +6,7 @@ import {
   useContext,
   ReactNode,
   useEffect,
+  createElement,
 } from 'react';
 
 interface TourContextType {
@@ -40,10 +41,10 @@ export function TourProvider({ children }: { children: ReactNode }) {
     setRun(false);
   };
 
-  return (
-    <TourContext.Provider value={{ run, startTour, stopTour }}>
-      {children}
-    </TourContext.Provider>
+  return createElement(
+    TourContext.Provider,
+    { value: { run, startTour, stopTour } },
+    children
   );
 }
 
