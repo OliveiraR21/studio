@@ -1,6 +1,7 @@
+
 'use server';
 
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, PDFFont } from 'pdf-lib';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { format } from 'date-fns';
@@ -10,6 +11,30 @@ interface CertificateData {
     userName: string;
     trackName: string;
 }
+
+// Helper function to wrap text
+function wrapText(text: string, font: PDFFont, fontSize: number, maxWidth: number): string[] {
+    const words = text.split(' ');
+    if (words.length === 0) return [];
+    
+    const lines: string[] = [];
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+        const word = words[i];
+        const testLine = currentLine + " " + word;
+        const width = font.widthOfTextAtSize(testLine, fontSize);
+        if (width < maxWidth) {
+            currentLine = testLine;
+        } else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+    lines.push(currentLine);
+    return lines;
+}
+
 
 export async function generateCertificatePdf({ userName, trackName }: CertificateData): Promise<string> {
     try {
@@ -50,67 +75,79 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         });
 
         // Main Title
-        page.drawText('CERTIFICADO', {
-            x: width / 2,
+        const titleText = 'CERTIFICADO';
+        const titleWidth = boldFont.widthOfTextAtSize(titleText, 30);
+        page.drawText(titleText, {
+            x: width / 2 - titleWidth / 2,
             y: height - 180,
             font: boldFont,
             size: 30,
             color: white,
-            xAlignment: 'center',
         });
         
         // "Conferred to" Text
-        page.drawText('CONFERIDO A', {
-            x: width / 2,
+        const conferredText = 'CONFERIDO A';
+        const conferredWidth = font.widthOfTextAtSize(conferredText, 14);
+        page.drawText(conferredText, {
+            x: width / 2 - conferredWidth / 2,
             y: height - 250,
             font: font,
             size: 14,
             color: lightGray,
-            xAlignment: 'center',
             characterSpacing: 1,
         });
         
         // User Name
-        page.drawText(userName.toUpperCase(), {
-            x: width / 2,
+        const upperUserName = userName.toUpperCase();
+        const userNameWidth = boldFont.widthOfTextAtSize(upperUserName, 36);
+        page.drawText(upperUserName, {
+            x: width / 2 - userNameWidth / 2,
             y: height - 290,
             font: boldFont,
             size: 36,
             color: primaryOrange,
-            xAlignment: 'center',
         });
 
         // "for successfully completing" Text
-        page.drawText('POR CONCLUIR COM SUCESSO A TRILHA:', {
-            x: width / 2,
+        const reasonText = 'POR CONCLUIR COM SUCESSO A TRILHA:';
+        const reasonWidth = font.widthOfTextAtSize(reasonText, 14);
+        page.drawText(reasonText, {
+            x: width / 2 - reasonWidth / 2,
             y: height - 340,
             font: font,
             size: 14,
             color: lightGray,
-            xAlignment: 'center',
             characterSpacing: 1,
         });
 
-        // Track Name
-        page.drawText(trackName.toUpperCase(), {
-            x: width / 2,
-            y: height - 380,
-            font: boldFont,
-            size: 24,
-            color: primaryOrange,
-            xAlignment: 'center',
-        });
+        // Track Name (with wrapping)
+        const maxTextWidth = width - 240; // Leave some padding (120px each side)
+        const trackNameLines = wrapText(trackName.toUpperCase(), boldFont, 24, maxTextWidth);
+        let currentY = height - 380;
+        const lineHeight = 30;
+
+        for (const line of trackNameLines) {
+            const trackNameWidth = boldFont.widthOfTextAtSize(line, 24);
+            page.drawText(line, {
+                x: width / 2 - trackNameWidth / 2,
+                y: currentY,
+                font: boldFont,
+                size: 24,
+                color: primaryOrange,
+            });
+            currentY -= lineHeight;
+        }
 
         // Date
         const completionDate = format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
         const dateText = `Concluído em ${completionDate}`;
+        const dateWidth = font.widthOfTextAtSize(dateText, 12);
         page.drawText(dateText, {
-            x: width / 2,
+            x: width / 2 - dateWidth / 2,
             y: 80,
             font: font,
             size: 12,
             color: lightGray,
-            xAlignment: 'center',
         });
         
         // Save PDF to bytes
