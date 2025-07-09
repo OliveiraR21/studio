@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { UserNotFound } from "@/components/layout/user-not-found";
 import { getCurrentUser } from "@/lib/auth";
 import { userHasCourseAccess } from "@/lib/access-control";
+import { AiSuggestionCard } from "@/components/dashboard/ai-suggestion-card";
 
 const PASSING_SCORE = 90;
 
@@ -41,11 +42,11 @@ export default async function DashboardPage() {
   }
   
   // Filter all courses based on user's access rights using the new hierarchical logic
-  const allCourses = allModules.flatMap(module => module.tracks.flatMap(track => track.courses))
+  const accessibleCourses = allModules.flatMap(module => module.tracks.flatMap(track => track.courses))
     .filter(course => userHasCourseAccess(currentUser, course));
 
-  const totalCourses = allCourses.length;
-  const completedCoursesCount = currentUser.completedCourses.filter(courseId => allCourses.some(c => c.id === courseId)).length;
+  const totalCourses = accessibleCourses.length;
+  const completedCoursesCount = currentUser.completedCourses.filter(courseId => accessibleCourses.some(c => c.id === courseId)).length;
 
   const allScores = [...(currentUser.courseScores ?? []).map(s => s.score), ...(currentUser.trackScores ?? []).map(s => s.score)];
   const averageScore = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
@@ -95,8 +96,8 @@ export default async function DashboardPage() {
   const nextCourse = await findNextCourseForUser(currentUser);
 
   // Calculate training hours based on accessible courses
-  const totalDuration = allCourses.reduce((acc, course) => acc + (course.durationInSeconds || 0), 0);
-  const completedCourses = allCourses.filter(course => currentUser.completedCourses.includes(course.id));
+  const totalDuration = accessibleCourses.reduce((acc, course) => acc + (course.durationInSeconds || 0), 0);
+  const completedCourses = accessibleCourses.filter(course => currentUser.completedCourses.includes(course.id));
   const completedDuration = completedCourses.reduce((acc, course) => acc + (course.durationInSeconds || 0), 0);
   const pendingDuration = totalDuration - completedDuration;
 
@@ -211,6 +212,8 @@ export default async function DashboardPage() {
               )}
             </Card>
         </div>
+
+        <AiSuggestionCard user={currentUser} courses={accessibleCourses} />
         
         <Card className="border-amber-500/50 bg-amber-500/5">
             <CardHeader>

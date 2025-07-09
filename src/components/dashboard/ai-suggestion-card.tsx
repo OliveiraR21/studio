@@ -11,7 +11,7 @@ import { CourseCard } from './course-card';
 
 interface AiSuggestionCardProps {
     user: User;
-    courses: Course[];
+    courses: Course[]; // All accessible courses for the user
 }
 
 export function AiSuggestionCard({ user, courses }: AiSuggestionCardProps) {
@@ -27,14 +27,11 @@ export function AiSuggestionCard({ user, courses }: AiSuggestionCardProps) {
             const result = await suggestTrainingAssignments({
                 userRole: user.role,
                 userArea: user.area || '',
-                completedTraining: user.completedTraining,
+                completedTrainingIds: user.completedCourses,
                 availableTraining: courses.map(c => ({
                     id: c.id,
                     title: c.title,
                     description: c.description,
-                    tags: c.tags || [],
-                    accessRoles: c.accessRoles || [],
-                    accessAreas: c.accessAreas || [],
                 })),
             });
             
@@ -66,35 +63,44 @@ export function AiSuggestionCard({ user, courses }: AiSuggestionCardProps) {
     };
 
     return (
-        <Card>
+        <Card className="border-primary/20 bg-primary/5">
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     <Wand2 className="h-6 w-6 text-primary" />
-                    Assistente de Carreira
-                </CardTitle>
-                <CardDescription>
-                    Não sabe o que aprender em seguida? Peça uma sugestão para nossa IA.
-                </CardDescription>
+                    <div>
+                        <CardTitle>Assistente de Carreira</CardTitle>
+                        <CardDescription>
+                            Não sabe o que aprender em seguida? Peça uma sugestão para nossa IA com base no seu perfil.
+                        </CardDescription>
+                    </div>
+                </div>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center gap-4">
+            <CardContent className="flex flex-col items-center justify-center gap-4 text-center">
                 {isLoading ? (
                      <div className="flex items-center justify-center p-8">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="ml-4">Analisando seu perfil...</p>
+                        <p className="ml-4 font-semibold">Analisando seu perfil...</p>
                     </div>
                 ) : suggestions.length === 0 ? (
                     <Button onClick={handleGetSuggestions}>
                         <Wand2 className="mr-2 h-4 w-4" />
-                        Sugerir cursos
+                        Sugerir Cursos
                     </Button>
                 ) : (
                     <div className="w-full space-y-4">
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {suggestions.map(course => <CourseCard key={course.id} course={course} />)}
+                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {suggestions.map(course => (
+                                <CourseCard 
+                                    key={course.id} 
+                                    course={course}
+                                    isUnlocked={true}
+                                    isCompleted={false}
+                                />
+                            ))}
                         </div>
                         <Button onClick={handleGetSuggestions} variant="outline" className="w-full">
                             <Wand2 className="mr-2 h-4 w-4" />
-                            Gerar novamente
+                            Gerar Novamente
                         </Button>
                     </div>
                 )}
