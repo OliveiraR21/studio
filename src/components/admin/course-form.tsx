@@ -276,9 +276,9 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
         <Input
           id="thumbnailUrl"
           name="thumbnailUrl"
-          type="url"
+          type="text"
           defaultValue={course?.thumbnailUrl || ''}
-          placeholder="https://exemplo.com/imagem-da-capa.png"
+          placeholder="/capa.png ou https://exemplo.com/imagem.png"
         />
         {state.errors?.thumbnailUrl && (
           <p className="text-sm text-destructive">{state.errors.thumbnailUrl[0]}</p>
