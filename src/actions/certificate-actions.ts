@@ -49,7 +49,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
         const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-        // Define colors based on the new design
+        // Define colors based on the design
         const darkBg = rgb(0.1, 0.1, 0.1);
         const white = rgb(1, 1, 1);
         const lightGray = rgb(0.8, 0.8, 0.8);
@@ -64,25 +64,24 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
             color: darkBg,
         });
 
-        // --- Dynamic Layout Section ---
-        let currentY = height - 60; // Start with a top margin
-
-        // Use the logo with white text for visibility on a dark background
+        // --- Logo Section (Top-Left) ---
         const logoPath = path.join(process.cwd(), 'public', 'br-supply-logo.png');
         const logoImageBytes = await fs.readFile(logoPath);
         const logoImage = await pdfDoc.embedPng(logoImageBytes);
-        const logoDims = logoImage.scale(0.25); // Correctly scaled logo
+        const logoDims = logoImage.scale(0.20); // Smaller logo
         
-        // 1. Draw Logo, centered
         page.drawImage(logoImage, {
-            x: width / 2 - logoDims.width / 2,
-            y: currentY - logoDims.height,
+            x: 60,
+            y: height - 60 - logoDims.height,
             width: logoDims.width,
             height: logoDims.height,
         });
-        currentY -= (logoDims.height + 50); // Move Y down past logo + gap
 
-        // 2. Main Title
+
+        // --- Centered Text Section ---
+        let currentY = height - 160;
+
+        // 1. Main Title
         const titleText = 'CERTIFICADO';
         const titleSize = 30;
         const titleWidth = boldFont.widthOfTextAtSize(titleText, titleSize);
@@ -95,7 +94,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         });
         currentY -= (titleSize + 30);
 
-        // 3. "Conferred to" Text
+        // 2. "Conferred to" Text
         const conferredText = 'CONFERIDO A';
         const conferredSize = 14;
         const conferredWidth = font.widthOfTextAtSize(conferredText, conferredSize);
@@ -109,20 +108,20 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         });
         currentY -= (conferredSize + 25);
 
-        // 4. User Name
+        // 3. User Name
         const userNameSize = 36;
         const upperUserName = userName.toUpperCase();
         const userNameWidth = boldFont.widthOfTextAtSize(upperUserName, userNameSize);
         page.drawText(upperUserName, {
             x: width / 2 - userNameWidth / 2,
-            y: currentY - userNameSize,
+            y: currentY,
             font: boldFont,
             size: userNameSize,
             color: primaryOrange,
         });
         currentY -= (userNameSize + 40);
 
-        // 5. "for successfully completing" Text
+        // 4. "for successfully completing" Text
         const reasonText = 'POR CONCLUIR COM SUCESSO A TRILHA:';
         const reasonSize = 14;
         const reasonWidth = font.widthOfTextAtSize(reasonText, reasonSize);
@@ -136,12 +135,11 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         });
         currentY -= (reasonSize + 25);
 
-        // 6. Track Name (with wrapping)
+        // 5. Track Name (with wrapping)
         const trackNameSize = 24;
         const maxTextWidth = width - 240; // Leave some padding
         const trackNameLines = wrapText(trackName.toUpperCase(), boldFont, trackNameSize, maxTextWidth);
         const lineHeight = 30;
-        currentY -= trackNameSize;
 
         for (const line of trackNameLines) {
             const trackNameWidth = boldFont.widthOfTextAtSize(line, trackNameSize);
@@ -155,7 +153,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
             currentY -= lineHeight;
         }
 
-        // 7. Date (at the bottom)
+        // 6. Date (at the bottom)
         const completionDate = format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
         const dateText = `Concluído em ${completionDate}`;
         const dateWidth = font.widthOfTextAtSize(dateText, 12);
