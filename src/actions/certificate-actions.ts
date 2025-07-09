@@ -20,80 +20,96 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
         const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-        // Use the logo with black text for better visibility on a white background
-        const logoPath = path.join(process.cwd(), 'public', 'BrSupply.png');
+        // Define colors based on the new design
+        const darkBg = rgb(0.1, 0.1, 0.1);
+        const white = rgb(1, 1, 1);
+        const lightGray = rgb(0.8, 0.8, 0.8);
+        const primaryOrange = rgb(1, 136 / 255, 46 / 255); // hsl(26 100% 59%)
+
+        // Draw background
+        page.drawRectangle({
+            x: 0,
+            y: 0,
+            width,
+            height,
+            color: darkBg,
+        });
+
+        // Use the logo with white text for visibility on a dark background
+        const logoPath = path.join(process.cwd(), 'public', 'br-supply-logo.png');
         const logoImageBytes = await fs.readFile(logoPath);
         const logoImage = await pdfDoc.embedPng(logoImageBytes);
         const logoDims = logoImage.scale(0.25);
         
-        // Draw Logo
+        // Draw Logo on top right
         page.drawImage(logoImage, {
-            x: width / 2 - logoDims.width / 2,
+            x: width - logoDims.width - 60,
             y: height - 100,
             width: logoDims.width,
             height: logoDims.height,
         });
 
-        // Title
-        page.drawText('Certificado de Conclusão', {
+        // Main Title
+        page.drawText('CERTIFICADO', {
             x: width / 2,
             y: height - 180,
             font: boldFont,
-            size: 32,
-            color: rgb(0.1, 0.1, 0.1),
-            lineHeight: 34,
+            size: 30,
+            color: white,
             xAlignment: 'center',
         });
         
-        // Main Text
-        page.drawText('Certificamos que', {
+        // "Conferred to" Text
+        page.drawText('CONFERIDO A', {
             x: width / 2,
             y: height - 250,
             font: font,
-            size: 20,
-            color: rgb(0.2, 0.2, 0.2),
+            size: 14,
+            color: lightGray,
             xAlignment: 'center',
+            characterSpacing: 1,
         });
         
         // User Name
-        page.drawText(userName, {
+        page.drawText(userName.toUpperCase(), {
             x: width / 2,
             y: height - 290,
             font: boldFont,
-            size: 28,
-            color: rgb(0.96, 0.45, 0.13), // Br Supply Orange: hsl(26 100% 59%)
+            size: 36,
+            color: primaryOrange,
             xAlignment: 'center',
         });
 
-        // Track Text
-        page.drawText('concluiu com sucesso a trilha de conhecimento:', {
+        // "for successfully completing" Text
+        page.drawText('POR CONCLUIR COM SUCESSO A TRILHA:', {
             x: width / 2,
             y: height - 340,
             font: font,
-            size: 16,
-            color: rgb(0.2, 0.2, 0.2),
+            size: 14,
+            color: lightGray,
             xAlignment: 'center',
+            characterSpacing: 1,
         });
 
         // Track Name
-        page.drawText(trackName, {
+        page.drawText(trackName.toUpperCase(), {
             x: width / 2,
-            y: height - 370,
+            y: height - 380,
             font: boldFont,
-            size: 22,
-            color: rgb(0.1, 0.1, 0.1),
+            size: 24,
+            color: primaryOrange,
             xAlignment: 'center',
         });
 
         // Date
         const completionDate = format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
-        const dateText = `Concluído em: ${completionDate}`;
+        const dateText = `Concluído em ${completionDate}`;
         page.drawText(dateText, {
             x: width / 2,
-            y: height - 450,
+            y: 80,
             font: font,
             size: 12,
-            color: rgb(0.4, 0.4, 0.4),
+            color: lightGray,
             xAlignment: 'center',
         });
         
