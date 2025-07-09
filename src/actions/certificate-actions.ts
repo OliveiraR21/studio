@@ -39,6 +39,10 @@ function wrapText(text: string, font: PDFFont, fontSize: number, maxWidth: numbe
 export async function generateCertificatePdf({ userName, trackName }: CertificateData): Promise<string> {
     try {
         const pdfDoc = await PDFDocument.create();
+        pdfDoc.setTitle(`Certificado de Conclusão - ${trackName}`);
+        pdfDoc.setAuthor('Br Supply Academy Stream');
+        pdfDoc.setCreator('Br Supply Academy Stream');
+
         const page = pdfDoc.addPage([841.89, 595.28]); // A4 landscape
         const { width, height } = page.getSize();
 
@@ -66,10 +70,10 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         const logoImage = await pdfDoc.embedPng(logoImageBytes);
         const logoDims = logoImage.scale(0.25);
         
-        // Draw Logo on top right
+        // Draw Logo on top right, ensuring it's not cut off
         page.drawImage(logoImage, {
-            x: width - logoDims.width - 60,
-            y: height - 100,
+            x: width - logoDims.width - 50, // 50px padding from the right
+            y: height - logoDims.height - 50, // 50px padding from the top
             width: logoDims.width,
             height: logoDims.height,
         });
@@ -79,7 +83,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         const titleWidth = boldFont.widthOfTextAtSize(titleText, 30);
         page.drawText(titleText, {
             x: width / 2 - titleWidth / 2,
-            y: height - 180,
+            y: height - 200, // Moved down to give space for logo
             font: boldFont,
             size: 30,
             color: white,
@@ -90,7 +94,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         const conferredWidth = font.widthOfTextAtSize(conferredText, 14);
         page.drawText(conferredText, {
             x: width / 2 - conferredWidth / 2,
-            y: height - 250,
+            y: height - 270, // Adjusted Y
             font: font,
             size: 14,
             color: lightGray,
@@ -102,7 +106,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         const userNameWidth = boldFont.widthOfTextAtSize(upperUserName, 36);
         page.drawText(upperUserName, {
             x: width / 2 - userNameWidth / 2,
-            y: height - 290,
+            y: height - 310, // Adjusted Y
             font: boldFont,
             size: 36,
             color: primaryOrange,
@@ -113,7 +117,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         const reasonWidth = font.widthOfTextAtSize(reasonText, 14);
         page.drawText(reasonText, {
             x: width / 2 - reasonWidth / 2,
-            y: height - 340,
+            y: height - 360, // Adjusted Y
             font: font,
             size: 14,
             color: lightGray,
@@ -123,7 +127,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         // Track Name (with wrapping)
         const maxTextWidth = width - 240; // Leave some padding (120px each side)
         const trackNameLines = wrapText(trackName.toUpperCase(), boldFont, 24, maxTextWidth);
-        let currentY = height - 380;
+        let currentY = height - 400; // Adjusted Y
         const lineHeight = 30;
 
         for (const line of trackNameLines) {
