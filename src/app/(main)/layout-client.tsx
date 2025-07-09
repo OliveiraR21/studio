@@ -2,6 +2,7 @@
 
 import {
   BookMarked,
+  HelpCircle,
   Home,
   LayoutGrid,
   LogOut,
@@ -43,6 +44,7 @@ export function MainLayoutClient({
   const baseNavItems = [
     { href: '/dashboard', icon: Home, label: 'Meu Painel' },
     { href: '/meus-cursos', icon: LayoutGrid, label: 'Meus Cursos' },
+    { href: '/help', icon: HelpCircle, label: 'Preciso de Ajuda' },
   ];
 
   const managerRoles = ['Supervisor', 'Coordenador', 'Gerente', 'Diretor'];
