@@ -68,7 +68,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         const logoPath = path.join(process.cwd(), 'public', 'br-supply-logo.png');
         const logoImageBytes = await fs.readFile(logoPath);
         const logoImage = await pdfDoc.embedPng(logoImageBytes);
-        const logoDims = logoImage.scale(0.20); // Smaller logo
+        const logoDims = logoImage.scale(0.10); // Drastically reduced logo size
         
         page.drawImage(logoImage, {
             x: 60,
