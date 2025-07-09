@@ -44,8 +44,9 @@ export function MainLayoutClient({
   const baseNavItems = [
     { href: '/dashboard', icon: Home, label: 'Meu Painel' },
     { href: '/meus-cursos', icon: LayoutGrid, label: 'Meus Cursos' },
-    { href: '/help', icon: HelpCircle, label: 'Preciso de Ajuda' },
   ];
+
+  const helpNavItem = { href: '/help', icon: HelpCircle, label: 'Preciso de Ajuda' };
 
   const managerRoles = ['Supervisor', 'Coordenador', 'Gerente', 'Diretor'];
   const teamNavItem = { href: '/team', icon: Users, label: 'Minha Equipe' };
@@ -69,6 +70,8 @@ export function MainLayoutClient({
   if (userRole && userRole === 'Admin') {
     allNavItems.push(...adminNavItems);
   }
+
+  allNavItems.push(helpNavItem);
 
   if (!user) {
     return null;
