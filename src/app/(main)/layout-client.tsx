@@ -32,6 +32,7 @@ import type { User } from '@/lib/types';
 import { NotificationBell } from '@/components/layout/notification-bell';
 import { OnboardingTour } from '@/components/layout/onboarding-tour';
 import { TourProvider } from '@/hooks/use-tour';
+import { GlobalSearch } from '@/components/layout/global-search';
 
 // Helper to create a slug for data attributes
 const toSlug = (str: string) => str.toLowerCase().replace(/\s+/g, '-');
@@ -138,6 +139,7 @@ export function MainLayoutClient({
             <div className="w-full flex-1">
               {/* Future search bar can go here */}
             </div>
+            <GlobalSearch />
             <NotificationBell />
             <ThemeToggle />
             <UserNav user={user} />
