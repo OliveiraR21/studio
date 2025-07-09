@@ -17,7 +17,6 @@ import { Separator } from "@/components/ui/separator";
 import { UserNotFound } from "@/components/layout/user-not-found";
 import { getCurrentUser } from "@/lib/auth";
 import { userHasCourseAccess } from "@/lib/access-control";
-import { AiSuggestionCard } from "@/components/dashboard/ai-suggestion-card";
 
 const PASSING_SCORE = 90;
 
@@ -212,8 +211,6 @@ export default async function DashboardPage() {
               )}
             </Card>
         </div>
-
-        <AiSuggestionCard user={currentUser} courses={accessibleCourses} />
         
         <Card className="border-amber-500/50 bg-amber-500/5">
             <CardHeader>
