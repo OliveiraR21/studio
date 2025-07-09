@@ -24,7 +24,7 @@ export function UserNav({ user }: { user: UserType | null }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-primary-foreground/10 focus-visible:ring-primary-foreground focus-visible:ring-offset-0">
           <Avatar className="h-9 w-9">
             <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="user avatar" />
             <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>

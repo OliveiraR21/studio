@@ -95,8 +95,8 @@ export function MainLayoutClient({
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6">
-          <SidebarTrigger className="md:hidden" />
+        <header className="flex h-14 items-center gap-4 border-b border-transparent bg-primary px-4 text-primary-foreground lg:h-[60px] lg:px-6">
+          <SidebarTrigger className="md:hidden hover:bg-primary-foreground/10 hover:text-primary-foreground focus-visible:ring-primary-foreground focus-visible:ring-offset-0" />
           <div className="w-full flex-1">
             {/* Future search bar can go here */}
           </div>
