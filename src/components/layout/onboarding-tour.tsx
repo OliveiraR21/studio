@@ -13,10 +13,11 @@ const TOUR_STORAGE_KEY = 'brsupply-tour-completed-v1';
 
 export function OnboardingTour({ user }: OnboardingTourProps) {
   const [run, setRun] = useState(false);
-  
+  const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
-    // Start the tour only if it hasn't been completed before.
-    // This check runs only on the client-side.
+    // This ensures all logic runs only on the client, after the component has mounted.
+    setIsMounted(true);
     const tourCompleted = localStorage.getItem(TOUR_STORAGE_KEY);
     if (!tourCompleted) {
       setRun(true);
@@ -77,6 +78,10 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
       setRun(false);
     }
   };
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <Joyride
