@@ -1,3 +1,4 @@
+
 'use server';
 
 import { z } from 'zod';
@@ -29,7 +30,7 @@ const courseFormSchema = z.object({
         return parts[1] < 60 && parts[2] < 60;
     }, { message: "Minutos e segundos devem ser menores que 60." }),
   trackId: z.string().optional(),
-  minimumRole: z.enum(['', 'Assistente', 'Analista', 'Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin']).optional(),
+  minimumRole: z.enum(['', 'none', 'Assistente', 'Analista', 'Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin']).optional(),
   accessAreas: z.string().optional(),
 }).refine(data => {
     // If id is not present (new course), trackId must be present.
@@ -126,7 +127,7 @@ export async function saveCourse(
     ...courseDetails,
     videoUrl: urlValidationResult.data, // Use validated and cleaned URL
     durationInSeconds: timeStringToSeconds(duration),
-    minimumRole: minimumRole && minimumRole !== '' ? (minimumRole as UserRole) : undefined,
+    minimumRole: minimumRole && minimumRole !== '' && minimumRole !== 'none' ? (minimumRole as UserRole) : undefined,
     accessAreas: accessAreas ? accessAreas.split(',').map(a => a.trim()).filter(Boolean) : undefined,
   };
 

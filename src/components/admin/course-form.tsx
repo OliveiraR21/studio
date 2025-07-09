@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Course, Module, UserRole } from '@/lib/types';
@@ -289,12 +290,12 @@ export function CourseForm({ course, modules }: CourseFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                   <Label htmlFor="minimumRole">Cargo Mínimo Necessário</Label>
-                  <Select name="minimumRole" defaultValue={course?.minimumRole || ''}>
+                  <Select name="minimumRole" defaultValue={course?.minimumRole || 'none'}>
                       <SelectTrigger id="minimumRole">
                           <SelectValue placeholder="Visível para todos os cargos" />
                       </SelectTrigger>
                       <SelectContent>
-                          <SelectItem value="">Visível para todos os cargos</SelectItem>
+                          <SelectItem value="none">Visível para todos os cargos</SelectItem>
                           {ALL_ROLES.map(role => (
                               <SelectItem key={role} value={role}>{role}</SelectItem>
                           ))}
