@@ -28,13 +28,34 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import type { User, UserRole } from '@/lib/types';
+import type { User } from '@/lib/types';
 import { NotificationBell } from '@/components/layout/notification-bell';
 import { OnboardingTour } from '@/components/layout/onboarding-tour';
 import { TourProvider } from '@/hooks/use-tour';
 
 // Helper to create a slug for data attributes
 const toSlug = (str: string) => str.toLowerCase().replace(/\s+/g, '-');
+
+// Nav Item Component to reduce repetition
+const NavItem = ({ href, icon: Icon, label, pathname }: { href: string; icon: React.ElementType, label: string; pathname: string }) => {
+  const isActive = pathname.startsWith(href);
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        asChild
+        tooltip={label}
+        isActive={isActive}
+        data-tour-id={toSlug(label)}
+      >
+        <Link href={href}>
+          <Icon />
+          <span>{label}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+};
+
 
 export function MainLayoutClient({
   user,
@@ -70,17 +91,9 @@ export function MainLayoutClient({
     },
   ];
 
-  const allNavItems = [...baseNavItems];
+  const isManager = userRole && managerRoles.includes(userRole);
+  const isAdmin = userRole === 'Admin';
 
-  if (userRole && (managerRoles.includes(userRole) || userRole === 'Admin')) {
-    allNavItems.push(teamNavItem);
-  }
-
-  if (userRole && userRole === 'Admin') {
-    allNavItems.push(...adminNavItems);
-  }
-
-  allNavItems.push(helpNavItem);
 
   if (!user) {
     return null;
@@ -95,24 +108,24 @@ export function MainLayoutClient({
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
-              {allNavItems.map((item) => {
-                const isActive = pathname.startsWith(item.href);
-                return (
-                  <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={item.label}
-                      isActive={isActive}
-                      data-tour-id={toSlug(item.label)}
-                    >
-                      <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+              {baseNavItems.map((item) => (
+                <NavItem key={item.label} {...item} pathname={pathname} />
+              ))}
+
+              {(isManager || isAdmin) && (
+                <NavItem {...teamNavItem} pathname={pathname} />
+              )}
+              
+              {isAdmin && (
+                <div data-tour-id="area-de-administracao">
+                   {adminNavItems.map((item) => (
+                    <NavItem key={item.label} {...item} pathname={pathname} />
+                  ))}
+                </div>
+              )}
+
+              <NavItem {...helpNavItem} pathname={pathname} />
+
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>

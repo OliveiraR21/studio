@@ -17,10 +17,11 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
     setIsMounted(true);
   }, []);
 
-  const managerRoles = ['Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin'];
-  const isManagerOrAdmin = user && managerRoles.includes(user.role);
+  const managerRoles = ['Supervisor', 'Coordenador', 'Gerente', 'Diretor'];
+  const isManager = user && managerRoles.includes(user.role);
+  const isAdmin = user && user.role === 'Admin';
 
-  const baseSteps: Step[] = [
+  let steps: Step[] = [
     {
       content:
         'Boas-vindas à Academia Br Supply! Vamos fazer um tour rápido pela plataforma.',
@@ -30,25 +31,32 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
     {
       target: '[data-tour-id="meu-painel"]',
       content:
-        'Aqui no "Meu Painel", você encontra um resumo do seu progresso, sua média e suas pendências.',
+        'Este é o seu Painel de Controle. Aqui você visualiza rapidamente sua evolução nos cursos, sua média geral, e o mais importante: quais cursos precisam ser refeitos para atingir a nota mínima.',
       disableBeacon: true,
     },
     {
       target: '[data-tour-id="meus-cursos"]',
       content:
-        'Em "Meus Cursos", você acessa todas as trilhas de conhecimento e cursos disponíveis para você.',
+        'Aqui fica sua jornada de aprendizado. Os cursos são organizados em Módulos (grandes áreas) e Trilhas (sequências de aulas). Você precisa concluir um curso para desbloquear o próximo, seguindo um caminho lógico de conhecimento.',
     },
   ];
 
-  if (isManagerOrAdmin) {
-    baseSteps.push({
+  if (isManager || isAdmin) {
+    steps.push({
       target: '[data-tour-id="minha-equipe"]',
       content:
-        'Como gestor, aqui você pode acompanhar o desenvolvimento e o desempenho da sua equipe.',
+        'Como gestor, esta área é sua ferramenta para acompanhar o progresso de sua equipe. Você pode visualizar o desempenho individual e geral, ajudando no desenvolvimento do time.',
     });
   }
 
-  const finalSteps: Step[] = [
+  if (isAdmin) {
+    steps.push({
+      target: '[data-tour-id="area-de-administracao"]',
+      content: 'Como Administrador, você tem acesso total. A partir daqui, você pode gerenciar usuários, criar e organizar os módulos, trilhas e todos os cursos da plataforma.'
+    });
+  }
+
+  steps.push(
     {
       target: '[data-tour-id="notification-bell"]',
       content:
@@ -62,11 +70,9 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
     {
       target: '[data-tour-id="preciso-de-ajuda"]',
       content:
-        'Se tiver qualquer dúvida, o menu de ajuda tem um guia completo sobre todas as funcionalidades.',
-    },
-  ];
-
-  const steps = [...baseSteps, ...finalSteps];
+        'Se tiver qualquer dúvida, o menu de ajuda tem um guia completo sobre todas as funcionalidades. Você também pode refazer este tour a qualquer momento por lá.',
+    }
+  );
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
