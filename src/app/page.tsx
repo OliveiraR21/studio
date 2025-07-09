@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from "next/link";
@@ -27,43 +28,54 @@ export default function LoginPage() {
   }, [searchParams, toast]);
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="mx-auto grid w-[380px] gap-6">
-        <div className="grid gap-2 text-center">
+    <div className="relative w-full min-h-screen flex items-center justify-center p-4 overflow-hidden">
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute top-0 left-0 w-full h-full object-cover z-[-2]"
+        data-ai-hint="background video"
+      >
+        {/* IMPORTANT: Add your video file named 'background-video.mp4' to the /public folder */}
+        <source src="/background-video.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      
+      {/* Dark Overlay */}
+      <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-[-1]"></div>
+
+      {/* Login Content */}
+      <div className="relative z-10 mx-auto grid w-[380px] gap-6 text-center text-white">
+        <div className="grid gap-2">
             <h1 className="text-3xl font-bold">
               <span className="text-primary">Br</span> Supply | Academia
             </h1>
         </div>
-        <Card>
+        <Card className="bg-background/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-2xl">Login</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl text-card-foreground">Login</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Digite seu e-mail e senha para acessar a plataforma.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <LoginForm />
-            <div className="mt-4 text-center text-sm">
+            <div className="mt-4 text-center text-sm text-muted-foreground">
               Não tem uma conta?{" "}
-              <Link href="/signup" className="underline">
+              <Link href="/signup" className="underline text-primary">
                 Cadastre-se
               </Link>
             </div>
           </CardContent>
         </Card>
         <div className="flex justify-center">
-            {/* Light mode logo */}
-            <img
-                src="/BrSupply.png"
-                alt="Br Supply Logo"
-                className="h-28 block dark:hidden"
-                data-ai-hint="logo"
-            />
-            {/* Dark mode logo */}
+            {/* Logo for both light/dark themes, since the background is now dark */}
             <img
                 src="/br-supply-logo.png"
                 alt="Br Supply Logo"
-                className="h-28 hidden dark:block"
+                className="h-28"
                 data-ai-hint="logo"
             />
         </div>
