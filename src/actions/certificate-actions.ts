@@ -54,7 +54,6 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         const white = rgb(1, 1, 1);
         const lightGray = rgb(0.8, 0.8, 0.8);
         const primaryOrange = rgb(1, 136 / 255, 46 / 255);
-        const borderColor = rgb(0.25, 0.25, 0.25);
 
         // Draw background
         page.drawRectangle({
@@ -72,7 +71,7 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
             y: padding,
             width: width - padding * 2,
             height: height - padding * 2,
-            borderColor: borderColor,
+            borderColor: primaryOrange,
             borderWidth: 1,
         });
 
