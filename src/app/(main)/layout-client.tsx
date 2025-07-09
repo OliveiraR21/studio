@@ -31,6 +31,7 @@ import {
 import type { User, UserRole } from '@/lib/types';
 import { NotificationBell } from '@/components/layout/notification-bell';
 import { OnboardingTour } from '@/components/layout/onboarding-tour';
+import { TourProvider } from '@/hooks/use-tour';
 
 // Helper to create a slug for data attributes
 const toSlug = (str: string) => str.toLowerCase().replace(/\s+/g, '-');
@@ -50,7 +51,11 @@ export function MainLayoutClient({
     { href: '/meus-cursos', icon: LayoutGrid, label: 'Meus Cursos' },
   ];
 
-  const helpNavItem = { href: '/help', icon: HelpCircle, label: 'Preciso de Ajuda' };
+  const helpNavItem = {
+    href: '/help',
+    icon: HelpCircle,
+    label: 'Preciso de Ajuda',
+  };
 
   const managerRoles = ['Supervisor', 'Coordenador', 'Gerente', 'Diretor'];
   const teamNavItem = { href: '/team', icon: Users, label: 'Minha Equipe' };
@@ -80,49 +85,56 @@ export function MainLayoutClient({
   if (!user) {
     return null;
   }
-  
+
   return (
-    <SidebarProvider>
-      <Sidebar collapsible="icon">
-        <SidebarHeader>
-          <Logo />
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarMenu>
-            {allNavItems.map((item) => {
-              const isActive = pathname.startsWith(item.href);
-              return (
-                <SidebarMenuItem key={item.label}>
-                  <SidebarMenuButton asChild tooltip={item.label} isActive={isActive} data-tour-id={toSlug(item.label)}>
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter>
-          <SidebarTrigger />
-        </SidebarFooter>
-      </Sidebar>
-      <SidebarInset>
-        <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6">
-          <SidebarTrigger className="md:hidden" />
-          <div className="w-full flex-1">
-            {/* Future search bar can go here */}
+    <TourProvider>
+      <SidebarProvider>
+        <Sidebar collapsible="icon">
+          <SidebarHeader>
+            <Logo />
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarMenu>
+              {allNavItems.map((item) => {
+                const isActive = pathname.startsWith(item.href);
+                return (
+                  <SidebarMenuItem key={item.label}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.label}
+                      isActive={isActive}
+                      data-tour-id={toSlug(item.label)}
+                    >
+                      <Link href={item.href}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarContent>
+          <SidebarFooter>
+            <SidebarTrigger />
+          </SidebarFooter>
+        </Sidebar>
+        <SidebarInset>
+          <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6">
+            <SidebarTrigger className="md:hidden" />
+            <div className="w-full flex-1">
+              {/* Future search bar can go here */}
+            </div>
+            <NotificationBell />
+            <ThemeToggle />
+            <UserNav user={user} />
+          </header>
+          <div className="flex-1 p-4 lg:p-6 bg-muted/20">
+            <OnboardingTour user={user} />
+            {children}
           </div>
-          <NotificationBell />
-          <ThemeToggle />
-          <UserNav user={user} />
-        </header>
-        <div className="flex-1 p-4 lg:p-6 bg-muted/20">
-          <OnboardingTour user={user} />
-          {children}
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+        </SidebarInset>
+      </SidebarProvider>
+    </TourProvider>
   );
 }
