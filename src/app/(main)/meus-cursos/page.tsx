@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/accordion";
 import { CheckCircle, Lock, NotebookText } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import type { Track, Course } from "@/lib/types";
+import type { Track, Course, User } from "@/lib/types";
 import { CourseCard } from "@/components/dashboard/course-card";
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
@@ -29,11 +29,24 @@ export default async function MyCoursesPage({
   searchParams?: { openTrack?: string };
 }) {
   const currentUser = await getCurrentUser();
-  const learningModules = await getLearningModules();
+  const allModules = await getLearningModules();
 
   if (!currentUser) {
     return <UserNotFound />
   }
+
+  // Create a new version of the modules with courses filtered by user's access rights.
+  const learningModules = allModules.map(module => ({
+    ...module,
+    tracks: module.tracks.map(track => ({
+        ...track,
+        courses: track.courses.filter(course => {
+            const hasRoleAccess = !course.accessRoles || course.accessRoles.length === 0 || course.accessRoles.includes(currentUser.role);
+            const hasAreaAccess = !course.accessAreas || course.accessAreas.length === 0 || (currentUser.area && course.accessAreas.includes(currentUser.area));
+            return hasRoleAccess && hasAreaAccess;
+        })
+    }))
+  }));
 
   const nextCourse = await findNextCourseForUser(currentUser);
   
@@ -148,7 +161,7 @@ export default async function MyCoursesPage({
                       </AccordionTrigger>
                       <AccordionContent className="px-6 pb-6">
                         <div className="border-t pt-6">
-                          {track.courses.length > 0 && (
+                          {track.courses.length > 0 ? (
                             <>
                               <h4 className="text-md font-semibold mb-4">Cursos da Trilha</h4>
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -168,6 +181,10 @@ export default async function MyCoursesPage({
                                 })}
                               </div>
                             </>
+                          ) : (
+                            <div className="text-center py-4 text-muted-foreground">
+                                <p>Nenhum curso disponível para você nesta trilha.</p>
+                            </div>
                           )}
                           
                           <Separator className="my-6" />

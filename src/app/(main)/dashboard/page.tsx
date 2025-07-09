@@ -33,15 +33,21 @@ const formatDuration = (totalSeconds: number) => {
 
 export default async function DashboardPage() {
   const currentUser = await getCurrentUser();
-  const learningModules = await getLearningModules();
+  const allModules = await getLearningModules();
 
   if (!currentUser) {
     return <UserNotFound />
   }
   
-  const allCourses = learningModules.flatMap(module => module.tracks.flatMap(track => track.courses));
+  // Filter all courses based on user's access rights
+  const allCourses = allModules.flatMap(module => module.tracks.flatMap(track => track.courses)).filter(course => {
+    const hasRoleAccess = !course.accessRoles || course.accessRoles.length === 0 || course.accessRoles.includes(currentUser.role);
+    const hasAreaAccess = !course.accessAreas || course.accessAreas.length === 0 || (currentUser.area && course.accessAreas.includes(currentUser.area));
+    return hasRoleAccess && hasAreaAccess;
+  });
+
   const totalCourses = allCourses.length;
-  const completedCoursesCount = currentUser.completedCourses.length;
+  const completedCoursesCount = currentUser.completedCourses.filter(courseId => allCourses.some(c => c.id === courseId)).length;
 
   const allScores = [...(currentUser.courseScores ?? []).map(s => s.score), ...(currentUser.trackScores ?? []).map(s => s.score)];
   const averageScore = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
@@ -50,7 +56,16 @@ export default async function DashboardPage() {
     .filter(scoreInfo => scoreInfo.score < PASSING_SCORE)
     .map(async scoreInfo => {
         const courseDetails = await findCourseById(scoreInfo.courseId);
-        return courseDetails ? { ...courseDetails.course, score: scoreInfo.score } : null;
+        if (!courseDetails) return null;
+
+        const { course } = courseDetails;
+        const hasRoleAccess = !course.accessRoles || course.accessRoles.length === 0 || course.accessRoles.includes(currentUser.role);
+        const hasAreaAccess = !course.accessAreas || course.accessAreas.length === 0 || (currentUser.area && course.accessAreas.includes(currentUser.area));
+
+        if (hasRoleAccess && hasAreaAccess) {
+            return { ...course, score: scoreInfo.score };
+        }
+        return null;
     });
 
   const coursesToRetake = (await Promise.all(coursesToRetakePromises))
@@ -59,7 +74,7 @@ export default async function DashboardPage() {
   const trackPerformance = (currentUser.trackScores ?? [])
     .map(scoreInfo => {
       let trackDetails: Track | null = null;
-      for (const module of learningModules) {
+      for (const module of allModules) {
         const foundTrack = module.tracks.find(t => t.id === scoreInfo.trackId);
         if (foundTrack) {
           trackDetails = foundTrack;
@@ -73,7 +88,7 @@ export default async function DashboardPage() {
 
   const nextCourse = await findNextCourseForUser(currentUser);
 
-  // Calculate training hours
+  // Calculate training hours based on accessible courses
   const totalDuration = allCourses.reduce((acc, course) => acc + (course.durationInSeconds || 0), 0);
   const completedCourses = allCourses.filter(course => currentUser.completedCourses.includes(course.id));
   const completedDuration = completedCourses.reduce((acc, course) => acc + (course.durationInSeconds || 0), 0);
@@ -136,7 +151,7 @@ export default async function DashboardPage() {
                   <div className="text-center">
                       <div className="text-5xl font-bold tracking-tighter">{currentUser.completedTracks.length}</div>
                       <p className="text-sm text-muted-foreground">
-                        de {learningModules.flatMap(m => m.tracks).length} no total
+                        de {allModules.flatMap(m => m.tracks).length} no total
                       </p>
                   </div>
                   

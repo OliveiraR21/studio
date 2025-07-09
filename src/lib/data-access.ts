@@ -84,12 +84,18 @@ export async function findNextCourseForUser(user: User): Promise<(Course & {trac
         for (const track of module.tracks) {
             for (const course of track.courses) {
                 if (!user.completedCourses.includes(course.id)) {
-                    return Promise.resolve({...course, trackId: track.id});
+                    // Check for access control
+                    const hasRoleAccess = !course.accessRoles || course.accessRoles.length === 0 || course.accessRoles.includes(user.role);
+                    const hasAreaAccess = !course.accessAreas || course.accessAreas.length === 0 || (user.area && course.accessAreas.includes(user.area));
+
+                    if (hasRoleAccess && hasAreaAccess) {
+                        return Promise.resolve({...course, trackId: track.id});
+                    }
                 }
             }
         }
     }
-    return Promise.resolve(null); // All courses completed
+    return Promise.resolve(null); // All accessible courses completed
 }
 
 // --- Mutation Functions ---

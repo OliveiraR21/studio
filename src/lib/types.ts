@@ -28,6 +28,8 @@ export interface Course {
   quiz?: Quiz;
   likes?: number;
   dislikes?: number;
+  accessRoles?: UserRole[];
+  accessAreas?: string[];
 }
 
 export interface Quiz {
