@@ -1,3 +1,4 @@
+
 import type { User, Module } from './types';
 
 export const users: User[] = [
@@ -211,7 +212,7 @@ export const learningModules: Module[] = [
             trackId: 'track-hs-cp',
             title: 'ERP Próprio',
             description: 'Uma visão geral do nosso sistema ERP interno e suas funcionalidades.',
-            videoUrl: 'https://app.heygen.com/embeds/6fb51d7538a54f71bcb36f5897e99ae8',
+            videoUrl: 'https://app.heygen.com/embeds/b6d2d9c03f544277a174ef68654d616e',
             thumbnailUrl: '/br-supply-logo.png',
             likes: 0,
             dislikes: 0,
