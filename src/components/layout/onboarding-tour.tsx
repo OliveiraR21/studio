@@ -31,13 +31,13 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
     {
       target: '[data-tour-id="meu-painel"]',
       content:
-        'Este é o seu Painel de Controle. Aqui você visualiza rapidamente sua evolução nos cursos, sua média geral, e o mais importante: quais cursos precisam ser refeitos para atingir a nota mínima.',
+        'Este é o seu Painel. Acompanhe seu progresso e notas aqui.',
       disableBeacon: true,
     },
     {
       target: '[data-tour-id="meus-cursos"]',
       content:
-        'Aqui fica sua jornada de aprendizado. Os cursos são organizados em Módulos (grandes áreas) e Trilhas (sequências de aulas). Você precisa concluir um curso para desbloquear o próximo, seguindo um caminho lógico de conhecimento.',
+        'Em "Meus Cursos", você acessa suas trilhas de conhecimento e aulas.',
     },
   ];
 
@@ -45,14 +45,14 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
     steps.push({
       target: '[data-tour-id="minha-equipe"]',
       content:
-        'Como gestor, esta área é sua ferramenta para acompanhar o progresso de sua equipe. Você pode visualizar o desempenho individual e geral, ajudando no desenvolvimento do time.',
+        'Como gestor, use esta área para ver o progresso da sua equipe.',
     });
   }
 
   if (isAdmin) {
     steps.push({
       target: '[data-tour-id="area-de-administracao"]',
-      content: 'Como Administrador, você tem acesso total. A partir daqui, você pode gerenciar usuários, criar e organizar os módulos, trilhas e todos os cursos da plataforma.'
+      content: 'Como Admin, aqui você gerencia usuários, trilhas e cursos.',
     });
   }
 
@@ -60,17 +60,17 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
     {
       target: '[data-tour-id="notification-bell"]',
       content:
-        'Fique de olho no sino para receber notificações sobre novos cursos e lembretes importantes.',
+        'O sino mostra notificações sobre novos cursos e lembretes.',
     },
     {
       target: '[data-tour-id="user-nav"]',
       content:
-        'No seu perfil, você pode ver suas informações, alterar configurações e sair da plataforma.',
+        'Clique no seu avatar para ver seu perfil ou sair.',
     },
     {
       target: '[data-tour-id="preciso-de-ajuda"]',
       content:
-        'Se tiver qualquer dúvida, o menu de ajuda tem um guia completo sobre todas as funcionalidades. Você também pode refazer este tour a qualquer momento por lá.',
+        'Precisa de ajuda? Clique aqui para rever o guia ou refazer este tour.',
     }
   );
 
