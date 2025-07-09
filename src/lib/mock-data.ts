@@ -206,6 +206,17 @@ export const learningModules: Module[] = [
             likes: 0,
             dislikes: 0,
           },
+          {
+            id: 'course-erp-proprio',
+            moduleId: 'module-hs',
+            trackId: 'track-hs-cp',
+            title: 'ERP Próprio',
+            description: 'Uma visão geral sobre o funcionamento do nosso sistema ERP.',
+            videoUrl: 'https://app.heygen.com/embeds/b6d2d9c03f544277a174ef68654d616e',
+            thumbnailUrl: '/br-supply-logo.png',
+            likes: 0,
+            dislikes: 0,
+          },
         ],
         quiz: { questions: [] }
       },
