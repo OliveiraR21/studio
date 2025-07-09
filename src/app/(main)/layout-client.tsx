@@ -10,6 +10,7 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { Logo } from '@/components/layout/logo';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
@@ -36,6 +37,7 @@ export function MainLayoutClient({
   user: User;
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const userRole = user?.role || null;
 
   const baseNavItems = [
@@ -78,16 +80,19 @@ export function MainLayoutClient({
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {allNavItems.map((item) => (
-              <SidebarMenuItem key={item.label}>
-                <SidebarMenuButton asChild tooltip={item.label}>
-                  <Link href={item.href}>
-                    <item.icon />
-                    <span>{item.label}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+            {allNavItems.map((item) => {
+              const isActive = pathname.startsWith(item.href);
+              return (
+                <SidebarMenuItem key={item.label}>
+                  <SidebarMenuButton asChild tooltip={item.label} isActive={isActive}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
