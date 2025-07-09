@@ -194,6 +194,7 @@ export default async function MyCoursesPage({
                             trackCompleted={trackCompleted}
                             hasQuiz={hasQuiz}
                             courseCount={track.courses.length}
+                            currentUser={currentUser}
                           />
                         </div>
                       </AccordionContent>

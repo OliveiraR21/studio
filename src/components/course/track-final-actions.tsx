@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Star, ThumbsUp, ThumbsDown, CheckCircle, Loader2 } from "lucide-react";
+import { Star, ThumbsUp, ThumbsDown, CheckCircle, Loader2, Award } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { completeTrackForUser } from "@/actions/track-actions";
+import { generateCertificatePdf } from "@/actions/certificate-actions";
+import type { User } from "@/lib/types";
+
 
 interface TrackFinalActionsProps {
     trackId: string;
@@ -15,20 +18,21 @@ interface TrackFinalActionsProps {
     trackCompleted: boolean;
     trackTitle: string;
     courseCount: number;
+    currentUser: User;
 }
 
-export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted, trackCompleted, trackTitle, courseCount }: TrackFinalActionsProps) {
+export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted, trackCompleted, trackTitle, courseCount, currentUser }: TrackFinalActionsProps) {
     const { toast } = useToast();
     const router = useRouter();
     const [isCompleting, setIsCompleting] = useState(false);
-    const [feedbackState, setFeedbackState] = useState<'pending_quiz' | 'awaiting_feedback' | 'feedback_sent'>(trackCompleted ? 'awaiting_feedback' : 'pending_quiz');
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [feedbackState, setFeedbackState] = useState<'pending' | 'sent'>('pending');
 
     useEffect(() => {
         if (allCoursesInTrackCompleted && !trackCompleted && !hasQuiz && !isCompleting) {
             setIsCompleting(true);
-            completeTrackForUser(trackId).then((result) => {
+            completeTrackForUser(trackId).then(() => {
                 // The page will refresh and show the updated state.
-                // A toast here might be redundant if the UI changes clearly.
                 router.refresh();
             });
         }
@@ -40,8 +44,35 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
     };
 
     const handleFeedback = () => {
-        setFeedbackState('feedback_sent');
+        setFeedbackState('sent');
         toast({ title: "Obrigado pelo seu feedback!", description: `Sua avaliação para a trilha "${trackTitle}" foi registrada.` });
+    };
+    
+    const handleDownloadCertificate = async () => {
+        setIsDownloading(true);
+        toast({ title: 'Gerando seu certificado...', description: 'Isso pode levar alguns segundos.' });
+        try {
+            const pdfDataUri = await generateCertificatePdf({
+                userName: currentUser.name,
+                trackName: trackTitle,
+            });
+
+            const link = document.createElement('a');
+            link.href = pdfDataUri;
+            link.download = `Certificado-${trackTitle.replace(/ /g, '_')}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error(error);
+            toast({
+                variant: 'destructive',
+                title: 'Erro ao gerar certificado',
+                description: error instanceof Error ? error.message : 'Tente novamente.',
+            });
+        } finally {
+            setIsDownloading(false);
+        }
     };
     
     // While auto-completing, show a loader.
@@ -54,36 +85,38 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
         );
     }
     
-    // If track is completed, show feedback options (only if there was content).
+    // If track is completed, show certificate and feedback options.
     if (trackCompleted) {
         // If there's no content to give feedback on, render nothing.
         if (courseCount === 0 && !hasQuiz) {
             return null;
         }
 
-        if (feedbackState === 'awaiting_feedback') {
-            return (
-                <Card className="bg-muted/50">
-                    <CardHeader className="text-center">
-                        <CardTitle>Parabéns por concluir a trilha!</CardTitle>
-                        <CardDescription>O que você achou do conteúdo geral desta trilha?</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex justify-center gap-4">
-                        <Button variant="outline" size="lg" onClick={handleFeedback}><ThumbsUp className="mr-2 h-5 w-5" /> Gostei</Button>
-                        <Button variant="outline" size="lg" onClick={handleFeedback}><ThumbsDown className="mr-2 h-5 w-5" /> Não Gostei</Button>
-                    </CardContent>
-                </Card>
-            );
-        }
-        if (feedbackState === 'feedback_sent') {
-            return (
-                <div className="flex items-center justify-center p-4 rounded-lg bg-green-500/10 text-green-700">
-                    <CheckCircle className="h-5 w-5 mr-2" />
-                    <p className="font-semibold text-sm">Obrigado pelo seu feedback!</p>
-                </div>
-            );
-        }
-        return null;
+        return (
+            <Card className="bg-green-500/10">
+                <CardHeader className="text-center">
+                    <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-2" />
+                    <CardTitle>Parabéns, trilha concluída!</CardTitle>
+                    <CardDescription>Você finalizou a trilha "{trackTitle}".</CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <Button 
+                        onClick={handleDownloadCertificate} 
+                        disabled={isDownloading}
+                        size="lg"
+                    >
+                        {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Award className="mr-2 h-5 w-5" />}
+                        {isDownloading ? 'Gerando...' : 'Baixar Certificado'}
+                    </Button>
+                    {feedbackState === 'pending' && (
+                        <div className="flex gap-2">
+                            <Button variant="outline" size="lg" onClick={handleFeedback}><ThumbsUp className="mr-2 h-5 w-5" /> Gostei</Button>
+                            <Button variant="outline" size="lg" onClick={handleFeedback}><ThumbsDown className="mr-2 h-5 w-5" /> Não Gostei</Button>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+        );
     }
 
     // If there's a quiz, show the "Prova Final" section (enabled or disabled).
@@ -104,6 +137,6 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
         );
     }
     
-    // If no quiz, and courses are complete, useEffect will run. If not complete, nothing is shown.
+    // If no quiz, and courses are not yet complete, nothing is shown. `useEffect` handles auto-completion.
     return null;
 }
