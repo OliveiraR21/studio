@@ -190,7 +190,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                   content={<CustomTooltip />}
                 />
                 <Bar dataKey="successRate" stackId="a" fill="hsla(145, 63%, 42%, 0.2)" stroke="hsl(145, 63%, 42%)" strokeWidth={1} />
-                <Bar dataKey="errorRate" stackId="a" fill="hsla(var(--destructive), 0.2)" stroke="hsl(var(--destructive))" strokeWidth={1} radius={[0, 4, 4, 0]} />
+                <Bar dataKey="errorRate" stackId="a" fill="hsla(0, 84.2%, 60.2%, 0.2)" stroke="hsl(0, 84.2%, 60.2%)" strokeWidth={1} radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
