@@ -211,7 +211,7 @@ export const learningModules: Module[] = [
             trackId: 'track-hs-cp',
             title: 'ERP Próprio',
             description: 'Uma visão geral do nosso sistema ERP interno e suas funcionalidades.',
-            videoUrl: 'https://app.heygen.com/embeds/6fb51d7538a54f71bcb36f5897e99ae8',
+            videoUrl: 'https://app.heygen.com/videos/6fb51d7538a54f71bcb36f5897e99ae8',
             thumbnailUrl: '/br-supply-logo.png',
             likes: 0,
             dislikes: 0,
