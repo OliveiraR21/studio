@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Star, ThumbsUp, ThumbsDown, CheckCircle, Loader2, Award, Linkedin } from "lucide-react";
+import { Star, ThumbsUp, ThumbsDown, CheckCircle, Loader2, Award } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,6 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
     const router = useRouter();
     const [isCompleting, setIsCompleting] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
-    const [isSharing, setIsSharing] = useState(false);
     const [feedbackState, setFeedbackState] = useState<'pending' | 'sent'>('pending');
 
     const handleCompleteTrack = async () => {
@@ -59,7 +58,6 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
     };
     
     const handleDownloadCertificate = async () => {
-        if (isSharing) return;
         setIsDownloading(true);
         toast({ title: 'Gerando seu certificado...', description: 'Isso pode levar alguns segundos.' });
         try {
@@ -85,51 +83,6 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
             setIsDownloading(false);
         }
     };
-
-    const handleShareOnLinkedIn = async () => {
-        if (isSharing || isDownloading) return;
-        setIsSharing(true);
-        toast({ title: 'Preparando para compartilhar...', description: 'Gerando e baixando seu certificado.' });
-
-        try {
-            // 1. Generate and download the certificate PDF
-            const pdfDataUri = await generateCertificatePdf({
-                userName: currentUser.name,
-                trackName: trackTitle,
-            });
-
-            const link = document.createElement('a');
-            link.href = pdfDataUri;
-            link.download = `Certificado-${trackTitle.replace(/ /g, '_')}.pdf`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            // 2. Prepare LinkedIn post
-            const postText = `Estou feliz em compartilhar que concluí a trilha de conhecimento "${trackTitle}" na Br Supply Academy Stream! #DesenvolvimentoProfissional #BrSupply`;
-            const encodedText = encodeURIComponent(postText);
-            const linkedInUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedText}`;
-            
-            // 3. Open LinkedIn in a new tab
-            window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
-
-            // 4. Update user with instructions
-            toast({
-                title: "Certificado Baixado!",
-                description: "Agora, anexe o arquivo PDF que foi baixado à sua publicação no LinkedIn."
-            });
-
-        } catch (error) {
-            console.error("Failed to share on LinkedIn:", error);
-            toast({
-                variant: 'destructive',
-                title: 'Erro ao compartilhar',
-                description: 'Não foi possível gerar seu certificado para compartilhamento. Tente novamente.',
-            });
-        } finally {
-            setIsSharing(false);
-        }
-    };
     
     // If track is already completed, show certificate and feedback options.
     if (trackCompleted) {
@@ -147,20 +100,11 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
                 <CardContent className="flex flex-col sm:flex-row justify-center items-center gap-4 flex-wrap">
                     <Button 
                         onClick={handleDownloadCertificate} 
-                        disabled={isDownloading || isSharing}
+                        disabled={isDownloading}
                         size="lg"
                     >
                         {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Award className="mr-2 h-5 w-5" />}
                         {isDownloading ? 'Gerando...' : 'Baixar Certificado'}
-                    </Button>
-                    <Button 
-                        size="lg"
-                        onClick={handleShareOnLinkedIn}
-                        className="bg-[#0A66C2] hover:bg-[#004182]"
-                        disabled={isDownloading || isSharing}
-                    >
-                        {isSharing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Linkedin className="mr-2 h-5 w-5" />}
-                        {isSharing ? 'Preparando...' : 'Publicar no LinkedIn'}
                     </Button>
                     {feedbackState === 'pending' && (
                         <div className="flex gap-2">
