@@ -13,15 +13,14 @@ declare global {
   var a_modules: Module[];
 }
 
-if (process.env.NODE_ENV === 'production') {
-  // In production, initialize only once.
-  if (!global.a_users) {
-    global.a_users = JSON.parse(JSON.stringify(mockUsers));
-    global.a_modules = JSON.parse(JSON.stringify(mockModules));
-  }
-} else {
-  // In development, always re-initialize to reflect changes in mock-data.ts on hot reload.
+// This pattern ensures that in a development environment with hot-reloading,
+// our in-memory data isn't wiped out on every file change. The global object
+// persists across reloads, so we only initialize the data if it's not already there.
+// In production, this code runs only once when the server starts.
+if (!global.a_users) {
   global.a_users = JSON.parse(JSON.stringify(mockUsers));
+}
+if (!global.a_modules) {
   global.a_modules = JSON.parse(JSON.stringify(mockModules));
 }
 
