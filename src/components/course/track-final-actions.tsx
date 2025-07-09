@@ -87,7 +87,7 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
         const postText = `Estou feliz em compartilhar que concluí a trilha de conhecimento "${trackTitle}" na Br Supply Academy Stream! #DesenvolvimentoProfissional #BrSupply`;
         const encodedText = encodeURIComponent(postText);
         
-        const linkedInUrl = `https://www.linkedin.com/compose/intent/feed/share?text=${encodedText}`;
+        const linkedInUrl = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedText}`;
         
         window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
 
