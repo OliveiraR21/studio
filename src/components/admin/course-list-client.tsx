@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Course, Module } from "@/lib/types";
@@ -79,6 +80,8 @@ export function CourseListClient({ modules }: CourseListClientProps) {
           <TableRow>
             <TableHead>Título do Curso</TableHead>
             <TableHead>Trilha</TableHead>
+            <TableHead>Cargo Mínimo</TableHead>
+            <TableHead>Áreas</TableHead>
             <TableHead>Questionário</TableHead>
             <TableHead>Avaliação Média</TableHead>
             <TableHead className="w-[150px] text-right">Ações</TableHead>
@@ -98,6 +101,24 @@ export function CourseListClient({ modules }: CourseListClientProps) {
                 </TableCell>
                 <TableCell>
                     <Badge variant="secondary">{course.trackTitle}</Badge>
+                </TableCell>
+                <TableCell>
+                  {course.minimumRole ? (
+                    <Badge variant="outline">{course.minimumRole}</Badge>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">Todos</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {course.accessAreas && course.accessAreas.length > 0 ? (
+                    <div className="flex flex-wrap gap-1 max-w-[200px]">
+                      {course.accessAreas.map((area) => (
+                        <Badge key={area} variant="secondary">{area}</Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">Todas</span>
+                  )}
                 </TableCell>
                 <TableCell>
                     {course.quiz ? (

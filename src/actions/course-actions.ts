@@ -18,7 +18,7 @@ const courseFormSchema = z.object({
   title: z.string().min(3, 'O título precisa ter pelo menos 3 caracteres.'),
   description: z.string().min(10, 'A descrição precisa ter pelo menos 10 caracteres.'),
   videoUrl: z.string().min(1, "A URL do vídeo ou código de incorporação é obrigatório."),
-  thumbnailUrl: z.string().url('Por favor, insira uma URL de capa válida.').optional().or(z.literal('')),
+  thumbnailUrl: z.string().optional(),
   duration: z.string().optional()
     .refine((val) => {
         if (!val || val.trim() === '') return true; // Allow empty string
