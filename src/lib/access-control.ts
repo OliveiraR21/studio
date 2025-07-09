@@ -11,6 +11,11 @@ const ROLE_HIERARCHY: UserRole[] = ['Assistente', 'Analista', 'Supervisor', 'Coo
  * @returns True if the user has access, false otherwise.
  */
 export function userHasCourseAccess(user: User, course: Course): boolean {
+  // Admins have access to everything, so we can bypass all other checks.
+  if (user.role === 'Admin') {
+    return true;
+  }
+
   // Determine if the course has role or area restrictions.
   // The value 'none' is used by the form for "no selection".
   const isRoleRestricted = !!course.minimumRole && course.minimumRole !== 'none';
