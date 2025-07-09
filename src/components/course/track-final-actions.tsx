@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Star, ThumbsUp, ThumbsDown, CheckCircle, Loader2, Award } from "lucide-react";
+import { Star, ThumbsUp, ThumbsDown, CheckCircle, Loader2, Award, Linkedin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
@@ -82,6 +82,22 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
             setIsDownloading(false);
         }
     };
+
+    const handleShareOnLinkedIn = () => {
+        const certName = encodeURIComponent(trackTitle);
+        const orgName = encodeURIComponent("Br Supply Academy Stream");
+        const issueYear = new Date().getFullYear();
+        const issueMonth = new Date().getMonth() + 1;
+        
+        const linkedInUrl = `https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${certName}&organizationName=${orgName}&issueYear=${issueYear}&issueMonth=${issueMonth}`;
+        
+        window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
+
+        toast({
+            title: "Publicando no LinkedIn",
+            description: "Uma nova aba foi aberta para você adicionar o certificado ao seu perfil."
+        });
+    };
     
     // If track is already completed, show certificate and feedback options.
     if (trackCompleted) {
@@ -96,7 +112,7 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
                     <CardTitle>Parabéns, trilha concluída!</CardTitle>
                     <CardDescription>Você finalizou a trilha "{trackTitle}".</CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <CardContent className="flex flex-col sm:flex-row justify-center items-center gap-4 flex-wrap">
                     <Button 
                         onClick={handleDownloadCertificate} 
                         disabled={isDownloading}
@@ -104,6 +120,14 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
                     >
                         {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Award className="mr-2 h-5 w-5" />}
                         {isDownloading ? 'Gerando...' : 'Baixar Certificado'}
+                    </Button>
+                    <Button 
+                        variant="outline"
+                        size="lg"
+                        onClick={handleShareOnLinkedIn}
+                    >
+                        <Linkedin className="mr-2 h-5 w-5" />
+                        Publicar no LinkedIn
                     </Button>
                     {feedbackState === 'pending' && (
                         <div className="flex gap-2">
