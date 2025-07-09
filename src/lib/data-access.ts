@@ -1,6 +1,7 @@
 // In-memory data store
 import type { User, Module, Track, Course, UserRole } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
+import { userHasCourseAccess } from './access-control';
 
 // A simple in-memory database.
 // In a real app, you would use a database like Firestore or Prisma.
@@ -84,11 +85,8 @@ export async function findNextCourseForUser(user: User): Promise<(Course & {trac
         for (const track of module.tracks) {
             for (const course of track.courses) {
                 if (!user.completedCourses.includes(course.id)) {
-                    // Check for access control
-                    const hasRoleAccess = !course.accessRoles || course.accessRoles.length === 0 || course.accessRoles.includes(user.role);
-                    const hasAreaAccess = !course.accessAreas || course.accessAreas.length === 0 || (user.area && course.accessAreas.includes(user.area));
-
-                    if (hasRoleAccess && hasAreaAccess) {
+                    // Check for access control using the hierarchical helper
+                    if (userHasCourseAccess(user, course)) {
                         return Promise.resolve({...course, trackId: track.id});
                     }
                 }
@@ -101,7 +99,7 @@ export async function findNextCourseForUser(user: User): Promise<(Course & {trac
 // --- Mutation Functions ---
 
 // Creates a course in the in-memory store.
-export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; thumbnailUrl?: string; durationInSeconds?: number; }): Promise<Course> {
+export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; thumbnailUrl?: string; durationInSeconds?: number; minimumRole?: UserRole; accessAreas?: string[] }): Promise<Course> {
     let parentModule: Module | undefined;
     let parentTrack: Track | undefined;
 

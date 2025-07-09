@@ -20,6 +20,7 @@ import { Card } from "@/components/ui/card";
 import { UserNotFound } from "@/components/layout/user-not-found";
 import { TrackFinalActions } from "@/components/course/track-final-actions";
 import { getCurrentUser } from "@/lib/auth";
+import { userHasCourseAccess } from "@/lib/access-control";
 
 const PASSING_SCORE = 90;
 
@@ -40,11 +41,7 @@ export default async function MyCoursesPage({
     ...module,
     tracks: module.tracks.map(track => ({
         ...track,
-        courses: track.courses.filter(course => {
-            const hasRoleAccess = !course.accessRoles || course.accessRoles.length === 0 || course.accessRoles.includes(currentUser.role);
-            const hasAreaAccess = !course.accessAreas || course.accessAreas.length === 0 || (currentUser.area && course.accessAreas.includes(currentUser.area));
-            return hasRoleAccess && hasAreaAccess;
-        })
+        courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
     }))
   }));
 

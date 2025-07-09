@@ -28,7 +28,8 @@ export interface Course {
   quiz?: Quiz;
   likes?: number;
   dislikes?: number;
-  accessRoles?: UserRole[];
+  // Access control fields
+  minimumRole?: UserRole;
   accessAreas?: string[];
 }
 

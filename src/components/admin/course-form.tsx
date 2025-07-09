@@ -1,6 +1,6 @@
 'use client';
 
-import type { Course, Module } from '@/lib/types';
+import type { Course, Module, UserRole } from '@/lib/types';
 import { useFormStatus } from 'react-dom';
 import { useEffect, useActionState, useMemo, useState } from 'react';
 import { saveCourse } from '@/actions/course-actions';
@@ -33,11 +33,14 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
+import { Separator } from '../ui/separator';
 
 interface CourseFormProps {
   course: Course | null;
   modules: Module[];
 }
+
+const ALL_ROLES: UserRole[] = ['Assistente', 'Analista', 'Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin'];
 
 function SubmitButton({ isNew }: { isNew: boolean }) {
   const { pending } = useFormStatus();
@@ -263,7 +266,7 @@ export function CourseForm({ course, modules }: CourseFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="duration">Duração (hh:mm:ss)</Label>
-        <p className="text-xs text-muted-foreground">Este campo deve ser preenchido manualmente.</p>
+        <p className="text-xs text-muted-foreground">Este campo deve ser preenchido manually.</p>
         <Input
           id="duration"
           name="duration"
@@ -276,7 +279,47 @@ export function CourseForm({ course, modules }: CourseFormProps) {
         )}
       </div>
 
-      <div className="flex justify-end gap-4">
+      <Separator />
+
+      <div className="space-y-4">
+          <h3 className="text-lg font-medium">Controle de Acesso (Opcional)</h3>
+          <p className="text-sm text-muted-foreground -mt-2">
+              Defina quem pode ver este curso. Se nenhum critério for definido, o curso será visível para todos.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                  <Label htmlFor="minimumRole">Cargo Mínimo Necessário</Label>
+                  <Select name="minimumRole" defaultValue={course?.minimumRole || ''}>
+                      <SelectTrigger id="minimumRole">
+                          <SelectValue placeholder="Visível para todos os cargos" />
+                      </SelectTrigger>
+                      <SelectContent>
+                          <SelectItem value="">Visível para todos os cargos</SelectItem>
+                          {ALL_ROLES.map(role => (
+                              <SelectItem key={role} value={role}>{role}</SelectItem>
+                          ))}
+                      </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">O cargo selecionado e todos acima dele na hierarquia terão acesso.</p>
+              </div>
+
+              <div className="space-y-2">
+                  <Label htmlFor="accessAreas">Áreas com Acesso</Label>
+                  <Input
+                      id="accessAreas"
+                      name="accessAreas"
+                      defaultValue={course?.accessAreas?.join(', ')}
+                      placeholder="Ex: Comercial, Logística, TI"
+                  />
+                  <p className="text-xs text-muted-foreground">Separe as áreas por vírgula. Se em branco, todas as áreas têm acesso.</p>
+              </div>
+          </div>
+          {state.errors?.minimumRole && <p className="text-sm text-destructive">{state.errors.minimumRole[0]}</p>}
+          {state.errors?.accessAreas && <p className="text-sm text-destructive">{state.errors.accessAreas[0]}</p>}
+      </div>
+
+
+      <div className="flex justify-end gap-4 pt-6 border-t">
         <Button variant="outline" type="button" onClick={() => router.back()}>
           Cancelar
         </Button>

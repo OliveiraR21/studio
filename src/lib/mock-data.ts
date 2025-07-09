@@ -217,7 +217,7 @@ export const learningModules: Module[] = [
             thumbnailUrl: '/br-supply-logo.png',
             likes: 0,
             dislikes: 0,
-            accessRoles: ['Admin', 'Diretor', 'Gerente', 'Coordenador', 'Supervisor'],
+            minimumRole: 'Supervisor',
           },
         ],
         quiz: { questions: [] }

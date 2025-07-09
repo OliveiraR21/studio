@@ -16,6 +16,7 @@ import { ProgressChart } from "@/components/dashboard/progress-chart";
 import { Separator } from "@/components/ui/separator";
 import { UserNotFound } from "@/components/layout/user-not-found";
 import { getCurrentUser } from "@/lib/auth";
+import { userHasCourseAccess } from "@/lib/access-control";
 
 const PASSING_SCORE = 90;
 
@@ -39,12 +40,9 @@ export default async function DashboardPage() {
     return <UserNotFound />
   }
   
-  // Filter all courses based on user's access rights
-  const allCourses = allModules.flatMap(module => module.tracks.flatMap(track => track.courses)).filter(course => {
-    const hasRoleAccess = !course.accessRoles || course.accessRoles.length === 0 || course.accessRoles.includes(currentUser.role);
-    const hasAreaAccess = !course.accessAreas || course.accessAreas.length === 0 || (currentUser.area && course.accessAreas.includes(currentUser.area));
-    return hasRoleAccess && hasAreaAccess;
-  });
+  // Filter all courses based on user's access rights using the new hierarchical logic
+  const allCourses = allModules.flatMap(module => module.tracks.flatMap(track => track.courses))
+    .filter(course => userHasCourseAccess(currentUser, course));
 
   const totalCourses = allCourses.length;
   const completedCoursesCount = currentUser.completedCourses.filter(courseId => allCourses.some(c => c.id === courseId)).length;
@@ -59,10 +57,8 @@ export default async function DashboardPage() {
         if (!courseDetails) return null;
 
         const { course } = courseDetails;
-        const hasRoleAccess = !course.accessRoles || course.accessRoles.length === 0 || course.accessRoles.includes(currentUser.role);
-        const hasAreaAccess = !course.accessAreas || course.accessAreas.length === 0 || (currentUser.area && course.accessAreas.includes(currentUser.area));
-
-        if (hasRoleAccess && hasAreaAccess) {
+        // Check access for the course to retake
+        if (userHasCourseAccess(currentUser, course)) {
             return { ...course, score: scoreInfo.score };
         }
         return null;

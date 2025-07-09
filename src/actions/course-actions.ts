@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { createCourse, updateCourse, findCourseById, getUserById, updateUser, deleteCourse } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
-import type { Course, Quiz } from '@/lib/types';
+import type { Course, Quiz, UserRole } from '@/lib/types';
 import { getSimulatedUserId } from '@/lib/auth';
 
 // Helper to extract src from iframe
@@ -29,6 +29,8 @@ const courseFormSchema = z.object({
         return parts[1] < 60 && parts[2] < 60;
     }, { message: "Minutos e segundos devem ser menores que 60." }),
   trackId: z.string().optional(),
+  minimumRole: z.enum(['', 'Assistente', 'Analista', 'Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin']).optional(),
+  accessAreas: z.string().optional(),
 }).refine(data => {
     // If id is not present (new course), trackId must be present.
     return !!data.id || !!data.trackId;
@@ -47,6 +49,8 @@ export type CourseFormState = {
     thumbnailUrl?: string[];
     duration?: string[];
     trackId?: string[];
+    minimumRole?: string[];
+    accessAreas?: string[];
   };
   success: boolean;
 };
@@ -75,6 +79,8 @@ export async function saveCourse(
     thumbnailUrl: formData.get('thumbnailUrl'),
     duration: formData.get('duration'),
     trackId: formData.get('trackId') || undefined,
+    minimumRole: formData.get('minimumRole'),
+    accessAreas: formData.get('accessAreas'),
   };
 
   const validatedFields = courseFormSchema.safeParse(rawData);
@@ -87,7 +93,7 @@ export async function saveCourse(
     };
   }
 
-  const { id, trackId, duration, videoUrl: videoUrlOrEmbed, ...courseDetails } = validatedFields.data;
+  const { id, trackId, duration, videoUrl: videoUrlOrEmbed, minimumRole, accessAreas, ...courseDetails } = validatedFields.data;
 
   let finalVideoUrl: string;
   const trimmedInput = (videoUrlOrEmbed || '').trim();
@@ -120,6 +126,8 @@ export async function saveCourse(
     ...courseDetails,
     videoUrl: urlValidationResult.data, // Use validated and cleaned URL
     durationInSeconds: timeStringToSeconds(duration),
+    minimumRole: minimumRole && minimumRole !== '' ? (minimumRole as UserRole) : undefined,
+    accessAreas: accessAreas ? accessAreas.split(',').map(a => a.trim()).filter(Boolean) : undefined,
   };
 
 
