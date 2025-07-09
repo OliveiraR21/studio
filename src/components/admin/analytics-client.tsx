@@ -22,6 +22,14 @@ import { Clock, Users, AreaChart, AlertCircle, Download } from "lucide-react";
 import Link from 'next/link';
 import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface AnalyticsClientProps {
   data: AnalyticsData;
@@ -73,9 +81,9 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
     successRate: 100 - q.errorRate,
     courseTitle: q.courseTitle,
     courseId: q.courseId,
-  }));
+  })).sort((a, b) => b.errorRate - a.errorRate);
 
-  const handleDownload = () => {
+  const handleDownloadProficiency = () => {
     const headers = ["Questão", "Curso", "Taxa de Erro (%)"];
     const rows = questionProficiency.map(q => [
         `"${q.questionText.replace(/"/g, '""')}"`, // Escape double quotes
@@ -100,6 +108,13 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
       description: "O relatório de proficiência por questão foi baixado.",
     });
   };
+  
+  const handleDownloadEngagement = () => {
+      toast({
+          title: "Funcionalidade em desenvolvimento",
+          description: "O download para este relatório ainda não está disponível.",
+      });
+  };
 
   return (
     <div className="container mx-auto space-y-6">
@@ -110,10 +125,27 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                     Insights sobre o engajamento dos usuários e a eficácia do conteúdo.
                 </p>
             </div>
-            <Button onClick={handleDownload} disabled={chartData.length === 0}>
-                <Download className="mr-2 h-4 w-4" />
-                Baixar Relatório de Proficiência
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button>
+                  <Download className="mr-2 h-4 w-4" />
+                  Baixar Relatórios
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Escolha um relatório</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleDownloadProficiency}
+                  disabled={chartData.length === 0}
+                >
+                  Proficiência por Questão
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDownloadEngagement}>
+                  Engajamento de Usuários
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
         </div>
 
       {/* Engagement Stats */}
@@ -190,7 +222,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                   content={<CustomTooltip />}
                 />
                 <Bar dataKey="successRate" stackId="a" fill="hsla(145, 63%, 42%, 0.2)" stroke="hsl(145, 63%, 42%)" strokeWidth={1} />
-                <Bar dataKey="errorRate" stackId="a" fill="hsla(0, 84.2%, 60.2%, 0.2)" stroke="hsl(0, 84.2%, 60.2%)" strokeWidth={1} radius={[0, 4, 4, 0]} />
+                <Bar dataKey="errorRate" stackId="a" fill="hsla(0, 100%, 70%, 0.2)" stroke="hsl(0, 84.2%, 60.2%)" strokeWidth={1} radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
