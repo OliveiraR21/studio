@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { AnalyticsData } from "@/lib/types";
@@ -72,7 +73,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
     successRate: 100 - q.errorRate,
     courseTitle: q.courseTitle,
     courseId: q.courseId,
-  })).reverse(); // Reverse to have highest error rate at the top
+  }));
 
   const handleDownload = () => {
     const headers = ["Questão", "Curso", "Taxa de Erro (%)"];
@@ -188,8 +189,8 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                   cursor={{ fill: 'hsl(var(--muted))' }}
                   content={<CustomTooltip />}
                 />
-                <Bar dataKey="successRate" stackId="a" fill="#22c55e" />
-                <Bar dataKey="errorRate" stackId="a" fill="hsl(var(--destructive))" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="successRate" stackId="a" fill="hsla(145, 63%, 42%, 0.2)" stroke="hsl(145, 63%, 42%)" strokeWidth={1} />
+                <Bar dataKey="errorRate" stackId="a" fill="hsla(var(--destructive), 0.2)" stroke="hsl(var(--destructive))" strokeWidth={1} radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
