@@ -84,18 +84,16 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
     };
 
     const handleShareOnLinkedIn = () => {
-        const certName = encodeURIComponent(trackTitle);
-        const orgName = encodeURIComponent("Br Supply Academy Stream");
-        const issueYear = new Date().getFullYear();
-        const issueMonth = new Date().getMonth() + 1;
+        const postText = `Estou feliz em compartilhar que concluí a trilha de conhecimento "${trackTitle}" na Br Supply Academy Stream! #DesenvolvimentoProfissional #BrSupply`;
+        const encodedText = encodeURIComponent(postText);
         
-        const linkedInUrl = `https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${certName}&organizationName=${orgName}&issueYear=${issueYear}&issueMonth=${issueMonth}`;
+        const linkedInUrl = `https://www.linkedin.com/share/v2/text?text=${encodedText}`;
         
         window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
 
         toast({
-            title: "Publicando no LinkedIn",
-            description: "Uma nova aba foi aberta para você adicionar o certificado ao seu perfil."
+            title: "Compartilhando no LinkedIn",
+            description: "Uma nova aba foi aberta para você criar sua publicação."
         });
     };
     
