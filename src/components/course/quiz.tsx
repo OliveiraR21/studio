@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Quiz as QuizType, Question } from "@/lib/types";
@@ -11,6 +12,12 @@ interface QuizProps {
   quiz: QuizType;
   onQuizComplete: (score: number) => void;
 }
+
+// Helper function to shuffle an array
+const shuffleArray = <T,>(array: T[]): T[] => {
+  return [...array].sort(() => Math.random() - 0.5);
+};
+
 
 // Helper function to shuffle an array and take the first N items
 const shuffleAndSelect = (array: Question[], numItems: number): Question[] => {
@@ -30,6 +37,14 @@ export function Quiz({ quiz, onQuizComplete }: QuizProps) {
   // Memoize the selected questions so they don't change on re-renders
   const selectedQuestions = useMemo(() => shuffleAndSelect(quiz.questions, 10), [quiz]);
 
+  // Memoize the shuffled options for each question
+  const shuffledQuestions = useMemo(() => {
+    return selectedQuestions.map(q => ({
+      ...q,
+      options: shuffleArray(q.options)
+    }));
+  }, [selectedQuestions]);
+
 
   const handleValueChange = (questionIndex: number, value: string) => {
     if (submitted) return;
@@ -38,6 +53,7 @@ export function Quiz({ quiz, onQuizComplete }: QuizProps) {
 
   const handleSubmit = () => {
     let correctAnswers = 0;
+    // We check against the original (unshuffled) selectedQuestions object to find the correct answer
     selectedQuestions.forEach((q, i) => {
       if (answers[i] === q.correctAnswer) {
         correctAnswers++;
@@ -61,11 +77,12 @@ export function Quiz({ quiz, onQuizComplete }: QuizProps) {
   return (
     <>
       <div className="space-y-6">
-        {selectedQuestions.map((question, qIndex) => (
+        {shuffledQuestions.map((question, qIndex) => (
           <div key={qIndex}>
             <p className="font-medium mb-3 flex items-start">
               {submitted && (
-                  answers[qIndex] === question.correctAnswer ? 
+                  // We still compare against the original question's correct answer
+                  answers[qIndex] === selectedQuestions[qIndex].correctAnswer ? 
                   <CheckCircle className="h-5 w-5 mr-2 text-green-500 flex-shrink-0" /> : 
                   <XCircle className="h-5 w-5 mr-2 text-red-500 flex-shrink-0" />
               )}
@@ -77,7 +94,7 @@ export function Quiz({ quiz, onQuizComplete }: QuizProps) {
               disabled={submitted}
             >
               {question.options.map((option, oIndex) => (
-                <div key={oIndex} className={`flex items-center space-x-2 p-2 rounded-md ${submitted && option === question.correctAnswer ? 'bg-green-500/20' : ''} ${submitted && answers[qIndex] === option && option !== question.correctAnswer ? 'bg-red-500/20' : ''}`}>
+                <div key={oIndex} className={`flex items-center space-x-2 p-2 rounded-md ${submitted && option === selectedQuestions[qIndex].correctAnswer ? 'bg-green-500/20' : ''} ${submitted && answers[qIndex] === option && option !== selectedQuestions[qIndex].correctAnswer ? 'bg-red-500/20' : ''}`}>
                   <RadioGroupItem value={option} id={`q${qIndex}o${oIndex}`} />
                   <Label htmlFor={`q${qIndex}o${oIndex}`}>{option}</Label>
                 </div>
