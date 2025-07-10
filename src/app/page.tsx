@@ -1,7 +1,7 @@
 
 import Link from "next/link";
 import { LoginPageClient } from "@/components/auth/login-page-client";
-import { Globe, Briefcase, Linkedin, Youtube, Info, Shield, Waves } from "lucide-react";
+import { Globe, Briefcase, Linkedin, Youtube, Info, Shield, Waves, Facebook } from "lucide-react";
 
 export default async function LoginPage() {
   
@@ -11,6 +11,7 @@ export default async function LoginPage() {
     { name: "Oceano", href: "https://www.oceanob2b.com/", icon: Waves },
     { name: "LinkedIn", href: "https://www.linkedin.com/company/brsupply-suprimentos-corporativos/posts/?feedView=all", icon: Linkedin },
     { name: "Youtube", href: "https://www.youtube.com/@brsupplysuprimentos", icon: Youtube },
+    { name: "Facebook", href: "https://www.facebook.com/brsupply.suprimentos.corporativos", icon: Facebook },
     { name: "SIC", href: "#", icon: Info },
     { name: "Contato Seguro", href: "#", icon: Shield },
   ];
@@ -39,7 +40,7 @@ export default async function LoginPage() {
       <div className="absolute top-0 left-0 w-full h-full bg-black/70 z-[-1]"></div>
 
       {/* Main Content Area */}
-      <div className="z-10 w-full max-w-md">
+      <div className="z-10 w-full max-w-[380px]">
         <LoginPageClient />
       </div>
 
