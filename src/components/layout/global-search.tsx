@@ -97,7 +97,7 @@ export function GlobalSearch() {
             <span>Pesquisar...</span>
         </div>
         <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 hidden h-6 select-none items-center gap-1 rounded border bg-background px-2 font-mono text-xs font-medium text-muted-foreground opacity-100 sm:flex">
-          <span className="text-base">⌘</span>K
+          Ctrl+K
         </kbd>
       </Button>
       <CommandDialog open={isOpen} onOpenChange={setIsOpen}>
