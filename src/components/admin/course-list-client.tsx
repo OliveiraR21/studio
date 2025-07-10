@@ -33,7 +33,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Edit, Trash2, FileText, ThumbsUp, Loader2 } from "lucide-react";
+import { Edit, Trash2, FileText, ThumbsUp, Loader2, ThumbsDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { deleteCourseAction } from "@/actions/course-actions";
@@ -169,10 +169,15 @@ export function CourseListClient({ modules }: CourseListClientProps) {
                 </TableCell>
                 <TableCell>
                   {totalVotes > 0 ? (
-                      <div className="flex items-center gap-2">
-                          <ThumbsUp className="h-4 w-4 text-green-500" />
-                          <span className="font-semibold">{course.likes || 0}</span>
-                          <span className="text-xs text-muted-foreground">({totalVotes} votos)</span>
+                      <div className="flex items-center gap-4 text-xs">
+                          <div className="flex items-center gap-1.5">
+                            <ThumbsUp className="h-4 w-4 text-green-500" />
+                            <span className="font-semibold">{course.likes || 0}</span>
+                          </div>
+                           <div className="flex items-center gap-1.5">
+                            <ThumbsDown className="h-4 w-4 text-destructive" />
+                            <span className="font-semibold">{course.dislikes || 0}</span>
+                          </div>
                       </div>
                   ) : (
                       <span className="text-xs text-muted-foreground">Nenhuma</span>

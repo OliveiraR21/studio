@@ -2,17 +2,20 @@
 "use client"
 
 import { useState } from "react";
+import confetti from "canvas-confetti";
 import { CoursePlayer } from "@/components/course/course-player";
 import { Quiz as QuizComponent } from "@/components/course/quiz";
 import { notFound, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { ArrowLeft, Lightbulb, Video, ThumbsUp, ThumbsDown, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Lightbulb, ThumbsUp, ThumbsDown, AlertCircle, Loader2 } from "lucide-react";
 import type { Course, Track, User, Module } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { recordCourseFeedback, completeCourseForUser } from "@/actions/course-actions";
 import { Textarea } from "@/components/ui/textarea";
 import { CoursePlaylist } from "@/components/course/course-playlist";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 const PASSING_SCORE = 90;
 
@@ -43,6 +46,44 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
   if (!course || !track) {
     notFound();
   }
+
+  const triggerConfetti = () => {
+    const count = 200;
+    const defaults = {
+      origin: { y: 0.7 },
+    };
+
+    function fire(particleRatio: number, opts: any) {
+      confetti({
+        ...defaults,
+        ...opts,
+        particleCount: Math.floor(count * particleRatio),
+      });
+    }
+
+    fire(0.25, {
+      spread: 26,
+      startVelocity: 55,
+    });
+    fire(0.2, {
+      spread: 60,
+    });
+    fire(0.35, {
+      spread: 100,
+      decay: 0.91,
+      scalar: 0.8,
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 25,
+      decay: 0.92,
+      scalar: 1.2,
+    });
+    fire(0.1, {
+      spread: 120,
+      startVelocity: 45,
+    });
+  };
   
   const handleQuizComplete = (score: number) => {
     setLastScore(score);
@@ -93,6 +134,9 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
     const feedbackResult = await recordCourseFeedback(course.id, feedbackToSend, oldFeedback);
 
     if (feedbackResult.success) {
+        if (feedbackToSend === 'like') {
+            triggerConfetti();
+        }
         setCurrentFeedback(feedbackToSend);
         setLikes(feedbackResult.newLikes);
         setDislikes(feedbackResult.newDislikes);
@@ -159,13 +203,32 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
             <div className="flex justify-between items-center -mt-2">
                 <p className="text-muted-foreground">{course.description}</p>
                  {completionStep === 'completed' && (
-                     <div className="flex items-center gap-4">
-                        <Button variant="outline" size="sm" onClick={() => handleFeedbackClick('like')} disabled={isSubmittingFeedback}>
-                            <ThumbsUp className={`mr-2 h-5 w-5 ${currentFeedback === 'like' ? 'text-primary' : ''}`} />
+                     <div className="flex items-center border rounded-full overflow-hidden">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleFeedbackClick('like')}
+                            disabled={isSubmittingFeedback}
+                            className={cn(
+                                "rounded-none rounded-l-full px-4 h-9 hover:bg-green-500/10",
+                                currentFeedback === 'like' && "bg-green-500/10 text-green-600"
+                            )}
+                        >
+                            <ThumbsUp className="mr-2 h-5 w-5" />
                             {likes}
                         </Button>
-                         <Button variant="outline" size="sm" onClick={() => handleFeedbackClick('dislike')} disabled={isSubmittingFeedback}>
-                            <ThumbsDown className={`mr-2 h-5 w-5 ${currentFeedback === 'dislike' ? 'text-destructive' : ''}`} />
+                        <Separator orientation="vertical" className="h-5" />
+                         <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleFeedbackClick('dislike')}
+                            disabled={isSubmittingFeedback}
+                            className={cn(
+                                "rounded-none rounded-r-full px-4 h-9 hover:bg-red-500/10",
+                                currentFeedback === 'dislike' && "bg-red-500/10 text-destructive"
+                            )}
+                        >
+                            <ThumbsDown className="mr-2 h-5 w-5" />
                             {dislikes}
                         </Button>
                     </div>
