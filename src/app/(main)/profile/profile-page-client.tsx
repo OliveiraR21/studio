@@ -176,19 +176,6 @@ export function ProfilePageClient({ user: initialUser }: ProfilePageClientProps)
                     </div>
                 </CardContent>
             </Card>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>Meu Desempenho</CardTitle>
-                    <CardDescription>Resumo do seu progresso na plataforma.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {/* Placeholder for stats - In a real app, you'd fetch and display user's stats here */}
-                    <div className="text-center text-muted-foreground py-8">
-                        <p>Gráficos de progresso e estatísticas de desempenho seriam exibidos aqui.</p>
-                    </div>
-                </CardContent>
-            </Card>
         </div>
     );
 }
