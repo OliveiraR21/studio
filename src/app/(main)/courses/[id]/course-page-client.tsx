@@ -1,8 +1,7 @@
 
 "use client"
 
-import { useState } from "react";
-import confetti from "canvas-confetti";
+import { useState, useEffect } from "react";
 import { CoursePlayer } from "@/components/course/course-player";
 import { Quiz as QuizComponent } from "@/components/course/quiz";
 import { notFound, useRouter } from "next/navigation";
@@ -42,48 +41,11 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
   const [feedbackText, setFeedbackText] = useState("");
   const [likes, setLikes] = useState(course.likes || 0);
   const [dislikes, setDislikes] = useState(course.dislikes || 0);
+  const [isLiking, setIsLiking] = useState(false);
 
   if (!course || !track) {
     notFound();
   }
-
-  const triggerConfetti = () => {
-    const count = 200;
-    const defaults = {
-      origin: { y: 0.7 },
-    };
-
-    function fire(particleRatio: number, opts: any) {
-      confetti({
-        ...defaults,
-        ...opts,
-        particleCount: Math.floor(count * particleRatio),
-      });
-    }
-
-    fire(0.25, {
-      spread: 26,
-      startVelocity: 55,
-    });
-    fire(0.2, {
-      spread: 60,
-    });
-    fire(0.35, {
-      spread: 100,
-      decay: 0.91,
-      scalar: 0.8,
-    });
-    fire(0.1, {
-      spread: 120,
-      startVelocity: 25,
-      decay: 0.92,
-      scalar: 1.2,
-    });
-    fire(0.1, {
-      spread: 120,
-      startVelocity: 45,
-    });
-  };
   
   const handleQuizComplete = (score: number) => {
     setLastScore(score);
@@ -131,12 +93,14 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
     }
 
     setIsSubmittingFeedback(true);
+    if (feedbackToSend === 'like') {
+        setIsLiking(true);
+        setTimeout(() => setIsLiking(false), 1000); // Animation duration
+    }
+
     const feedbackResult = await recordCourseFeedback(course.id, feedbackToSend, oldFeedback);
 
     if (feedbackResult.success) {
-        if (feedbackToSend === 'like') {
-            triggerConfetti();
-        }
         setCurrentFeedback(feedbackToSend);
         setLikes(feedbackResult.newLikes);
         setDislikes(feedbackResult.newDislikes);
@@ -210,11 +174,12 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
                             onClick={() => handleFeedbackClick('like')}
                             disabled={isSubmittingFeedback}
                             className={cn(
-                                "rounded-none rounded-l-full px-4 h-9 hover:bg-green-500/10",
-                                currentFeedback === 'like' && "bg-green-500/10 text-green-600"
+                                "rounded-none rounded-l-full px-4 h-9",
+                                "hover:bg-green-500/10",
+                                currentFeedback === 'like' && "bg-muted/50"
                             )}
                         >
-                            <ThumbsUp className="mr-2 h-5 w-5" />
+                            <ThumbsUp className={cn("mr-2 h-5 w-5", currentFeedback === 'like' && 'text-primary', isLiking && 'animate-bounce')} />
                             {likes}
                         </Button>
                         <Separator orientation="vertical" className="h-5" />
@@ -224,11 +189,12 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
                             onClick={() => handleFeedbackClick('dislike')}
                             disabled={isSubmittingFeedback}
                             className={cn(
-                                "rounded-none rounded-r-full px-4 h-9 hover:bg-red-500/10",
-                                currentFeedback === 'dislike' && "bg-red-500/10 text-destructive"
+                                "rounded-none rounded-r-full px-4 h-9",
+                                "hover:bg-muted",
+                                currentFeedback === 'dislike' && "bg-muted/50"
                             )}
                         >
-                            <ThumbsDown className="mr-2 h-5 w-5" />
+                            <ThumbsDown className={cn("mr-2 h-5 w-5", currentFeedback === 'dislike' && 'text-primary')} />
                             {dislikes}
                         </Button>
                     </div>
