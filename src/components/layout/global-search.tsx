@@ -89,7 +89,7 @@ export function GlobalSearch() {
     <>
       <Button
         variant="outline"
-        className="relative h-10 w-full max-w-md lg:max-w-lg justify-start text-sm text-muted-foreground bg-muted/50 hover:bg-muted/80 rounded-full"
+        className="relative h-10 w-full max-w-md lg:max-w-lg justify-start text-sm text-muted-foreground bg-card dark:bg-muted/50 hover:bg-muted/80 rounded-full"
         onClick={() => setIsOpen(true)}
       >
         <div className="flex items-center gap-2 pl-2">
