@@ -28,40 +28,22 @@ export function LoginPageClient() {
   }, [searchParams, toast]);
 
   return (
-    <>
-      <div>
-          {/* Light mode logo */}
-          <img
-              src="/BrSupply.png"
-              alt="Br Supply Logo"
-              className="h-28 block dark:hidden"
-              data-ai-hint="logo"
-          />
-          {/* Dark mode logo */}
-          <img
-              src="/br-supply-logo.png"
-              alt="Br Supply Logo"
-              className="h-28 hidden dark:block"
-              data-ai-hint="logo"
-          />
-      </div>
-      <Card className="w-full bg-background/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl text-card-foreground">Login</CardTitle>
-          <CardDescription className="text-muted-foreground">
-            Digite seu e-mail e senha para acessar a plataforma.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <LoginForm />
-          <div className="mt-4 text-center text-sm text-muted-foreground">
-            Não tem uma conta?{" "}
-            <Link href="/signup" className="underline text-primary">
-              Cadastre-se
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    </>
+    <Card className="w-full bg-background/80 backdrop-blur-sm">
+      <CardHeader>
+        <CardTitle className="text-2xl text-card-foreground">Login</CardTitle>
+        <CardDescription className="text-muted-foreground">
+          Digite seu e-mail e senha para acessar a plataforma.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <LoginForm />
+        <div className="mt-4 text-center text-sm text-muted-foreground">
+          Não tem uma conta?{" "}
+          <Link href="/signup" className="underline text-primary">
+            Cadastre-se
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

@@ -1,4 +1,3 @@
-
 import Link from "next/link";
 import { LoginPageClient } from "@/components/auth/login-page-client";
 import { Globe, Briefcase, Linkedin, Youtube, Info, Shield, Facebook, Waves } from "lucide-react";
@@ -18,7 +17,7 @@ export default async function LoginPage() {
   ];
 
   return (
-    <div className="relative w-full min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
+    <div className="relative w-full min-h-screen flex flex-col items-center justify-between p-4 overflow-hidden">
       {/* Background Iframe for YouTube */}
       <div className="absolute top-0 left-0 w-full h-full z-[-2] pointer-events-none">
         <iframe
@@ -40,13 +39,31 @@ export default async function LoginPage() {
       {/* Dark Overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-black/70 z-[-1]"></div>
 
+      {/* Header with Logo */}
+      <header className="w-full z-10 flex justify-center py-4">
+          {/* Light mode logo */}
+          <img
+              src="/BrSupply.png"
+              alt="Br Supply Logo"
+              className="h-28 block dark:hidden"
+              data-ai-hint="logo"
+          />
+          {/* Dark mode logo */}
+          <img
+              src="/br-supply-logo.png"
+              alt="Br Supply Logo"
+              className="h-28 hidden dark:block"
+              data-ai-hint="logo"
+          />
+      </header>
+
       {/* Main Content Area */}
-      <div className="z-10 w-full max-w-[380px] flex flex-col items-center gap-6">
+      <main className="z-10 w-full max-w-[380px] flex flex-col items-center">
         <LoginPageClient />
-      </div>
+      </main>
 
        {/* Footer with links */}
-      <footer className="absolute bottom-4 left-4 right-4 z-10">
+      <footer className="w-full z-10 flex justify-center py-4">
         <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-4">
             {footerLinks.map((link) => {
                 const Icon = link.icon;
