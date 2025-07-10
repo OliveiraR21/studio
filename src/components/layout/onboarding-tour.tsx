@@ -79,23 +79,29 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, step, type, action } = data;
     const finishedStatuses: string[] = ['finished', 'skipped'];
+    const targetEl = step.target === 'body' ? null : document.querySelector<HTMLElement>(step.target as string);
 
-    // Limpa a classe do alvo anterior
-    if (lastTarget.current) {
-        lastTarget.current.classList.remove('joyride-active-step');
-    }
-
+    // Quando o tour termina ou é pulado, limpa o último alvo.
     if (finishedStatuses.includes(status)) {
+      if (lastTarget.current) {
+        lastTarget.current.removeAttribute('data-active');
+      }
       stopTour();
       return;
     }
 
     if (type === EVENTS.STEP_AFTER || (type === EVENTS.TOOLTIP && action === 'close')) {
-        const currentTarget = step.target === 'body' ? null : document.querySelector<HTMLElement>(step.target as string);
-        if (currentTarget) {
-            currentTarget.classList.add('joyride-active-step');
-            lastTarget.current = currentTarget;
-        }
+      // Remove o destaque do alvo anterior
+      if (lastTarget.current && lastTarget.current !== targetEl) {
+        lastTarget.current.removeAttribute('data-active');
+      }
+
+      // Adiciona o destaque ao alvo atual
+      if (targetEl) {
+        // Usamos data-active="true" para simular o estado de seleção do menu.
+        targetEl.setAttribute('data-active', 'true');
+        lastTarget.current = targetEl;
+      }
     }
   };
 
@@ -131,15 +137,36 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
         buttonClose: {
           display: 'none',
         },
-      }}
-      floaterProps={{
-        styles: {
-          arrow: {
-            length: 8,
-            spread: 12,
-          }
+        buttonNext: {
+          borderRadius: '0.375rem',
+          padding: '0.5rem 1rem',
+          fontSize: '0.875rem',
         }
       }}
+      tooltipComponent={({
+        continuous,
+        index,
+        step,
+        backProps,
+        closeProps,
+        primaryProps,
+        tooltipProps,
+      }) => (
+        <div {...tooltipProps} className="p-4 rounded-lg bg-card text-card-foreground shadow-lg max-w-xs">
+          {step.content}
+          <div className="flex justify-between items-center mt-4">
+              <span className="text-xs text-muted-foreground">{index + 1} de {steps.length}</span>
+              <div>
+                {index > 0 && (
+                  <button {...backProps} className="text-sm mr-4 text-muted-foreground hover:text-foreground">Voltar</button>
+                )}
+                <button {...primaryProps} className="joyride-next-button">
+                    {continuous ? 'Next' : 'Finalizar'}
+                </button>
+              </div>
+          </div>
+        </div>
+      )}
     />
   );
 }
