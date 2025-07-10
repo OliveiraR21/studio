@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -118,6 +119,9 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
         buttonNext: {
             fontSize: '14px',
             padding: '8px 16px',
+            backgroundColor: 'hsl(var(--primary))',
+            color: 'hsl(var(--primary-foreground))',
+            boxShadow: '0 0 10px hsl(var(--primary)), 0 0 5px hsl(var(--primary))'
         },
         spotlight: {
           borderRadius: 'var(--radius)',
@@ -134,37 +138,6 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
           }
         }
       }}
-      tooltipComponent={({
-        continuous,
-        index,
-        step,
-        backProps,
-        closeProps,
-        primaryProps,
-        tooltipProps,
-      }) => (
-        <div {...tooltipProps} className="joyride-tooltip bg-card text-card-foreground p-4 rounded-lg shadow-lg max-w-xs">
-          {step.title && <h4 className="font-bold text-lg mb-2">{step.title}</h4>}
-          <div className="text-sm">{step.content}</div>
-          <div className="flex justify-end items-center mt-4">
-             {index > 0 && (
-              <button {...backProps} className="text-xs text-muted-foreground mr-4">
-                {step.locale?.back}
-              </button>
-            )}
-            {continuous && (
-              <button {...primaryProps} className="joyride-next-button rounded-md font-semibold">
-                {step.locale?.next}
-              </button>
-            )}
-            {!continuous && (
-              <button {...closeProps} className="joyride-next-button rounded-md font-semibold">
-                {step.locale?.close}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
     />
   );
 }
