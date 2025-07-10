@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,8 +39,8 @@ export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps)
             </div>
           )}
           {isCompleted && (
-             <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full shadow-lg p-1">
-                <CheckCircle className="h-6 w-6 text-green-500" />
+             <div className="absolute top-2 right-2">
+                <CheckCircle className="h-6 w-6 text-green-500 bg-background rounded-full" />
             </div>
           )}
         </div>
