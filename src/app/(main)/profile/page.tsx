@@ -1,9 +1,11 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { User as UserIcon, Mail, Briefcase, Building2 } from "lucide-react";
+import { User as UserIcon, Mail, Briefcase, Building2, Camera } from "lucide-react";
 import { UserNotFound } from "@/components/layout/user-not-found";
 import { getCurrentUser } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
 
 export default async function ProfilePage() {
   const currentUser = await getCurrentUser();
@@ -11,6 +13,14 @@ export default async function ProfilePage() {
   if (!currentUser) {
     return <UserNotFound />;
   }
+  
+  const getInitials = (name: string) => {
+    const nameParts = name.split(' ');
+    if (nameParts.length > 1) {
+      return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+    }
+    return name.charAt(0).toUpperCase();
+  };
 
   return (
     <div className="container mx-auto space-y-6">
@@ -24,10 +34,19 @@ export default async function ProfilePage() {
       <Card>
         <CardHeader>
             <div className="flex items-center gap-6">
-                <Avatar className="h-24 w-24 border-4 border-primary/20">
-                    <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} data-ai-hint="user avatar" />
-                    <AvatarFallback className="text-3xl">{currentUser.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+                <div className="relative group">
+                    <Avatar className="h-24 w-24 border-4 border-primary/20">
+                        <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} data-ai-hint="user avatar" />
+                        <AvatarFallback className="text-3xl">{getInitials(currentUser.name)}</AvatarFallback>
+                    </Avatar>
+                     <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button variant="ghost" size="icon" className="h-12 w-12 text-white hover:bg-white/20 hover:text-white"
+                          onClick={() => alert('Funcionalidade de alterar foto em desenvolvimento.')}
+                        >
+                            <Camera className="h-6 w-6" />
+                        </Button>
+                    </div>
+                </div>
                 <div>
                     <h2 className="text-4xl font-bold">{currentUser.name}</h2>
                     <p className="text-lg text-muted-foreground">{currentUser.email}</p>
