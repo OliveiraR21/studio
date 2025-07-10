@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Um fluxo de IA para gerar um questionário com base no título e descrição de um curso.
@@ -61,6 +62,15 @@ Descrição do Curso: {{{description}}}
 Seu resultado deve ser um objeto JSON que siga estritamente o esquema de saída fornecido.`,
 });
 
+// Helper function to shuffle an array in-place
+const shuffleArray = <T,>(array: T[]): T[] => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
 const generateQuizFlow = ai.defineFlow(
   {
     name: 'generateQuizFlow',
@@ -73,8 +83,13 @@ const generateQuizFlow = ai.defineFlow(
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const { output } = await prompt(input);
-        // If the call succeeds with valid output, return immediately.
+        
+        // If the call succeeds with valid output, process and return.
         if (output) {
+          // Shuffle the options for each question to avoid predictability
+          output.questions.forEach(question => {
+            question.options = shuffleArray(question.options);
+          });
           return output;
         }
       } catch (e: any) {
