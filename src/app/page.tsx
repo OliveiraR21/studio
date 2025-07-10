@@ -32,8 +32,14 @@ export default function LoginPage() {
       {/* Background Iframe for YouTube */}
       <div className="absolute top-0 left-0 w-full h-full z-[-2] pointer-events-none">
         <iframe
-          className="absolute top-1/2 left-1/2 w-full h-full -translate-x-1/2 -translate-y-1/2 object-cover"
-          style={{ width: '177.77vh', height: '100vw' }} // Maintain 16:9 ratio while covering screen
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{
+            width: '177.77vh', // 100 * (16/9)
+            minWidth: '100vw',
+            height: '100vw', // 100 * (9/16)
+            minHeight: '100vh',
+            objectFit: 'cover'
+          }}
           src="https://www.youtube.com/embed/NgPkB-5-v6Y?autoplay=1&mute=1&loop=1&playlist=NgPkB-5-v6Y&controls=0&showinfo=0&modestbranding=1&iv_load_policy=3&rel=0"
           allow="autoplay; encrypted-media;"
           title="YouTube background video"
