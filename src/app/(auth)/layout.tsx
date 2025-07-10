@@ -1,10 +1,11 @@
-import Link from "next/link";
-import { LoginPageClient } from "@/components/auth/login-page-client";
 import { Globe, Briefcase, Linkedin, Youtube, Shield, Facebook } from "lucide-react";
 
+export default function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
 
-export default async function LoginPage() {
-  
   const footerLinks = [
     { name: "Site", href: "https://brsupply.com.br/", icon: Globe },
     { name: "Supply Manager", href: "#", icon: Briefcase },
@@ -13,7 +14,7 @@ export default async function LoginPage() {
     { name: "Facebook", href: "https://www.facebook.com/brsupply.suprimentos.corporativos", icon: Facebook },
     { name: "Contato Seguro", href: "https://www.brsupply.com.br/canal-etico/", icon: Shield },
   ];
-
+  
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center justify-between p-4 overflow-hidden">
       {/* Background Iframe for YouTube */}
@@ -39,25 +40,17 @@ export default async function LoginPage() {
 
       {/* Header with Logo */}
       <header className="w-full z-10 flex justify-center py-4">
-          {/* Light mode logo */}
-          <img
-              src="/BrSupply.png"
-              alt="Br Supply Logo"
-              className="h-28 block dark:hidden"
-              data-ai-hint="logo"
-          />
-          {/* Dark mode logo */}
           <img
               src="/br-supply-logo.png"
               alt="Br Supply Logo"
-              className="h-28 hidden dark:block"
+              className="h-28"
               data-ai-hint="logo"
           />
       </header>
 
       {/* Main Content Area */}
-      <main className="z-10 w-full max-w-[380px] flex flex-col items-center">
-        <LoginPageClient />
+      <main className="z-10 w-full flex flex-1 flex-col items-center justify-center">
+        {children}
       </main>
 
        {/* Footer with links */}
@@ -82,5 +75,5 @@ export default async function LoginPage() {
         </ul>
       </footer>
     </div>
-  );
+  )
 }
