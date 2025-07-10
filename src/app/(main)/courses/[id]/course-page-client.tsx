@@ -19,19 +19,23 @@ interface CoursePageClientProps {
     course: Course;
     track: Track;
     isAlreadyCompleted: boolean;
+    initialFeedback: 'like' | 'dislike' | 'none';
 }
 
-export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePageClientProps) {
+export function CoursePageClient({ course, track, isAlreadyCompleted, initialFeedback }: CoursePageClientProps) {
   const router = useRouter();
   const { toast } = useToast();
 
   const [view, setView] = useState<'video' | 'quiz'>(course.quiz ? 'video' : 'video');
   const [quizFinished, setQuizFinished] = useState(false);
   const [lastScore, setLastScore] = useState<number | null>(null);
-  const [completionStep, setCompletionStep] = useState<'in_progress' | 'awaiting_feedback' | 'awaiting_dislike_reason' | 'feedback_given'>(isAlreadyCompleted ? 'feedback_given' : 'in_progress');
+  
+  const [completionStep, setCompletionStep] = useState(isAlreadyCompleted ? 'completed' : 'in_progress');
+  const [currentFeedback, setCurrentFeedback] = useState<'like' | 'dislike' | 'none'>(initialFeedback);
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [feedbackText, setFeedbackText] = useState("");
-
+  const [likes, setLikes] = useState(course.likes || 0);
+  const [dislikes, setDislikes] = useState(course.dislikes || 0);
 
   if (!course || !track) {
     notFound();
@@ -39,77 +43,82 @@ export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePa
   
   const handleQuizComplete = (score: number) => {
     setLastScore(score);
-    
     if (score >= PASSING_SCORE) {
       setQuizFinished(true);
       // User must now click "Finalizar Curso" to proceed to feedback and completion.
-      console.log(`Quiz for course ${course.id} passed. Awaiting feedback.`);
     } else {
       setQuizFinished(false);
     }
     setView('video'); // Go back to the video view to show the result card
   };
   
-  const handleRequestFeedback = () => {
-    console.log(`Course ${course.id} finished. Requesting feedback.`);
-    setCompletionStep('awaiting_feedback');
+  const handleFinishCourse = async () => {
+    const completionResult = await completeCourseForUser(course.id);
+    if (completionResult.success) {
+        setCompletionStep('completed');
+        toast({
+            title: "Curso Concluído!",
+            description: "Seu progresso foi registrado com sucesso. Dê seu feedback!",
+        });
+    } else {
+         toast({
+            variant: "destructive",
+            title: "Erro",
+            description: completionResult.message,
+        });
+    }
   };
 
-  const handleCourseFeedback = async (feedbackType: 'like' | 'dislike') => {
+  const handleFeedbackClick = async (newFeedback: 'like' | 'dislike') => {
     if (isSubmittingFeedback) return;
+
+    // Determine the type of action: giving new feedback, changing feedback, or undoing feedback.
+    const feedbackToSend = currentFeedback === newFeedback ? 'none' : newFeedback;
+    const oldFeedback = currentFeedback;
     
-    // If dislike is clicked, show the feedback form instead of submitting
-    if (feedbackType === 'dislike') {
+    // If user clicks dislike, always prompt for a reason unless they are undoing a dislike.
+    if (feedbackToSend === 'dislike') {
         setCompletionStep('awaiting_dislike_reason');
         return;
     }
 
     setIsSubmittingFeedback(true);
-    // Bundle completion and feedback recording
-    const completionResult = await completeCourseForUser(course.id);
-    const feedbackResult = await recordCourseFeedback(course.id, 'like');
+    const feedbackResult = await recordCourseFeedback(course.id, feedbackToSend, oldFeedback);
 
-    if (completionResult.success && feedbackResult.success) {
-        setCompletionStep('feedback_given');
-        toast({
-            title: "Obrigado!",
-            description: "Seu progresso e feedback foram registrados com sucesso.",
-        });
-        // Redirect immediately to the course list to see unlocked content
-        router.push(`/meus-cursos?openTrack=${track.id}`);
+    if (feedbackResult.success) {
+        setCurrentFeedback(feedbackToSend);
+        setLikes(feedbackResult.newLikes);
+        setDislikes(feedbackResult.newDislikes);
     } else {
         toast({
             variant: "destructive",
             title: "Erro",
-            description: !completionResult.success ? completionResult.message : feedbackResult.message,
+            description: feedbackResult.message,
         });
-        setIsSubmittingFeedback(false);
     }
+    setIsSubmittingFeedback(false);
   };
   
   const handleSubmitDislikeFeedback = async () => {
     if (isSubmittingFeedback) return;
     setIsSubmittingFeedback(true);
-    
-    // Bundle completion and feedback recording
-    const completionResult = await completeCourseForUser(course.id);
-    const feedbackResult = await recordCourseFeedback(course.id, 'dislike', feedbackText);
 
-    if (completionResult.success && feedbackResult.success) {
-        setCompletionStep('feedback_given');
-        toast({
-            title: "Obrigado!",
-            description: "Seu progresso e feedback foram registrados com sucesso.",
-        });
-        router.push(`/meus-cursos?openTrack=${track.id}`);
+    const oldFeedback = currentFeedback;
+    const feedbackResult = await recordCourseFeedback(course.id, 'dislike', oldFeedback, feedbackText);
+
+    if (feedbackResult.success) {
+        setCurrentFeedback('dislike');
+        setLikes(feedbackResult.newLikes);
+        setDislikes(feedbackResult.newDislikes);
+        setCompletionStep('completed'); // Return to the main completed view
     } else {
         toast({
             variant: "destructive",
             title: "Erro",
-            description: !completionResult.success ? completionResult.message : feedbackResult.message,
+            description: feedbackResult.message,
         });
-        setIsSubmittingFeedback(false);
     }
+    setIsSubmittingFeedback(false);
   };
 
   const handleStartQuiz = () => {
@@ -117,6 +126,10 @@ export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePa
     setLastScore(null);
     setQuizFinished(false);
   }
+
+  const courseHasQuiz = !!course.quiz;
+  const showCompleteButton = !courseHasQuiz && completionStep === 'in_progress';
+  const showFinalizeButton = courseHasQuiz && quizFinished && completionStep === 'in_progress';
 
   return (
     <div className="container mx-auto py-6">
@@ -129,7 +142,22 @@ export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePa
         {/* Main Content: Video or Quiz */}
         <div className="lg:col-span-2 space-y-6">
             <h1 className="text-3xl font-bold tracking-tight">{course.title}</h1>
-            <p className="text-muted-foreground -mt-4">{course.description}</p>
+            
+            <div className="flex justify-between items-center -mt-2">
+                <p className="text-muted-foreground">{course.description}</p>
+                 {completionStep === 'completed' && (
+                     <div className="flex items-center gap-4">
+                        <Button variant="ghost" size="sm" onClick={() => handleFeedbackClick('like')} disabled={isSubmittingFeedback}>
+                            <ThumbsUp className={`mr-2 h-5 w-5 ${currentFeedback === 'like' ? 'text-primary' : ''}`} />
+                            {likes}
+                        </Button>
+                         <Button variant="ghost" size="sm" onClick={() => handleFeedbackClick('dislike')} disabled={isSubmittingFeedback}>
+                            <ThumbsDown className={`mr-2 h-5 w-5 ${currentFeedback === 'dislike' ? 'text-destructive' : ''}`} />
+                            {dislikes}
+                        </Button>
+                    </div>
+                )}
+            </div>
             
             {completionStep === 'in_progress' && (
               <>
@@ -146,7 +174,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePa
                           Sua nota foi {lastScore}%. Clique abaixo para finalizar o curso.
                         </CardDescription>
                         <div className="flex gap-4 justify-center mt-6">
-                            <Button onClick={handleRequestFeedback}>Finalizar Curso</Button>
+                            <Button onClick={handleFinishCourse}>Finalizar Curso</Button>
                             <Button variant="outline" onClick={handleStartQuiz}>Refazer Prova</Button>
                         </div>
                       </Card>
@@ -169,30 +197,13 @@ export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePa
                             <CardDescription className="flex items-center gap-2 pt-2">
                                <AlertCircle className="h-4 w-4" /> O vídeo não estará visível durante a prova.
                             </CardDescription>
-                        </CardHeader>
+                        </Header>
                         <CardContent>
                             <QuizComponent quiz={course.quiz} onQuizComplete={handleQuizComplete} />
                         </CardContent>
                     </Card>
                 )}
               </>
-            )}
-
-            {completionStep === 'awaiting_feedback' && (
-              <Card>
-                <CardHeader className="text-center">
-                  <CardTitle>O que você achou do conteúdo?</CardTitle>
-                  <CardDescription>Seu feedback é anônimo e nos ajuda a melhorar.</CardDescription>
-                </CardHeader>
-                <CardContent className="flex justify-center gap-6">
-                  <Button variant="outline" size="icon" className="h-20 w-20" disabled={isSubmittingFeedback} onClick={() => handleCourseFeedback('like')}>
-                    {isSubmittingFeedback ? <Loader2 className="h-10 w-10 animate-spin" /> : <ThumbsUp className="h-10 w-10" />}
-                  </Button>
-                  <Button variant="outline" size="icon" className="h-20 w-20" disabled={isSubmittingFeedback} onClick={() => handleCourseFeedback('dislike')}>
-                    <ThumbsDown className="h-10 w-10" />
-                  </Button>
-                </CardContent>
-              </Card>
             )}
 
             {completionStep === 'awaiting_dislike_reason' && (
@@ -212,7 +223,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePa
                     />
                 </CardContent>
                 <CardFooter className="justify-end gap-2">
-                    <Button variant="ghost" onClick={() => setCompletionStep('awaiting_feedback')} disabled={isSubmittingFeedback}>Voltar</Button>
+                    <Button variant="ghost" onClick={() => setCompletionStep('completed')} disabled={isSubmittingFeedback}>Cancelar</Button>
                     <Button onClick={handleSubmitDislikeFeedback} disabled={isSubmittingFeedback}>
                         {isSubmittingFeedback && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Enviar Feedback
@@ -221,20 +232,8 @@ export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePa
               </Card>
             )}
 
-
-            {completionStep === 'feedback_given' && (
-              // If the user is just reviewing a completed course, show the video player directly.
-              isAlreadyCompleted ? (
-                <CoursePlayer videoUrl={course.videoUrl} title={course.title} />
-              ) : (
-                <Card className="flex flex-col items-center justify-center text-center p-8 bg-green-500/10 border-green-500/20">
-                    <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                    <CardTitle className="text-2xl">Feedback Recebido!</CardTitle>
-                    <CardDescription className="mt-2">
-                      Obrigado por nos ajudar a melhorar. Você será redirecionado em breve.
-                    </CardDescription>
-                </Card>
-              )
+            {completionStep === 'completed' && (
+              <CoursePlayer videoUrl={course.videoUrl} title={course.title} />
             )}
         </div>
 
@@ -246,8 +245,8 @@ export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePa
                         <CardTitle>Progresso da Aula</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className={`flex items-center gap-3 p-3 rounded-md transition-colors ${view === 'video' ? 'bg-primary/10' : ''}`}>
-                            <Video className={`h-6 w-6 ${view === 'video' ? 'text-primary' : 'text-muted-foreground'}`} />
+                        <div className={`flex items-center gap-3 p-3 rounded-md transition-colors ${view === 'video' ? 'bg-primary/10' : ''} ${isAlreadyCompleted ? 'bg-green-500/10' : ''}`}>
+                             {isAlreadyCompleted ? <CheckCircle className="h-6 w-6 text-green-500" /> : <Video className={`h-6 w-6 ${view === 'video' ? 'text-primary' : 'text-muted-foreground'}`} />}
                             <div>
                                 <p className="font-semibold">1. Assistir Vídeo</p>
                                 <p className="text-xs text-muted-foreground">Conteúdo principal da aula.</p>
@@ -257,7 +256,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePa
                         {course.quiz ? (
                             <>
                                 <div className={`flex items-center gap-3 p-3 rounded-md transition-colors ${view === 'quiz' ? 'bg-primary/10' : ''} ${quizFinished || isAlreadyCompleted ? 'bg-green-500/10' : ''}`}>
-                                    <Lightbulb className={`h-6 w-6 ${view === 'quiz' ? 'text-primary' : 'text-muted-foreground'}  ${quizFinished || isAlreadyCompleted ? 'text-green-500' : ''}`} />
+                                    {isAlreadyCompleted || quizFinished ? <CheckCircle className="h-6 w-6 text-green-500" /> : <Lightbulb className={`h-6 w-6 ${view === 'quiz' ? 'text-primary' : 'text-muted-foreground'}`} />}
                                     <div>
                                         <p className="font-semibold">2. Fazer Questionário</p>
                                         <p className="text-xs text-muted-foreground">Teste seu conhecimento.</p>
@@ -268,14 +267,17 @@ export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePa
                                     onClick={handleStartQuiz}
                                     disabled={view === 'quiz' || completionStep !== 'in_progress'}
                                 >
-                                    {isAlreadyCompleted ? 'Revisar Questionário' : (quizFinished ? 'Questionário Concluído' : (lastScore !== null ? 'Tentar Novamente' : 'Iniciar Questionário'))}
+                                    {isAlreadyCompleted ? 'Revisar Questionário' : (quizFinished ? 'Finalizar Curso' : (lastScore !== null ? 'Tentar Novamente' : 'Iniciar Questionário'))}
                                 </Button>
+                                {showFinalizeButton && (
+                                     <Button className="w-full" onClick={handleFinishCourse}>Finalizar Curso</Button>
+                                )}
                             </>
                         ) : (
                              <Button 
                                 className="w-full" 
-                                onClick={handleRequestFeedback}
-                                disabled={completionStep !== 'in_progress' || isAlreadyCompleted}
+                                onClick={handleFinishCourse}
+                                disabled={!showCompleteButton}
                             >
                                 {isAlreadyCompleted ? 'Curso Concluído' : 'Marcar como Concluído'}
                             </Button>

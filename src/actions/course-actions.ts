@@ -177,44 +177,56 @@ export async function saveQuiz(courseId: string, quiz: Quiz): Promise<{ success:
 
 export async function recordCourseFeedback(
   courseId: string, 
-  feedbackType: 'like' | 'dislike',
+  newFeedback: 'like' | 'dislike' | 'none',
+  oldFeedback: 'like' | 'dislike' | 'none',
   feedbackText?: string
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ success: boolean; message: string; newLikes: number; newDislikes: number }> {
   if (!courseId) {
-    return { success: false, message: "ID do curso não fornecido." };
+    return { success: false, message: "ID do curso não fornecido.", newLikes: 0, newDislikes: 0 };
   }
 
   const result = await findCourseById(courseId);
   if (!result) {
-    return { success: false, message: `Curso com ID ${courseId} não encontrado.` };
+    return { success: false, message: `Curso com ID ${courseId} não encontrado.`, newLikes: 0, newDislikes: 0 };
   }
   const { course } = result;
   
-  const currentLikes = course.likes || 0;
-  const currentDislikes = course.dislikes || 0;
+  let currentLikes = course.likes || 0;
+  let currentDislikes = course.dislikes || 0;
 
-  const updateData = feedbackType === 'like' 
-    ? { likes: currentLikes + 1 }
-    : { dislikes: currentDislikes + 1 };
+  // Decrement the old feedback if it was 'like' or 'dislike'
+  if (oldFeedback === 'like') {
+    currentLikes = Math.max(0, currentLikes - 1);
+  } else if (oldFeedback === 'dislike') {
+    currentDislikes = Math.max(0, currentDislikes - 1);
+  }
+
+  // Increment the new feedback
+  if (newFeedback === 'like') {
+    currentLikes += 1;
+  } else if (newFeedback === 'dislike') {
+    currentDislikes += 1;
+  }
+
+  const updateData = { likes: currentLikes, dislikes: currentDislikes };
 
   try {
     await updateCourse(courseId, updateData);
-    if (feedbackType === 'dislike' && feedbackText && feedbackText.trim() !== '') {
-        // In a real application, you'd save this to a database.
-        // For this simulation, we'll just log it to the server console.
+    if (newFeedback === 'dislike' && feedbackText && feedbackText.trim() !== '') {
         console.log(`\n[Feedback Recebido] Curso ID: ${courseId}`);
         console.log(`Motivo: "${feedbackText}"\n`);
     }
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
-    return { success: false, message: `Falha ao registrar o feedback: ${errorMessage}` };
+    return { success: false, message: `Falha ao registrar o feedback: ${errorMessage}`, newLikes: course.likes || 0, newDislikes: course.dislikes || 0 };
   }
 
   revalidatePath(`/admin/courses`);
   revalidatePath(`/courses/${courseId}`);
   
-  return { success: true, message: 'Feedback registrado com sucesso!' };
+  return { success: true, message: 'Feedback registrado com sucesso!', newLikes: currentLikes, newDislikes: currentDislikes };
 }
+
 
 export async function completeCourseForUser(
   courseId: string
@@ -228,10 +240,22 @@ export async function completeCourseForUser(
       throw new Error(`Usuário com ID ${userId} não encontrado.`);
     }
 
+    // This part is for the initial completion. Feedback is handled separately now.
     if (!user.completedCourses.includes(courseId)) {
         const updatedCompletedCourses = [...user.completedCourses, courseId];
         await updateUser(userId, { completedCourses: updatedCompletedCourses });
     }
+
+    // Add user to course voters if not already there, for simulation purposes.
+    const course = await findCourseById(courseId);
+    if (course) {
+        let voters = course.course.voters || [];
+        if (!voters.includes(userId)) {
+            voters.push(userId);
+            await updateCourse(courseId, { voters });
+        }
+    }
+
 
     // Revalidate all paths where progress is shown
     revalidatePath('/dashboard');

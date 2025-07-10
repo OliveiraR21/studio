@@ -30,6 +30,7 @@ export interface Course {
   quiz?: Quiz;
   likes?: number;
   dislikes?: number;
+  voters?: string[]; // list of user IDs who have voted, for simulation
   // Access control fields
   minimumRole?: UserRole;
   accessAreas?: string[];

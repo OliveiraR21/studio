@@ -83,14 +83,13 @@ export function CourseListClient({ modules }: CourseListClientProps) {
             <TableHead>Cargo Mínimo</TableHead>
             <TableHead>Áreas</TableHead>
             <TableHead>Questionário</TableHead>
-            <TableHead>Avaliação Média</TableHead>
+            <TableHead>Avaliações</TableHead>
             <TableHead className="w-[150px] text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {allCourses.map((course) => {
             const totalVotes = (course.likes || 0) + (course.dislikes || 0);
-            const satisfaction = totalVotes > 0 ? Math.round(((course.likes || 0) / totalVotes) * 100) : null;
 
             return (
               <TableRow key={course.id}>
@@ -169,14 +168,14 @@ export function CourseListClient({ modules }: CourseListClientProps) {
                     )}
                 </TableCell>
                 <TableCell>
-                  {satisfaction !== null ? (
+                  {totalVotes > 0 ? (
                       <div className="flex items-center gap-2">
                           <ThumbsUp className="h-4 w-4 text-green-500" />
-                          <span className="font-semibold">{satisfaction}%</span>
+                          <span className="font-semibold">{course.likes || 0}</span>
                           <span className="text-xs text-muted-foreground">({totalVotes} votos)</span>
                       </div>
                   ) : (
-                      <span className="text-xs text-muted-foreground">Nenhuma avaliação</span>
+                      <span className="text-xs text-muted-foreground">Nenhuma</span>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
