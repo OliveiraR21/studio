@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
@@ -16,6 +17,7 @@ import {
 } from '@/components/ui/command';
 import { globalSearch, type SearchResult } from '@/actions/search-actions';
 import { Skeleton } from '../ui/skeleton';
+import { Button } from '../ui/button';
 
 export function GlobalSearch() {
   const router = useRouter();
@@ -68,16 +70,17 @@ export function GlobalSearch() {
 
   return (
     <>
-      <div className="relative w-full max-w-md lg:max-w-lg">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <CommandInput
-          className="h-10 w-full pl-10 bg-muted/50 rounded-lg"
-          placeholder="Pesquisar..."
-          onClick={() => setIsOpen(true)}
-          onValueChange={setQuery}
-          value={query}
-        />
-      </div>
+      <Button
+        variant="outline"
+        className="relative h-10 w-full max-w-md lg:max-w-lg justify-start text-sm text-muted-foreground bg-muted/50 hover:bg-muted/80"
+        onClick={() => setIsOpen(true)}
+      >
+        <Search className="h-4 w-4 mr-2" />
+        <span>Pesquisar...</span>
+        <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 hidden h-6 select-none items-center gap-1 rounded border bg-background px-2 font-mono text-xs font-medium text-muted-foreground opacity-100 sm:flex">
+          <span className="text-xs">⌘</span>K
+        </kbd>
+      </Button>
       <CommandDialog open={isOpen} onOpenChange={setIsOpen}>
         <CommandInput
           placeholder="Pesquisar por cursos, páginas e mais..."
