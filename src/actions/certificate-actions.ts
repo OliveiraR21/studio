@@ -4,7 +4,7 @@
 import { PDFDocument, rgb, StandardFonts, PDFFont } from 'pdf-lib';
 import { promises as fs } from 'fs';
 import path from 'path';
-import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { ptBR } from 'date-fns/locale';
 
 interface CertificateData {
@@ -165,7 +165,10 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
         }
 
         // 6. Date and Location (at the bottom)
-        const completionDate = format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+        const now = new Date();
+        const timeZone = 'America/Sao_Paulo';
+        const completionDate = formatInTimeZone(now, timeZone, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+        
         const locationText = 'Rio Grande do Sul, Brasil';
         const dateText = `Concluído em ${completionDate}`;
 
