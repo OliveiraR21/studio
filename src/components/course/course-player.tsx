@@ -7,10 +7,23 @@ interface CoursePlayerProps {
 
 export function CoursePlayer({ videoUrl, title }: CoursePlayerProps) {
   const getEmbedUrl = (url: string): string => {
-    if (url && url.includes("heygen.com/")) {
+    if (!url) return '';
+    
+    // Handle YouTube URLs
+    if (url.includes("youtube.com/watch") || url.includes("youtu.be/")) {
+      const videoIdMatch = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})(?:\?|&|$)/);
+      if (videoIdMatch && videoIdMatch[1]) {
+        return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
+      }
+    }
+
+    // Handle HeyGen URLs
+    if (url.includes("heygen.com/")) {
       // Handles /videos/, /video/, and /guest/videos/ formats, converting them to the correct /embeds/ format.
       return url.replace(/(\/guest)?\/videos?\//, "/embeds/");
     }
+    
+    // Return the URL as is if it's not a recognized format that needs conversion
     return url;
   };
 
