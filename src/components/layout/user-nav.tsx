@@ -21,12 +21,18 @@ export function UserNav({ user }: { user: UserType | null }) {
     return <Skeleton className="h-9 w-9 rounded-full" />
   }
   
+  const displayName = user.preferredName || user.name;
+  
   const getInitials = (name: string) => {
-    const nameParts = name.split(' ');
+    if (!name) return '';
+    const nameParts = name.split(' ').filter(part => part);
     if (nameParts.length > 1) {
       return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
     }
-    return name.charAt(0).toUpperCase();
+    if (nameParts.length === 1 && nameParts[0].length > 0) {
+        return nameParts[0][0].toUpperCase();
+    }
+    return '';
   };
 
   return (
@@ -34,15 +40,15 @@ export function UserNav({ user }: { user: UserType | null }) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full" data-tour-id="user-nav">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="user avatar" />
-            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+            <AvatarImage src={user.avatarUrl} alt={displayName} data-ai-hint="user avatar" />
+            <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.name}</p>
+            <p className="text-sm font-medium leading-none">{displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
           </div>
         </DropdownMenuLabel>

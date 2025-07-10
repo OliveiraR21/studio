@@ -111,3 +111,34 @@ export async function removeUserAvatar(): Promise<{ success: boolean; message: s
     return { success: false, message: `Falha ao remover a foto: ${errorMessage}` };
   }
 }
+
+const userProfileSchema = z.object({
+    preferredName: z.string().optional(),
+});
+
+export async function updateUserProfile(
+    formData: FormData
+): Promise<{ success: boolean; message: string }> {
+    const userId = getSimulatedUserId();
+    if (!userId) {
+        return { success: false, message: 'Usuário não autenticado.' };
+    }
+    
+    const validatedFields = userProfileSchema.safeParse({
+        preferredName: formData.get('preferredName'),
+    });
+
+    if (!validatedFields.success) {
+        return { success: false, message: 'Dados inválidos.' };
+    }
+    
+    try {
+        await updateUser(userId, { preferredName: validatedFields.data.preferredName });
+        revalidatePath('/profile');
+        revalidatePath('/(main)/layout'); // Revalidate layout to update UserNav
+        return { success: true, message: 'Perfil atualizado com sucesso!' };
+    } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
+        return { success: false, message: `Falha ao atualizar o perfil: ${errorMessage}` };
+    }
+}

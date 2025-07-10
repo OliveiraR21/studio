@@ -50,7 +50,8 @@ export type UserRole = 'Admin' | 'Diretor' | 'Gerente' | 'Coordenador' | 'Superv
 // User progress is now more granular.
 export interface User {
   id: string;
-  name: string;
+  name: string; // Full/Legal Name
+  preferredName?: string; // Nickname or how they prefer to be called
   email: string;
   password?: string;
   role: UserRole;
