@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Joyride, { type Step, type CallBackProps, type EVENTS } from 'react-joyride';
+import Joyride, { type Step, type CallBackProps, EVENTS } from 'react-joyride';
 import type { User } from '@/lib/types';
 import { useTour } from '@/hooks/use-tour';
 
@@ -131,34 +131,6 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
         buttonClose: {
           display: 'none',
         },
-        buttonNext: {
-            fontSize: '14px',
-            padding: '8px 16px',
-            backgroundColor: 'hsl(var(--primary))',
-            color: 'hsl(var(--primary-foreground))',
-            transition: 'box-shadow 0.2s ease-in-out',
-        },
-        tooltip: {
-          borderRadius: 'var(--radius)',
-        },
-      }}
-      tooltipOptions={{
-        modifiers: [
-            {
-                name: 'applyStyles',
-                fn: (data) => {
-                    const nextButton = data.state.elements.popper.querySelector<HTMLButtonElement>('.__floater__button-primary');
-                    if (nextButton) {
-                        nextButton.onmouseenter = () => {
-                            nextButton.style.boxShadow = '0 0 10px hsl(var(--primary)), 0 0 5px hsl(var(--primary))';
-                        };
-                        nextButton.onmouseleave = () => {
-                            nextButton.style.boxShadow = 'none';
-                        };
-                    }
-                }
-            }
-        ]
       }}
       floaterProps={{
         styles: {
