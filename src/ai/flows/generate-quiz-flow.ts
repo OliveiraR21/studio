@@ -8,6 +8,7 @@
  */
 
 import { ai } from '@/ai/genkit';
+import type { QuestionDifficulty } from '@/lib/types';
 import { z } from 'genkit';
 
 const GenerateQuizInputSchema = z.object({
@@ -21,6 +22,7 @@ const QuestionSchema = z.object({
     text: z.string().describe('O texto da pergunta do questionário.'),
     options: z.array(z.string()).length(4).describe('Uma lista de exatamente 4 respostas possíveis.'),
     correctAnswer: z.string().describe('A resposta correta, que deve ser uma das strings no array de opções.'),
+    difficulty: z.enum(['Fácil', 'Intermediário', 'Difícil']).describe('O nível de dificuldade da pergunta.'),
 });
 
 const GenerateQuizOutputSchema = z.object({
@@ -43,6 +45,8 @@ const prompt = ai.definePrompt({
 Sua tarefa é criar um banco de questões de múltipla escolha com base no conteúdo de um curso fornecido.
 
 Gere um banco de aproximadamente 40 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados.
+
+Para cada pergunta, você deve atribuir um nível de dificuldade: 'Fácil', 'Intermediário' ou 'Difícil'. Tente criar uma distribuição equilibrada entre os níveis de dificuldade.
 
 {{#if transcript}}
 Use a seguinte transcrição do vídeo como a fonte PRIMÁRIA de informação para criar as perguntas. O título e a descrição podem ser usados como contexto adicional.

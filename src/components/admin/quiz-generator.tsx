@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from 'react';
-import type { Quiz } from '@/lib/types';
+import type { Quiz, QuestionDifficulty } from '@/lib/types';
 import { generateQuiz } from '@/ai/flows/generate-quiz-flow';
 import { saveQuiz } from '@/actions/course-actions';
 import { useToast } from '@/hooks/use-toast';
@@ -21,6 +21,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useRouter } from 'next/navigation';
+import { Badge } from '../ui/badge';
 
 interface QuizGeneratorProps {
   courseId: string;
@@ -29,6 +30,19 @@ interface QuizGeneratorProps {
   hasExistingQuiz: boolean;
   transcript?: string; // Optional transcript from YouTube
 }
+
+const difficultyBadgeVariant: Record<QuestionDifficulty, "default" | "secondary" | "destructive"> = {
+    'Fácil': 'default',
+    'Intermediário': 'secondary',
+    'Difícil': 'destructive'
+};
+
+const difficultyBadgeColor: Record<QuestionDifficulty, string> = {
+    'Fácil': 'bg-green-500/80 hover:bg-green-500/90',
+    'Intermediário': 'bg-amber-500/80 hover:bg-amber-500/90',
+    'Difícil': 'bg-red-600/80 hover:bg-red-600/90',
+};
+
 
 export function QuizGenerator({ courseId, title, description, hasExistingQuiz, transcript: initialTranscript }: QuizGeneratorProps) {
   const { toast } = useToast();
@@ -156,9 +170,16 @@ export function QuizGenerator({ courseId, title, description, hasExistingQuiz, t
             <div className="space-y-4 max-h-[50vh] overflow-y-auto p-1 pr-4">
               {generatedQuiz.questions.map((q, index) => (
                 <div key={index} className="space-y-2 rounded-lg border bg-background p-4">
-                  <p className="font-semibold">
-                    {index + 1}. {q.text}
-                  </p>
+                  <div className="flex justify-between items-start">
+                    <p className="font-semibold pr-4">
+                      {index + 1}. {q.text}
+                    </p>
+                    {q.difficulty && (
+                        <Badge className={cn("text-xs", difficultyBadgeColor[q.difficulty])}>
+                            {q.difficulty}
+                        </Badge>
+                    )}
+                  </div>
                   <ul className="space-y-1 text-sm">
                     {q.options.map((opt, optIndex) => (
                       <li

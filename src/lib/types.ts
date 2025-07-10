@@ -41,10 +41,13 @@ export interface Quiz {
   questions: Question[];
 }
 
+export type QuestionDifficulty = 'Fácil' | 'Intermediário' | 'Difícil';
+
 export interface Question {
   text: string;
   options: string[];
   correctAnswer: string;
+  difficulty?: QuestionDifficulty;
 }
 
 export type UserRole = 'Admin' | 'Diretor' | 'Gerente' | 'Coordenador' | 'Supervisor' | 'Analista' | 'Assistente';

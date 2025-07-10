@@ -1,12 +1,21 @@
-import type { Quiz } from '@/lib/types';
+import type { Quiz, QuestionDifficulty } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Badge } from '../ui/badge';
+
 
 interface QuizViewerProps {
     quiz: Quiz;
     courseTitle: string;
 }
+
+const difficultyBadgeColor: Record<QuestionDifficulty, string> = {
+    'Fácil': 'bg-green-500/80 hover:bg-green-500/90',
+    'Intermediário': 'bg-amber-500/80 hover:bg-amber-500/90',
+    'Difícil': 'bg-red-600/80 hover:bg-red-600/90',
+};
+
 
 export function QuizViewer({ quiz, courseTitle }: QuizViewerProps) {
   return (
@@ -26,9 +35,16 @@ export function QuizViewer({ quiz, courseTitle }: QuizViewerProps) {
         <div className="max-h-[60vh] space-y-4 overflow-y-auto p-1 pr-4">
           {quiz.questions.map((q, index) => (
             <div key={index} className="space-y-2 rounded-lg border bg-muted/10 p-4">
-              <p className="font-semibold">
-                {index + 1}. {q.text}
-              </p>
+              <div className="flex justify-between items-start">
+                <p className="font-semibold pr-4">
+                  {index + 1}. {q.text}
+                </p>
+                {q.difficulty && (
+                    <Badge className={cn("text-xs", difficultyBadgeColor[q.difficulty])}>
+                        {q.difficulty}
+                    </Badge>
+                )}
+              </div>
               <ul className="space-y-1 text-sm">
                 {q.options.map((opt, optIndex) => (
                   <li
