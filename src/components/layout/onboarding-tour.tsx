@@ -93,14 +93,14 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
       continuous
       run={run}
       scrollToFirstStep
-      showProgress
+      showProgress={false}
       showSkipButton
       steps={steps}
       locale={{
         back: 'Voltar',
         close: 'Fechar',
         last: 'Finalizar',
-        next: 'Próximo',
+        next: 'Next',
         skip: 'Pular',
       }}
       styles={{
@@ -115,6 +115,11 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
         buttonClose: {
           display: 'none',
         },
+        buttonNext: {
+            boxShadow: '0 0 10px hsl(var(--primary)), 0 0 5px hsl(var(--primary))',
+            fontSize: '14px',
+            padding: '8px 16px',
+        }
       }}
     />
   );
