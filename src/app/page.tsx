@@ -41,7 +41,7 @@ export default async function LoginPage() {
       <div className="absolute top-0 left-0 w-full h-full bg-black/70 z-[-1]"></div>
 
       {/* Main Content Area */}
-      <div className="z-10 w-full max-w-[380px]">
+      <div className="z-10 w-full max-w-[380px] flex flex-col items-center gap-6">
         <LoginPageClient />
       </div>
 
