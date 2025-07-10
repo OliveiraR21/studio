@@ -82,3 +82,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .joyride-next-button {
+    background-color: transparent;
+    border: 2px solid hsl(var(--primary));
+    color: hsl(var(--foreground));
+    transition: all 0.3s ease;
+  }
+
+  .joyride-next-button:hover {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 0 10px hsl(var(--primary)), 0 0 5px hsl(var(--primary));
+  }
+}

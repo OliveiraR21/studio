@@ -116,11 +116,55 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
           display: 'none',
         },
         buttonNext: {
-            boxShadow: '0 0 10px hsl(var(--primary)), 0 0 5px hsl(var(--primary))',
             fontSize: '14px',
             padding: '8px 16px',
+        },
+        spotlight: {
+          borderRadius: 'var(--radius)',
+        },
+        tooltip: {
+          borderRadius: 'var(--radius)',
+        },
+      }}
+      floaterProps={{
+        styles: {
+          arrow: {
+            length: 8,
+            spread: 12,
+          }
         }
       }}
+      tooltipComponent={({
+        continuous,
+        index,
+        step,
+        backProps,
+        closeProps,
+        primaryProps,
+        tooltipProps,
+      }) => (
+        <div {...tooltipProps} className="joyride-tooltip bg-card text-card-foreground p-4 rounded-lg shadow-lg max-w-xs">
+          {step.title && <h4 className="font-bold text-lg mb-2">{step.title}</h4>}
+          <div className="text-sm">{step.content}</div>
+          <div className="flex justify-end items-center mt-4">
+             {index > 0 && (
+              <button {...backProps} className="text-xs text-muted-foreground mr-4">
+                {step.locale?.back}
+              </button>
+            )}
+            {continuous && (
+              <button {...primaryProps} className="joyride-next-button rounded-md font-semibold">
+                {step.locale?.next}
+              </button>
+            )}
+            {!continuous && (
+              <button {...closeProps} className="joyride-next-button rounded-md font-semibold">
+                {step.locale?.close}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     />
   );
 }
