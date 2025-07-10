@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Star, ThumbsUp, ThumbsDown, CheckCircle, Loader2, Award } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -29,7 +29,7 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
     const [isDownloading, setIsDownloading] = useState(false);
     const [feedbackState, setFeedbackState] = useState<'pending' | 'sent'>('pending');
 
-    const handleCompleteTrack = async () => {
+    const handleCompleteTrack = useCallback(async () => {
         setIsCompleting(true);
         const result = await completeTrackForUser(trackId);
         if (result.success) {
@@ -44,9 +44,17 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
                 title: "Erro",
                 description: result.message,
             });
-            setIsCompleting(false);
         }
-    };
+        // No need to set isCompleting to false, as the component will re-render in the completed state.
+    }, [trackId, toast, router]);
+
+    // Effect to automatically complete the track when all courses are done and there's no quiz.
+    useEffect(() => {
+        if (allCoursesInTrackCompleted && !trackCompleted && !hasQuiz && !isCompleting) {
+            handleCompleteTrack();
+        }
+    }, [allCoursesInTrackCompleted, trackCompleted, hasQuiz, isCompleting, handleCompleteTrack]);
+
 
     const handleStartQuiz = () => {
         toast({ title: "Funcionalidade em desenvolvimento", description: "A prova final da trilha ainda não foi implementada." });
@@ -137,14 +145,14 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
         );
     }
 
-    // If there's NO quiz and all courses are done, show the "Finalizar Trilha" button.
-    if (!hasQuiz && allCoursesInTrackCompleted) {
+    // While auto-completing, show a loading state.
+    if (allCoursesInTrackCompleted && !trackCompleted && !hasQuiz) {
         return (
-            <div className="flex items-center justify-center p-4 rounded-lg bg-muted/50">
-                <Button size="lg" onClick={handleCompleteTrack} disabled={isCompleting}>
-                    {isCompleting ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Award className="mr-2 h-5 w-5" />}
-                    {isCompleting ? 'Finalizando...' : 'Finalizar Trilha'}
-                </Button>
+             <div className="flex items-center justify-center p-4 rounded-lg bg-muted/50">
+                <div className="flex items-center gap-3 text-muted-foreground">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span className="font-semibold">Finalizando trilha...</span>
+                </div>
             </div>
         );
     }
