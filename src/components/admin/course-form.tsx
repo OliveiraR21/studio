@@ -287,7 +287,7 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="duration">Duração (hh:mm:ss)</Label>
-        <p className="text-xs text-muted-foreground">Este campo deve ser preenchido manually.</p>
+        <p className="text-xs text-muted-foreground">Este campo deve ser preenchido manualmente.</p>
         <Input
           id="duration"
           name="duration"
