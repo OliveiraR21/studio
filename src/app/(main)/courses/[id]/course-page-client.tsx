@@ -73,10 +73,8 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
             title: "Obrigado!",
             description: "Seu progresso e feedback foram registrados com sucesso.",
         });
-        // Redirect to the course list to see unlocked content
-        setTimeout(() => {
-            router.push(`/meus-cursos?openTrack=${track.id}`);
-        }, 2000);
+        // Redirect immediately to the course list to see unlocked content
+        router.push(`/meus-cursos?openTrack=${track.id}`);
     } else {
         toast({
             variant: "destructive",
@@ -101,9 +99,7 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
             title: "Obrigado!",
             description: "Seu progresso e feedback foram registrados com sucesso.",
         });
-        setTimeout(() => {
-            router.push(`/meus-cursos?openTrack=${track.id}`);
-        }, 2000);
+        router.push(`/meus-cursos?openTrack=${track.id}`);
     } else {
         toast({
             variant: "destructive",
