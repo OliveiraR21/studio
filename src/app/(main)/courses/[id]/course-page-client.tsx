@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react";
@@ -17,16 +18,17 @@ const PASSING_SCORE = 90;
 interface CoursePageClientProps {
     course: Course;
     track: Track;
+    isAlreadyCompleted: boolean;
 }
 
-export function CoursePageClient({ course, track }: CoursePageClientProps) {
+export function CoursePageClient({ course, track, isAlreadyCompleted }: CoursePageClientProps) {
   const router = useRouter();
   const { toast } = useToast();
 
   const [view, setView] = useState<'video' | 'quiz'>(course.quiz ? 'video' : 'video');
   const [quizFinished, setQuizFinished] = useState(false);
   const [lastScore, setLastScore] = useState<number | null>(null);
-  const [completionStep, setCompletionStep] = useState<'in_progress' | 'awaiting_feedback' | 'awaiting_dislike_reason' | 'feedback_given'>('in_progress');
+  const [completionStep, setCompletionStep] = useState<'in_progress' | 'awaiting_feedback' | 'awaiting_dislike_reason' | 'feedback_given'>(isAlreadyCompleted ? 'feedback_given' : 'in_progress');
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [feedbackText, setFeedbackText] = useState("");
 
@@ -221,13 +223,18 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
 
 
             {completionStep === 'feedback_given' && (
-              <Card className="flex flex-col items-center justify-center text-center p-8 bg-green-500/10 border-green-500/20">
-                <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                <CardTitle className="text-2xl">Feedback Recebido!</CardTitle>
-                <CardDescription className="mt-2">
-                  Obrigado por nos ajudar a melhorar. Você será redirecionado em breve.
-                </CardDescription>
-              </Card>
+              // If the user is just reviewing a completed course, show the video player directly.
+              isAlreadyCompleted ? (
+                <CoursePlayer videoUrl={course.videoUrl} title={course.title} />
+              ) : (
+                <Card className="flex flex-col items-center justify-center text-center p-8 bg-green-500/10 border-green-500/20">
+                    <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
+                    <CardTitle className="text-2xl">Feedback Recebido!</CardTitle>
+                    <CardDescription className="mt-2">
+                      Obrigado por nos ajudar a melhorar. Você será redirecionado em breve.
+                    </CardDescription>
+                </Card>
+              )
             )}
         </div>
 
@@ -249,8 +256,8 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
 
                         {course.quiz ? (
                             <>
-                                <div className={`flex items-center gap-3 p-3 rounded-md transition-colors ${view === 'quiz' ? 'bg-primary/10' : ''} ${quizFinished ? 'bg-green-500/10' : ''}`}>
-                                    <Lightbulb className={`h-6 w-6 ${view === 'quiz' ? 'text-primary' : 'text-muted-foreground'}  ${quizFinished ? 'text-green-500' : ''}`} />
+                                <div className={`flex items-center gap-3 p-3 rounded-md transition-colors ${view === 'quiz' ? 'bg-primary/10' : ''} ${quizFinished || isAlreadyCompleted ? 'bg-green-500/10' : ''}`}>
+                                    <Lightbulb className={`h-6 w-6 ${view === 'quiz' ? 'text-primary' : 'text-muted-foreground'}  ${quizFinished || isAlreadyCompleted ? 'text-green-500' : ''}`} />
                                     <div>
                                         <p className="font-semibold">2. Fazer Questionário</p>
                                         <p className="text-xs text-muted-foreground">Teste seu conhecimento.</p>
@@ -261,16 +268,16 @@ export function CoursePageClient({ course, track }: CoursePageClientProps) {
                                     onClick={handleStartQuiz}
                                     disabled={view === 'quiz' || completionStep !== 'in_progress'}
                                 >
-                                    {quizFinished ? 'Questionário Concluído' : (lastScore !== null ? 'Tentar Novamente' : 'Iniciar Questionário')}
+                                    {isAlreadyCompleted ? 'Revisar Questionário' : (quizFinished ? 'Questionário Concluído' : (lastScore !== null ? 'Tentar Novamente' : 'Iniciar Questionário'))}
                                 </Button>
                             </>
                         ) : (
                              <Button 
                                 className="w-full" 
                                 onClick={handleRequestFeedback}
-                                disabled={completionStep !== 'in_progress'}
+                                disabled={completionStep !== 'in_progress' || isAlreadyCompleted}
                             >
-                                Marcar como Concluído
+                                {isAlreadyCompleted ? 'Curso Concluído' : 'Marcar como Concluído'}
                             </Button>
                         )}
                     </CardContent>
