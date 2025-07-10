@@ -53,6 +53,9 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
   };
   
   const handleFinishCourse = async () => {
+    // This function should only be callable if the course isn't already completed.
+    if (isAlreadyCompleted) return;
+
     const completionResult = await completeCourseForUser(course.id);
     if (completionResult.success) {
         setCompletionStep('completed');
@@ -128,8 +131,9 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
   }
 
   const courseHasQuiz = !!course.quiz;
-  const showCompleteButton = !courseHasQuiz && completionStep === 'in_progress';
-  const showFinalizeButton = courseHasQuiz && quizFinished && completionStep === 'in_progress';
+  // The complete button should only show if the course is not quiz-based AND is not already completed.
+  const showCompleteButton = !courseHasQuiz && completionStep === 'in_progress' && !isAlreadyCompleted;
+  const showFinalizeButton = courseHasQuiz && quizFinished && completionStep === 'in_progress' && !isAlreadyCompleted;
 
   return (
     <div className="container mx-auto py-6">
@@ -174,7 +178,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
                           Sua nota foi {lastScore}%. Clique abaixo para finalizar o curso.
                         </CardDescription>
                         <div className="flex gap-4 justify-center mt-6">
-                            <Button onClick={handleFinishCourse}>Finalizar Curso</Button>
+                            <Button onClick={handleFinishCourse} disabled={!showFinalizeButton}>Finalizar Curso</Button>
                             <Button variant="outline" onClick={handleStartQuiz}>Refazer Prova</Button>
                         </div>
                       </Card>
@@ -265,13 +269,10 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
                                 <Button 
                                     className="w-full" 
                                     onClick={handleStartQuiz}
-                                    disabled={view === 'quiz' || completionStep !== 'in_progress'}
+                                    disabled={view === 'quiz' || isAlreadyCompleted}
                                 >
-                                    {isAlreadyCompleted ? 'Revisar Questionário' : (quizFinished ? 'Finalizar Curso' : (lastScore !== null ? 'Tentar Novamente' : 'Iniciar Questionário'))}
+                                    {isAlreadyCompleted ? 'Revisar Questionário' : (lastScore !== null && !quizFinished ? 'Tentar Novamente' : 'Iniciar Questionário')}
                                 </Button>
-                                {showFinalizeButton && (
-                                     <Button className="w-full" onClick={handleFinishCourse}>Finalizar Curso</Button>
-                                )}
                             </>
                         ) : (
                              <Button 
