@@ -6,9 +6,9 @@ import type { User } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Building2, Briefcase, Camera, Loader2, User as UserIcon } from "lucide-react";
+import { Building2, Briefcase, Camera, Loader2, User as UserIcon, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { updateUserAvatar } from "@/actions/user-actions";
+import { updateUserAvatar, removeUserAvatar } from "@/actions/user-actions";
 
 
 interface ProfilePageClientProps {
@@ -19,6 +19,7 @@ export function ProfilePageClient({ user: initialUser }: ProfilePageClientProps)
     const { toast } = useToast();
     const [user, setUser] = useState(initialUser);
     const [isUploading, setIsUploading] = useState(false);
+    const [isRemoving, setIsRemoving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const getInitials = (name: string): string => {
@@ -36,6 +37,25 @@ export function ProfilePageClient({ user: initialUser }: ProfilePageClientProps)
     const handleCameraClick = () => {
         fileInputRef.current?.click();
     };
+    
+    const handleRemoveClick = async () => {
+        setIsRemoving(true);
+        const response = await removeUserAvatar();
+        if (response.success) {
+            setUser(prevUser => ({ ...prevUser, avatarUrl: undefined }));
+            toast({
+                title: "Sucesso!",
+                description: response.message
+            });
+        } else {
+             toast({
+                variant: "destructive",
+                title: "Erro ao Remover",
+                description: response.message
+            });
+        }
+        setIsRemoving(false);
+    }
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -98,19 +118,30 @@ export function ProfilePageClient({ user: initialUser }: ProfilePageClientProps)
                     <div className="flex items-center gap-6">
                         <div className="relative group">
                             <Avatar className="h-24 w-24 border-4 border-primary/20">
-                                <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="user avatar" />
+                                {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="user avatar" />}
                                 <AvatarFallback className="text-3xl">{getInitials(user.name)}</AvatarFallback>
                             </Avatar>
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-12 w-12 text-white hover:bg-white/20 hover:text-white"
+                                    className="h-10 w-10 text-white hover:bg-white/20 hover:text-white"
                                     onClick={handleCameraClick}
-                                    disabled={isUploading}
+                                    disabled={isUploading || isRemoving}
                                 >
-                                    {isUploading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Camera className="h-6 w-6" />}
+                                    {isUploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
                                 </Button>
+                                {user.avatarUrl && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-10 w-10 text-white hover:bg-destructive/50 hover:text-white"
+                                        onClick={handleRemoveClick}
+                                        disabled={isUploading || isRemoving}
+                                    >
+                                        {isRemoving ? <Loader2 className="h-5 w-5 animate-spin" /> : <Trash2 className="h-5 w-5" />}
+                                    </Button>
+                                )}
                             </div>
                         </div>
                         <div>

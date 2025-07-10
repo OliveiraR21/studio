@@ -94,3 +94,20 @@ export async function updateUserAvatar(avatarDataUrl: string): Promise<{ success
     return { success: false, message: `Falha ao atualizar a foto: ${errorMessage}` };
   }
 }
+
+export async function removeUserAvatar(): Promise<{ success: boolean; message: string }> {
+  const userId = getSimulatedUserId();
+  if (!userId) {
+    return { success: false, message: 'Usuário não autenticado.' };
+  }
+
+  try {
+    await updateUser(userId, { avatarUrl: undefined });
+    revalidatePath('/profile');
+    revalidatePath('/(main)/layout');
+    return { success: true, message: 'Foto de perfil removida com sucesso!' };
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
+    return { success: false, message: `Falha ao remover a foto: ${errorMessage}` };
+  }
+}
