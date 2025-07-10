@@ -1,3 +1,4 @@
+
 'use server';
 
 import type { User, Course, Track, Module, UserRole } from '@/lib/types';
@@ -60,14 +61,20 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
   const modules = await getLearningModules();
   for (const module of modules) {
     for (const track of module.tracks) {
-      for (const course of track.courses) {
-        if (userHasCourseAccess(currentUser, course)) {
-          const titleMatch = course.title.toLowerCase().includes(lowerCaseQuery);
-          const descriptionMatch = course.description.toLowerCase().includes(lowerCaseQuery);
+      for (const [index, course] of track.courses.entries()) {
+        const hasAccessByRole = userHasCourseAccess(currentUser, course);
+        if (!hasAccessByRole) continue;
 
-          if (titleMatch || descriptionMatch) {
-            results.push({ type: 'course', course, track, module });
-          }
+        // Check sequential access
+        const previousCourse = index > 0 ? track.courses[index - 1] : undefined;
+        const isSequentiallyUnlocked = !previousCourse || currentUser.completedCourses.includes(previousCourse.id);
+        if (!isSequentiallyUnlocked) continue;
+
+        const titleMatch = course.title.toLowerCase().includes(lowerCaseQuery);
+        const descriptionMatch = course.description.toLowerCase().includes(lowerCaseQuery);
+
+        if (titleMatch || descriptionMatch) {
+          results.push({ type: 'course', course, track, module });
         }
       }
     }
