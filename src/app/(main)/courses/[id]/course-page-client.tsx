@@ -114,6 +114,11 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
         setLikes(feedbackResult.newLikes);
         setDislikes(feedbackResult.newDislikes);
         setCompletionStep('completed'); // Return to the main completed view
+        toast({
+            title: 'Feedback Enviado!',
+            description: 'Obrigado por nos ajudar a melhorar.',
+        });
+        router.push(`/meus-cursos?openTrack=${track.id}`);
     } else {
         toast({
             variant: "destructive",
@@ -201,7 +206,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
                             <CardDescription className="flex items-center gap-2 pt-2">
                                <AlertCircle className="h-4 w-4" /> O vídeo não estará visível durante a prova.
                             </CardDescription>
-                        </Header>
+                        </CardHeader>
                         <CardContent>
                             <QuizComponent quiz={course.quiz} onQuizComplete={handleQuizComplete} />
                         </CardContent>
