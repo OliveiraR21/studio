@@ -1,11 +1,18 @@
-
 import { LoginPageClient } from "@/components/auth/login-page-client";
-import { TrendingCourses } from "@/components/auth/trending-courses";
 
 export default async function LoginPage() {
+  
+  const footerLinks = [
+    { name: "Site Br Supply", href: "https://brsupply.com.br/" },
+    { name: "Supply Manager", href: "#" },
+    { name: "LinkedIn Br Supply", href: "https://www.linkedin.com/company/brsupply-suprimentos-corporativos/posts/?feedView=all" },
+    { name: "Youtube Br Supply", href: "https://www.youtube.com/@brsupplysuprimentos" },
+    { name: "SIC", href: "#" },
+    { name: "Contato Seguro", href: "#" },
+  ];
 
   return (
-    <div className="relative w-full min-h-screen flex items-center justify-center p-4 overflow-hidden">
+    <div className="relative w-full min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
       {/* Background Iframe for YouTube */}
       <div className="absolute top-0 left-0 w-full h-full z-[-2] pointer-events-none">
         <iframe
@@ -27,28 +34,40 @@ export default async function LoginPage() {
       {/* Dark Overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-black/70 z-[-1]"></div>
 
-      {/* Login Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center justify-center">
-        <div className="grid w-full max-w-[380px] gap-6 text-center text-white mb-16">
-            <div className="grid gap-2">
-                <h1 className="text-3xl font-bold">
-                  <span className="text-primary">Br</span> Supply | Academia
-                </h1>
-            </div>
-            <LoginPageClient />
-            <div className="flex justify-center">
-                <img
-                    src="/br-supply-logo.png"
-                    alt="Br Supply Logo"
-                    className="h-28"
-                    data-ai-hint="logo"
-                />
-            </div>
-        </div>
-        
-        <TrendingCourses />
+      {/* Curved Orange background effect */}
+       <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black via-black/80 to-transparent z-0"></div>
+        <div 
+            className="absolute -bottom-1/4 left-1/2 -translate-x-1/2 w-[200vw] h-[50vh] bg-primary/20"
+            style={{
+                background: 'radial-gradient(50% 50% at 50% 100%, hsl(var(--primary) / 0.15) 0%, rgba(255, 255, 255, 0) 100%)'
+            }}
+        ></div>
 
+      {/* Main Content Area */}
+      <div className="z-10 w-full max-w-md">
+        <LoginPageClient />
       </div>
+
+       {/* Footer with links */}
+      <footer className="absolute bottom-0 left-0 w-full p-4 md:p-8 z-10">
+        <div className="w-full max-w-6xl mx-auto">
+            <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+                {footerLinks.map((link) => (
+                    <li key={link.name}>
+                        <a 
+                            href={link.href} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                            {link.name}
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </div>
+      </footer>
+
     </div>
   );
 }

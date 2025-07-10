@@ -14,7 +14,6 @@ export default {
         body: ['Inter', 'sans-serif'],
         headline: ['Inter', 'sans-serif'],
         code: ['monospace'],
-        bebas: ['"Bebas Neue"', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -90,16 +89,10 @@ export default {
             height: '0',
           },
         },
-        'border-spin': {
-          '100%': {
-            transform: 'rotate(-360deg)',
-          },
-        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'border-spin': 'border-spin 7s linear infinite',
       },
     },
   },
