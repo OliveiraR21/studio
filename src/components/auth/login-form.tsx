@@ -36,9 +36,7 @@ export function LoginForm() {
   return (
     <form action={dispatch} className="grid gap-4">
       <div className="grid gap-2">
-        <div className="flex items-center">
-            <Label htmlFor="email">E-mail</Label>
-        </div>
+        <Label htmlFor="email">E-mail</Label>
         <Input
           id="email"
           name="email"

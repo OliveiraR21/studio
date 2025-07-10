@@ -35,7 +35,7 @@ export function LoginPageClient() {
           Digite seu e-mail e senha para acessar a plataforma.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         <LoginForm />
         <div className="mt-4 text-center text-sm text-muted-foreground">
           Não tem uma conta?{" "}
