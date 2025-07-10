@@ -2,6 +2,8 @@ import { findCourseByIdWithTrack } from "@/lib/data-access";
 import { notFound } from "next/navigation";
 import { CoursePageClient } from "./course-page-client";
 
+export const dynamic = 'force-dynamic';
+
 export default async function CoursePage({ params }: { params: { id: string } }) {
   const result = await findCourseByIdWithTrack(params.id);
 

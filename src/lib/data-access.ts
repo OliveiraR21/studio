@@ -3,6 +3,7 @@ import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
 import { userHasCourseAccess } from './access-control';
 import { differenceInDays } from 'date-fns';
+import { cache } from 'react';
 
 // A simple in-memory database.
 // In a real app, you would use a database like Firestore or Prisma.
@@ -46,20 +47,20 @@ if (!global.a_modules) {
 // --- Data Fetching Functions ---
 
 // Fetch all learning modules and their nested tracks/courses
-export async function getLearningModules(): Promise<Module[]> {
+export const getLearningModules = cache(async (): Promise<Module[]> => {
   return Promise.resolve(global.a_modules);
-}
+});
 
 // Fetch all users
-export async function getUsers(): Promise<User[]> {
+export const getUsers = cache(async (): Promise<User[]> => {
     return Promise.resolve(global.a_users);
-}
+});
 
 // Fetch a single user by ID
-export async function getUserById(userId: string): Promise<User | null> {
+export const getUserById = cache(async (userId: string): Promise<User | null> => {
     const user = global.a_users.find(u => u.id === userId);
     return Promise.resolve(user || null);
-}
+});
 
 // Fetch a single user by Email
 export async function findUserByEmail(email: string): Promise<User | null> {
@@ -70,7 +71,8 @@ export async function findUserByEmail(email: string): Promise<User | null> {
 
 // Find a course by its ID, and include its parent module and track.
 export async function findCourseById(courseId: string): Promise<{ course: Course, track: Track, module: Module } | null> {
-  for (const module of global.a_modules) {
+  const modules = await getLearningModules();
+  for (const module of modules) {
     for (const track of module.tracks) {
       const course = track.courses.find(c => c.id === courseId);
       if (course) {
@@ -84,12 +86,13 @@ export async function findCourseById(courseId: string): Promise<{ course: Course
 
 // Find a course and its parent track by the course ID
 export async function findCourseByIdWithTrack(courseId: string): Promise<{ course: Course, track: Track } | null> {
-  for (const module of global.a_modules) {
+  const modules = await getLearningModules();
+  for (const module of modules) {
     for (const track of module.tracks) {
       const course = track.courses.find(c => c.id === courseId);
       if (course) {
         // Return a deep copy to avoid mutations affecting the global store
-        return Promise.resolve(JSON.parse(JSON.stringify({ course, track })));
+        return Promise.resolve({ course, track });
       }
     }
   }
@@ -98,7 +101,8 @@ export async function findCourseByIdWithTrack(courseId: string): Promise<{ cours
 
 // Finds the very first course that is not marked as completed for a given user.
 export async function findNextCourseForUser(user: User): Promise<(Course & {trackId: string}) | null> {
-    for (const module of global.a_modules) {
+    const modules = await getLearningModules();
+    for (const module of modules) {
         for (const track of module.tracks) {
             for (const course of track.courses) {
                 if (!user.completedCourses.includes(course.id)) {
