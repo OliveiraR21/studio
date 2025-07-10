@@ -45,26 +45,24 @@ export default async function LoginPage() {
 
        {/* Footer with links */}
       <footer className="absolute bottom-4 left-4 right-4 z-10">
-        <div className="w-full max-w-5xl mx-auto p-4 border border-white/10 bg-black/20 backdrop-blur-sm rounded-xl">
-            <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-                {footerLinks.map((link) => {
-                    const Icon = link.icon;
-                    return (
-                        <li key={link.name}>
-                            <a 
-                                href={link.href} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                                <Icon className="h-4 w-4" />
-                                <span>{link.name}</span>
-                            </a>
-                        </li>
-                    )
-                })}
-            </ul>
-        </div>
+        <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-4">
+            {footerLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                    <li key={link.name}>
+                        <a 
+                            href={link.href} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="flex items-center justify-center h-10 w-10 rounded-full border border-muted-foreground/50 text-muted-foreground hover:bg-primary hover:border-primary hover:text-primary-foreground transition-colors"
+                            aria-label={link.name}
+                        >
+                            <Icon className="h-5 w-5" />
+                        </a>
+                    </li>
+                )
+            })}
+        </ul>
       </footer>
     </div>
   );
