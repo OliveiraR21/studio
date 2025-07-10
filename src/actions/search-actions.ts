@@ -6,16 +6,16 @@ import { getCurrentUser } from '@/lib/auth';
 import { getLearningModules } from '@/lib/data-access';
 import { userHasCourseAccess } from '@/lib/access-control';
 
-export type IconName = 'Home' | 'LayoutGrid' | 'UserIcon' | 'Settings' | 'HelpCircle' | 'Users' | 'UserCog' | 'Network' | 'BookMarked' | 'BarChart' | 'File';
+export type IconName = 'Home' | 'LayoutGrid' | 'UserIcon' | 'Settings' | 'HelpCircle' | 'Users' | 'UserCog' | 'Network' | 'BookMarked' | 'BarChart' | 'File' | 'Lock';
 
 // Define a result type that can be either a course or a navigation item
 export type SearchResult = 
-  | { type: 'course'; course: Course; track: Track; module: Module }
+  | { type: 'course'; course: Course; track: Track; module: Module; isLocked: boolean }
   | { type: 'page'; title: string; href: string; iconName: IconName };
 
 
 // Define available static pages for searching
-const getAvailablePages = (user: User): Omit<SearchResult, 'type' | 'course' | 'track' | 'module'>[] => {
+const getAvailablePages = (user: User): Omit<SearchResult, 'type' | 'course' | 'track' | 'module' | 'isLocked'>[] => {
     const pages: { title: string; href: string, iconName: IconName, requiredRole?: UserRole[], managerOnly?: boolean }[] = [
         { title: 'Meu Painel', href: '/dashboard', iconName: 'Home' },
         { title: 'Meus Cursos', href: '/meus-cursos', iconName: 'LayoutGrid' },
@@ -63,18 +63,26 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
     for (const track of module.tracks) {
       for (const [index, course] of track.courses.entries()) {
         const hasAccessByRole = userHasCourseAccess(currentUser, course);
+        // If user doesn't have access by role/area, skip this course entirely.
         if (!hasAccessByRole) continue;
-
-        // Check sequential access
-        const previousCourse = index > 0 ? track.courses[index - 1] : undefined;
-        const isSequentiallyUnlocked = !previousCourse || currentUser.completedCourses.includes(previousCourse.id);
-        if (!isSequentiallyUnlocked) continue;
 
         const titleMatch = course.title.toLowerCase().includes(lowerCaseQuery);
         const descriptionMatch = course.description.toLowerCase().includes(lowerCaseQuery);
 
         if (titleMatch || descriptionMatch) {
-          results.push({ type: 'course', course, track, module });
+            // Check if the course is sequentially unlocked.
+            // This is checked separately from role/area access.
+            const previousCourse = index > 0 ? track.courses[index - 1] : undefined;
+            const isSequentiallyUnlocked = !previousCourse || currentUser.completedCourses.includes(previousCourse.id);
+            
+            // The course is added to results if it matches, but with a lock status.
+            results.push({ 
+                type: 'course', 
+                course, 
+                track, 
+                module, 
+                isLocked: !isSequentiallyUnlocked 
+            });
         }
       }
     }
