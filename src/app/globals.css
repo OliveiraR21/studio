@@ -85,9 +85,12 @@
 
 @layer utilities {
   .joyride-next-button {
-    @apply bg-primary text-primary-foreground border-none transition-all;
+    @apply bg-primary text-primary-foreground border-none;
   }
   .joyride-next-button:hover {
-    @apply shadow-[0_0_15px] shadow-primary;
+    @apply shadow-[0_0_15px] shadow-primary transition-all;
+  }
+  .joyride-active-step {
+     @apply bg-sidebar-accent text-sidebar-accent-foreground;
   }
 }

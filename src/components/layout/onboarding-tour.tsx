@@ -79,31 +79,29 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status, step, type, action } = data;
     const finishedStatuses: string[] = ['finished', 'skipped'];
-    const targetEl = step.target === 'body' ? null : document.querySelector<HTMLElement>(step.target as string);
 
-    // Quando o tour termina ou é pulado, limpa o último alvo.
     if (finishedStatuses.includes(status)) {
       if (lastTarget.current) {
-        lastTarget.current.removeAttribute('data-active');
+        lastTarget.current.classList.remove('joyride-active-step');
       }
       stopTour();
       return;
     }
 
     if (type === EVENTS.STEP_AFTER || (type === EVENTS.TOOLTIP && action === 'close')) {
-      // Remove o destaque do alvo anterior
-      if (lastTarget.current && lastTarget.current !== targetEl) {
-        lastTarget.current.removeAttribute('data-active');
+      const currentTarget = step.target === 'body' ? null : document.querySelector<HTMLElement>(step.target as string);
+      
+      if (lastTarget.current && lastTarget.current !== currentTarget) {
+        lastTarget.current.classList.remove('joyride-active-step');
       }
 
-      // Adiciona o destaque ao alvo atual
-      if (targetEl) {
-        // Usamos data-active="true" para simular o estado de seleção do menu.
-        targetEl.setAttribute('data-active', 'true');
-        lastTarget.current = targetEl;
+      if (currentTarget) {
+        currentTarget.classList.add('joyride-active-step');
+        lastTarget.current = currentTarget;
       }
     }
   };
+
 
   if (!isMounted) {
     return null;
