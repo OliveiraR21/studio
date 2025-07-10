@@ -12,9 +12,9 @@ import {
   AccordionItem, 
   AccordionTrigger 
 } from "@/components/ui/accordion";
-import { CheckCircle, Lock, NotebookText } from "lucide-react";
+import { CheckCircle, Lock, ClipboardUser, BrainCircuit, HeartHandshake, Bot } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-import type { Track, Course, User } from "@/lib/types";
+import type { Track, Course, User, Module } from "@/lib/types";
 import { CourseCard } from "@/components/dashboard/course-card";
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
@@ -24,6 +24,13 @@ import { getCurrentUser } from "@/lib/auth";
 import { userHasCourseAccess } from "@/lib/access-control";
 
 const PASSING_SCORE = 90;
+
+const moduleIcons: Record<string, React.ElementType> = {
+    'module-integration': ClipboardUser,
+    'module-hs': BrainCircuit,
+    'module-ss': HeartHandshake,
+    'module-hms': Bot,
+};
 
 export default async function MyCoursesPage({
   searchParams,
@@ -102,15 +109,18 @@ export default async function MyCoursesPage({
       </div>
       <Tabs defaultValue={defaultOpenModuleId}>
         <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-4 h-auto">
-          {learningModules.map(module => (
-            <TabsTrigger key={module.id} value={module.id} className="h-full flex flex-col items-start p-4 text-left">
-               <div className="flex items-center gap-3">
-                 <NotebookText className="h-5 w-5" />
-                 <p className="font-bold text-lg">{module.title}</p>
-               </div>
-              <p className="text-xs text-muted-foreground whitespace-normal mt-2">{module.description}</p>
-            </TabsTrigger>
-          ))}
+          {learningModules.map(module => {
+            const Icon = moduleIcons[module.id] || ClipboardUser; // Fallback icon
+            return (
+                <TabsTrigger key={module.id} value={module.id} className="h-full flex flex-col items-start p-4 text-left">
+                <div className="flex items-center gap-3">
+                    <Icon className="h-5 w-5" />
+                    <p className="font-bold text-lg">{module.title}</p>
+                </div>
+                <p className="text-xs text-muted-foreground whitespace-normal mt-2">{module.description}</p>
+                </TabsTrigger>
+            );
+          })}
         </TabsList>
 
         {learningModules.map(module => (
@@ -142,6 +152,7 @@ export default async function MyCoursesPage({
                  const trackCompleted = currentUser.completedTracks.includes(track.id);
                  const hasQuiz = track.quiz && track.quiz.questions.length > 0;
                  const isCompletedEmptyTrack = trackCompleted && track.courses.length === 0 && !hasQuiz;
+                 const Icon = moduleIcons[module.id] || ClipboardUser;
 
                  return (
                   <Card key={track.id} className={!unlocked ? 'bg-muted/50' : ''}>
@@ -149,7 +160,7 @@ export default async function MyCoursesPage({
                       <AccordionTrigger className={`p-6 hover:no-underline ${!unlocked ? 'cursor-not-allowed' : ''}`} disabled={!unlocked}>
                         <div className="flex items-center gap-4 w-full">
                           {isCompletedEmptyTrack ? (
-                              <NotebookText className="h-8 w-8 text-muted-foreground flex-shrink-0" />
+                              <Icon className="h-8 w-8 text-muted-foreground flex-shrink-0" />
                           ) : trackCompleted ? (
                              <CheckCircle className="h-8 w-8 text-green-500 flex-shrink-0" />
                           ) : unlocked ? (
