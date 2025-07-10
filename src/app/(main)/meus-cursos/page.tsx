@@ -12,7 +12,7 @@ import {
   AccordionItem, 
   AccordionTrigger 
 } from "@/components/ui/accordion";
-import { Lock, ClipboardList, BrainCircuit, HeartHandshake, Bot } from "lucide-react";
+import { Lock, ClipboardList, BrainCircuit, HeartHandshake, Bot, CheckCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import type { Track, Course, User, Module } from "@/lib/types";
 import { CourseCard } from "@/components/dashboard/course-card";
@@ -22,7 +22,6 @@ import { UserNotFound } from "@/components/layout/user-not-found";
 import { TrackFinalActions } from "@/components/course/track-final-actions";
 import { getCurrentUser } from "@/lib/auth";
 import { userHasCourseAccess } from "@/lib/access-control";
-import { AnimatedCheckmark } from "@/components/ui/animated-checkmark";
 
 const PASSING_SCORE = 90;
 
@@ -164,7 +163,7 @@ export default async function MyCoursesPage({
                             {isCompletedEmptyTrack ? (
                                 <Icon className="h-8 w-8 text-muted-foreground" />
                             ) : trackCompleted ? (
-                               <AnimatedCheckmark size={32} />
+                               <CheckCircle className="h-8 w-8 text-green-500" />
                             ) : unlocked ? (
                               <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg flex-shrink-0">{trackIndex + 1}</div>
                             ) : (
