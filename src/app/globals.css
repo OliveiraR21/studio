@@ -82,3 +82,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .joyride-active-step {
+    @apply bg-sidebar-accent text-sidebar-accent-foreground;
+  }
+}

@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import Joyride, { type Step, type CallBackProps } from 'react-joyride';
+import { useState, useEffect, useRef } from 'react';
+import Joyride, { type Step, type CallBackProps, type EVENTS } from 'react-joyride';
 import type { User } from '@/lib/types';
 import { useTour } from '@/hooks/use-tour';
 
@@ -13,6 +13,7 @@ interface OnboardingTourProps {
 export function OnboardingTour({ user }: OnboardingTourProps) {
   const [isMounted, setIsMounted] = useState(false);
   const { run, stopTour } = useTour();
+  const lastTarget = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -76,11 +77,25 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
   );
 
   const handleJoyrideCallback = (data: CallBackProps) => {
-    const { status } = data;
+    const { status, step, type, action } = data;
     const finishedStatuses: string[] = ['finished', 'skipped'];
+
+    // Limpa a classe do alvo anterior
+    if (lastTarget.current) {
+        lastTarget.current.classList.remove('joyride-active-step');
+    }
 
     if (finishedStatuses.includes(status)) {
       stopTour();
+      return;
+    }
+
+    if (type === EVENTS.STEP_AFTER || (type === EVENTS.TOOLTIP && action === 'close')) {
+        const currentTarget = step.target === 'body' ? null : document.querySelector<HTMLElement>(step.target as string);
+        if (currentTarget) {
+            currentTarget.classList.add('joyride-active-step');
+            lastTarget.current = currentTarget;
+        }
     }
   };
 
@@ -121,14 +136,29 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
             padding: '8px 16px',
             backgroundColor: 'hsl(var(--primary))',
             color: 'hsl(var(--primary-foreground))',
-            boxShadow: '0 0 10px hsl(var(--primary)), 0 0 5px hsl(var(--primary))'
-        },
-        spotlight: {
-          borderRadius: 'var(--radius)',
+            transition: 'box-shadow 0.2s ease-in-out',
         },
         tooltip: {
           borderRadius: 'var(--radius)',
         },
+      }}
+      tooltipOptions={{
+        modifiers: [
+            {
+                name: 'applyStyles',
+                fn: (data) => {
+                    const nextButton = data.state.elements.popper.querySelector<HTMLButtonElement>('.__floater__button-primary');
+                    if (nextButton) {
+                        nextButton.onmouseenter = () => {
+                            nextButton.style.boxShadow = '0 0 10px hsl(var(--primary)), 0 0 5px hsl(var(--primary))';
+                        };
+                        nextButton.onmouseleave = () => {
+                            nextButton.style.boxShadow = 'none';
+                        };
+                    }
+                }
+            }
+        ]
       }}
       floaterProps={{
         styles: {
