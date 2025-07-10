@@ -29,19 +29,15 @@ export default function LoginPage() {
 
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center p-4 overflow-hidden">
-      {/* Background Video */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute top-0 left-0 w-full h-full object-cover z-[-2]"
+      {/* Background Iframe for YouTube */}
+      <iframe
+        className="absolute top-1/2 left-1/2 w-full h-full -translate-x-1/2 -translate-y-1/2 object-cover z-[-2]"
+        src="https://www.youtube.com/embed/NgPkB-5-v6Y?autoplay=1&mute=1&loop=1&playlist=NgPkB-5-v6Y&controls=0&showinfo=0&modestbranding=1&iv_load_policy=3&rel=0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        title="YouTube background video"
         data-ai-hint="background video"
-      >
-        {/* IMPORTANT: Add your video file named 'background-video.mp4' to the /public folder */}
-        <source src="/background-video.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+      ></iframe>
       
       {/* Dark Overlay */}
       <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-[-1]"></div>
