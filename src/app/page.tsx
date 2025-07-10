@@ -1,31 +1,8 @@
 
-'use client';
+import { LoginPageClient } from "@/components/auth/login-page-client";
+import { TrendingCourses } from "@/components/auth/trending-courses";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription
-} from "@/components/ui/card";
-import { LoginForm } from "@/components/auth/login-form";
-
-export default function LoginPage() {
-  const searchParams = useSearchParams();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (searchParams.get('message') === 'signup_success') {
-      toast({
-        title: "Conta Criada com Sucesso!",
-        description: "Agora você pode fazer login com seu e-mail e senha.",
-      });
-    }
-  }, [searchParams, toast]);
+export default async function LoginPage() {
 
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center p-4 overflow-hidden">
@@ -48,41 +25,29 @@ export default function LoginPage() {
       </div>
       
       {/* Dark Overlay */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-[-1]"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-black/70 z-[-1]"></div>
 
       {/* Login Content */}
-      <div className="relative z-10 mx-auto grid w-[380px] gap-6 text-center text-white">
-        <div className="grid gap-2">
-            <h1 className="text-3xl font-bold">
-              <span className="text-primary">Br</span> Supply | Academia
-            </h1>
-        </div>
-        <Card className="bg-background/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-2xl text-card-foreground">Login</CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Digite seu e-mail e senha para acessar a plataforma.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <LoginForm />
-            <div className="mt-4 text-center text-sm text-muted-foreground">
-              Não tem uma conta?{" "}
-              <Link href="/signup" className="underline text-primary">
-                Cadastre-se
-              </Link>
+      <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center justify-center">
+        <div className="grid w-full max-w-[380px] gap-6 text-center text-white mb-16">
+            <div className="grid gap-2">
+                <h1 className="text-3xl font-bold">
+                  <span className="text-primary">Br</span> Supply | Academia
+                </h1>
             </div>
-          </CardContent>
-        </Card>
-        <div className="flex justify-center">
-            {/* Logo for both light/dark themes, since the background is now dark */}
-            <img
-                src="/br-supply-logo.png"
-                alt="Br Supply Logo"
-                className="h-28"
-                data-ai-hint="logo"
-            />
+            <LoginPageClient />
+            <div className="flex justify-center">
+                <img
+                    src="/br-supply-logo.png"
+                    alt="Br Supply Logo"
+                    className="h-28"
+                    data-ai-hint="logo"
+                />
+            </div>
         </div>
+        
+        <TrendingCourses />
+
       </div>
     </div>
   );
