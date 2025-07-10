@@ -28,7 +28,7 @@ export function LoginPageClient() {
   }, [searchParams, toast]);
 
   return (
-    <Card className="w-full bg-background/80 backdrop-blur-sm">
+    <Card className="w-full max-w-[380px] bg-background/80 backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="text-2xl text-card-foreground">Login</CardTitle>
         <CardDescription className="text-muted-foreground">
