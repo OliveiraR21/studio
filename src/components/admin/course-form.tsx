@@ -3,8 +3,9 @@
 
 import type { Course, Module, UserRole, User } from '@/lib/types';
 import { useFormStatus } from 'react-dom';
-import { useEffect, useActionState, useMemo, useState, useCallback } from 'react';
+import { useEffect, useActionState, useMemo, useState, useCallback, useRef } from 'react';
 import { saveCourse } from '@/actions/course-actions';
+import { getYouTubeVideoDetails } from '@/actions/youtube-actions';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
@@ -12,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2, X, Youtube, CircleDashed } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -36,6 +37,8 @@ import {
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
 import { Badge } from '../ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+
 
 interface CourseFormProps {
   course: Course | null;
@@ -75,6 +78,8 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
 
   const initialState = { message: '', errors: {}, success: false };
   const [state, dispatch] = useActionState(saveCourse, initialState);
+  
+  const formRef = useRef<HTMLFormElement>(null);
 
   // State for the two-step selection
   const [selectedModuleId, setSelectedModuleId] = useState<string | undefined>(
@@ -86,7 +91,10 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [areaPopoverOpen, setAreaPopoverOpen] = useState(false);
   const [selectedAreas, setSelectedAreas] = useState<string[]>(course?.accessAreas || []);
-
+  
+  // State for YouTube auto-fill
+  const [isFetchingYouTube, setIsFetchingYouTube] = useState(false);
+  const [youTubeData, setYouTubeData] = useState<{ imported: boolean; transcript?: string }>({ imported: false });
 
   const availableTracks = useMemo(() => {
     if (!selectedModuleId) return [];
@@ -106,6 +114,34 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
         : [...currentSelected, area]
     );
   }, []);
+  
+  const handleVideoUrlBlur = async (event: React.FocusEvent<HTMLTextAreaElement>) => {
+    const url = event.target.value;
+    if (!url.includes('youtu')) {
+      setYouTubeData({ imported: false });
+      return;
+    }
+    
+    setIsFetchingYouTube(true);
+    const result = await getYouTubeVideoDetails(url);
+    setIsFetchingYouTube(false);
+    
+    if (result.success) {
+      const { title, description, durationInSeconds, thumbnailUrl, transcript } = result.data;
+      // Use formRef to programmatically set form values
+      if (formRef.current) {
+        (formRef.current.elements.namedItem('title') as HTMLInputElement).value = title;
+        (formRef.current.elements.namedItem('description') as HTMLTextAreaElement).value = description;
+        (formRef.current.elements.namedItem('duration') as HTMLInputElement).value = formatSecondsToHHMMSS(durationInSeconds);
+        (formRef.current.elements.namedItem('thumbnailUrl') as HTMLInputElement).value = thumbnailUrl;
+      }
+      setYouTubeData({ imported: true, transcript: transcript });
+      toast({ title: 'Sucesso!', description: 'Dados do vídeo do YouTube importados.' });
+    } else {
+      setYouTubeData({ imported: false });
+      toast({ variant: 'destructive', title: 'Erro ao buscar dados', description: result.message });
+    }
+  };
 
   useEffect(() => {
     if (state.success) {
@@ -135,10 +171,11 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
   }, [state, toast, router]);
 
   return (
-    <form action={dispatch} className="space-y-6">
+    <form ref={formRef} action={dispatch} className="space-y-6">
       {!isNew && <input type="hidden" name="id" value={course.id} />}
       {isNew && <input type="hidden" name="trackId" value={selectedTrackId || ''} />}
       <input type="hidden" name="accessAreas" value={selectedAreas.join(',')} />
+       {youTubeData.transcript && <input type="hidden" name="transcript" value={youTubeData.transcript} />}
 
 
       {isNew && (
@@ -258,14 +295,38 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="videoUrl">URL do Vídeo ou Código de Incorporação</Label>
-        <Textarea
-          id="videoUrl"
-          name="videoUrl"
-          defaultValue={course?.videoUrl || ''}
-          placeholder="Cole a URL do vídeo (ex: https://...) ou o código de incorporação do iframe aqui."
-          required
-          rows={4}
-        />
+        <div className="relative">
+          <Textarea
+            id="videoUrl"
+            name="videoUrl"
+            defaultValue={course?.videoUrl || ''}
+            placeholder="Cole a URL do YouTube para preencher automaticamente os campos, ou a URL/código de outra plataforma."
+            required
+            rows={4}
+            onBlur={handleVideoUrlBlur}
+            className="pr-10"
+          />
+          <div className="absolute top-2 right-2">
+              <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                       <span className="cursor-help">
+                         {isFetchingYouTube ? (
+                              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                          ) : youTubeData.imported ? (
+                              <Youtube className="h-5 w-5 text-red-500" />
+                          ) : (
+                              <CircleDashed className="h-5 w-5 text-muted-foreground" />
+                          )}
+                       </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {isFetchingYouTube ? 'Buscando dados do YouTube...' : youTubeData.imported ? 'Dados importados do YouTube' : 'Cole uma URL do YouTube para preenchimento automático'}
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
         {state.errors?.videoUrl && (
           <p className="text-sm text-destructive">{state.errors.videoUrl[0]}</p>
         )}
@@ -287,7 +348,7 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="duration">Duração (hh:mm:ss)</Label>
-        <p className="text-xs text-muted-foreground">Este campo deve ser preenchido manualmente.</p>
+        <p className="text-xs text-muted-foreground">Este campo é preenchido automaticamente para vídeos do YouTube.</p>
         <Input
           id="duration"
           name="duration"

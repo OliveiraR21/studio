@@ -34,6 +34,7 @@ export interface Course {
   // Access control fields
   minimumRole?: UserRole;
   accessAreas?: string[];
+  transcript?: string; // For YouTube video transcript
 }
 
 export interface Quiz {

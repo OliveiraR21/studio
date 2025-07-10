@@ -1,3 +1,4 @@
+
 // In-memory data store
 import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
@@ -120,7 +121,7 @@ export async function findNextCourseForUser(user: User): Promise<(Course & {trac
 // --- Mutation Functions ---
 
 // Creates a course in the in-memory store.
-export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; thumbnailUrl?: string; durationInSeconds?: number; minimumRole?: UserRole; accessAreas?: string[] }): Promise<Course> {
+export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; thumbnailUrl?: string; durationInSeconds?: number; minimumRole?: UserRole; accessAreas?: string[]; transcript?: string; }): Promise<Course> {
     let parentModule: Module | undefined;
     let parentTrack: Track | undefined;
 

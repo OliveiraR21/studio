@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -26,15 +27,16 @@ interface QuizGeneratorProps {
   title: string;
   description: string;
   hasExistingQuiz: boolean;
+  transcript?: string; // Optional transcript from YouTube
 }
 
-export function QuizGenerator({ courseId, title, description, hasExistingQuiz }: QuizGeneratorProps) {
+export function QuizGenerator({ courseId, title, description, hasExistingQuiz, transcript: initialTranscript }: QuizGeneratorProps) {
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
-  const [transcript, setTranscript] = useState("");
+  const [transcript, setTranscript] = useState(initialTranscript || "");
 
   const handleGenerate = async () => {
     setIsLoading(true);
@@ -130,7 +132,7 @@ export function QuizGenerator({ courseId, title, description, hasExistingQuiz }:
                     id="transcript"
                     value={transcript}
                     onChange={(e) => setTranscript(e.target.value)}
-                    placeholder="Cole a legenda ou um resumo detalhado do conteúdo do vídeo aqui para obter perguntas mais precisas e aprofundadas."
+                    placeholder="Cole a legenda ou um resumo detalhado do conteúdo do vídeo aqui para obter perguntas mais precisas e aprofundadas. Se uma URL do YouTube foi usada, este campo pode ter sido preenchido automaticamente."
                     rows={6}
                     className="bg-background/50"
                   />

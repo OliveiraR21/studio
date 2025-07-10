@@ -22,8 +22,8 @@ const courseFormSchema = z.object({
   duration: z.string().optional()
     .refine((val) => {
         if (!val || val.trim() === '') return true; // Allow empty string
-        return /^\d{1,2}:\d{2}:\d{2}$/.test(val);
-    }, { message: "Formato de duração inválido. Use hh:mm:ss." })
+        return /^\d{1,3}:\d{2}:\d{2}$/.test(val);
+    }, { message: "Formato de duração inválido. Use hh:mm:ss ou hhh:mm:ss." })
     .refine((val) => {
         if (!val || val.trim() === '') return true;
         const parts = val.split(':').map(Number);
@@ -32,6 +32,7 @@ const courseFormSchema = z.object({
   trackId: z.string().optional(),
   minimumRole: z.enum(['', 'none', 'Assistente', 'Analista', 'Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin']).optional(),
   accessAreas: z.string().optional(),
+  transcript: z.string().optional(), // Added for YouTube transcript
 }).refine(data => {
     // If id is not present (new course), trackId must be present.
     return !!data.id || !!data.trackId;
@@ -52,6 +53,7 @@ export type CourseFormState = {
     trackId?: string[];
     minimumRole?: string[];
     accessAreas?: string[];
+    transcript?: string[];
   };
   success: boolean;
 };
@@ -82,6 +84,7 @@ export async function saveCourse(
     trackId: formData.get('trackId') || undefined,
     minimumRole: formData.get('minimumRole'),
     accessAreas: formData.get('accessAreas'),
+    transcript: formData.get('transcript') || undefined,
   };
 
   const validatedFields = courseFormSchema.safeParse(rawData);

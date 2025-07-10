@@ -57,7 +57,8 @@ export default async function EditCoursePage({ params }: { params: { id: string 
             courseId={course.id}
             title={course.title}
             description={course.description}
-            hasExistingQuiz={!!course.quiz} 
+            hasExistingQuiz={!!course.quiz}
+            transcript={course.transcript}
         />
       )}
     </div>
