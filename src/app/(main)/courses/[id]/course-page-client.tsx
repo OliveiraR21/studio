@@ -174,8 +174,8 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
                             onClick={() => handleFeedbackClick('like')}
                             disabled={isSubmittingFeedback}
                             className={cn(
-                                "rounded-none rounded-l-full px-4 h-9",
-                                "hover:bg-green-500/10",
+                                "rounded-none rounded-l-full px-4 h-9 transition-transform hover:scale-110",
+                                "hover:text-primary",
                                 currentFeedback === 'like' && "bg-muted/50"
                             )}
                         >
@@ -190,7 +190,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
                             disabled={isSubmittingFeedback}
                             className={cn(
                                 "rounded-none rounded-r-full px-4 h-9",
-                                "hover:bg-muted",
+                                "hover:bg-transparent", // No hover effect for dislike
                                 currentFeedback === 'dislike' && "bg-muted/50"
                             )}
                         >
