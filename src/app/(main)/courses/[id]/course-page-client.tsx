@@ -8,10 +8,11 @@ import { notFound, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { ArrowLeft, Lightbulb, Video, ThumbsUp, ThumbsDown, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
-import type { Course, Track } from "@/lib/types";
+import type { Course, Track, User, Module } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { recordCourseFeedback, completeCourseForUser } from "@/actions/course-actions";
 import { Textarea } from "@/components/ui/textarea";
+import { CoursePlaylist } from "@/components/course/course-playlist";
 
 const PASSING_SCORE = 90;
 
@@ -20,9 +21,11 @@ interface CoursePageClientProps {
     track: Track;
     isAlreadyCompleted: boolean;
     initialFeedback: 'like' | 'dislike' | 'none';
+    allModules: Module[];
+    currentUser: User;
 }
 
-export function CoursePageClient({ course, track, isAlreadyCompleted, initialFeedback }: CoursePageClientProps) {
+export function CoursePageClient({ course, track, isAlreadyCompleted, initialFeedback, allModules, currentUser }: CoursePageClientProps) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -63,6 +66,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
             title: "Curso Concluído!",
             description: "Seu progresso foi registrado com sucesso. Dê seu feedback!",
         });
+        router.refresh();
     } else {
          toast({
             variant: "destructive",
@@ -156,11 +160,11 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
                 <p className="text-muted-foreground">{course.description}</p>
                  {completionStep === 'completed' && (
                      <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="sm" onClick={() => handleFeedbackClick('like')} disabled={isSubmittingFeedback}>
+                        <Button variant="outline" size="sm" onClick={() => handleFeedbackClick('like')} disabled={isSubmittingFeedback}>
                             <ThumbsUp className={`mr-2 h-5 w-5 ${currentFeedback === 'like' ? 'text-primary' : ''}`} />
                             {likes}
                         </Button>
-                         <Button variant="ghost" size="sm" onClick={() => handleFeedbackClick('dislike')} disabled={isSubmittingFeedback}>
+                         <Button variant="outline" size="sm" onClick={() => handleFeedbackClick('dislike')} disabled={isSubmittingFeedback}>
                             <ThumbsDown className={`mr-2 h-5 w-5 ${currentFeedback === 'dislike' ? 'text-destructive' : ''}`} />
                             {dislikes}
                         </Button>
@@ -244,52 +248,39 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
             {completionStep === 'completed' && (
               <CoursePlayer videoUrl={course.videoUrl} title={course.title} />
             )}
+            
+            {course.quiz ? (
+                <div className="flex justify-center gap-4">
+                    <Button 
+                        className="w-full" 
+                        onClick={handleStartQuiz}
+                        disabled={view === 'quiz' || isAlreadyCompleted}
+                    >
+                        <Lightbulb className="mr-2 h-4 w-4" />
+                        {isAlreadyCompleted ? 'Revisar Questionário' : (lastScore !== null && !quizFinished ? 'Tentar Novamente' : 'Iniciar Questionário')}
+                    </Button>
+                </div>
+            ) : (
+                    <Button 
+                    className="w-full" 
+                    onClick={handleFinishCourse}
+                    disabled={!showCompleteButton}
+                >
+                    {isAlreadyCompleted ? 'Curso Concluído' : 'Marcar como Concluído'}
+                </Button>
+            )}
+
         </div>
 
         {/* Sidebar: Navigation & Actions */}
         <div className="lg:col-span-1">
             <div className="sticky top-6">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Progresso da Aula</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className={`flex items-center gap-3 p-3 rounded-md transition-colors ${view === 'video' ? 'bg-primary/10' : ''} ${isAlreadyCompleted ? 'bg-green-500/10' : ''}`}>
-                             {isAlreadyCompleted ? <CheckCircle className="h-6 w-6 text-green-500" /> : <Video className={`h-6 w-6 ${view === 'video' ? 'text-primary' : 'text-muted-foreground'}`} />}
-                            <div>
-                                <p className="font-semibold">1. Assistir Vídeo</p>
-                                <p className="text-xs text-muted-foreground">Conteúdo principal da aula.</p>
-                            </div>
-                        </div>
-
-                        {course.quiz ? (
-                            <>
-                                <div className={`flex items-center gap-3 p-3 rounded-md transition-colors ${view === 'quiz' ? 'bg-primary/10' : ''} ${quizFinished || isAlreadyCompleted ? 'bg-green-500/10' : ''}`}>
-                                    {isAlreadyCompleted || quizFinished ? <CheckCircle className="h-6 w-6 text-green-500" /> : <Lightbulb className={`h-6 w-6 ${view === 'quiz' ? 'text-primary' : 'text-muted-foreground'}`} />}
-                                    <div>
-                                        <p className="font-semibold">2. Fazer Questionário</p>
-                                        <p className="text-xs text-muted-foreground">Teste seu conhecimento.</p>
-                                    </div>
-                                </div>
-                                <Button 
-                                    className="w-full" 
-                                    onClick={handleStartQuiz}
-                                    disabled={view === 'quiz' || isAlreadyCompleted}
-                                >
-                                    {isAlreadyCompleted ? 'Revisar Questionário' : (lastScore !== null && !quizFinished ? 'Tentar Novamente' : 'Iniciar Questionário')}
-                                </Button>
-                            </>
-                        ) : (
-                             <Button 
-                                className="w-full" 
-                                onClick={handleFinishCourse}
-                                disabled={!showCompleteButton}
-                            >
-                                {isAlreadyCompleted ? 'Curso Concluído' : 'Marcar como Concluído'}
-                            </Button>
-                        )}
-                    </CardContent>
-                </Card>
+               <CoursePlaylist
+                    allModules={allModules}
+                    currentUser={currentUser}
+                    currentCourseId={course.id}
+                    currentTrackId={track.id}
+               />
             </div>
         </div>
       </div>
