@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import Joyride, { type Step, type CallBackProps, EVENTS } from 'react-joyride';
 import type { User } from '@/lib/types';
 import { useTour } from '@/hooks/use-tour';
+import { Button } from '@/components/ui/button';
 
 interface OnboardingTourProps {
   user: User;
@@ -135,18 +136,12 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
         buttonClose: {
           display: 'none',
         },
-        buttonNext: {
-          borderRadius: '0.375rem',
-          padding: '0.5rem 1rem',
-          fontSize: '0.875rem',
-        }
       }}
       tooltipComponent={({
         continuous,
         index,
         step,
         backProps,
-        closeProps,
         primaryProps,
         tooltipProps,
       }) => (
@@ -154,13 +149,15 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
           {step.content}
           <div className="flex justify-between items-center mt-4">
               <span className="text-xs text-muted-foreground">{index + 1} de {steps.length}</span>
-              <div>
+              <div className="flex items-center gap-2">
                 {index > 0 && (
-                  <button {...backProps} className="text-sm mr-4 text-muted-foreground hover:text-foreground">Voltar</button>
+                  <Button {...backProps} variant="ghost" size="sm">
+                    Voltar
+                  </Button>
                 )}
-                <button {...primaryProps} className="joyride-next-button">
+                <Button {...primaryProps} size="sm" className="joyride-next-button">
                     {continuous ? 'Next' : 'Finalizar'}
-                </button>
+                </Button>
               </div>
           </div>
         </div>

@@ -84,9 +84,6 @@
 }
 
 @layer utilities {
-  .joyride-next-button {
-    @apply bg-primary text-primary-foreground border-none;
-  }
   .joyride-next-button:hover {
     @apply shadow-[0_0_15px] shadow-primary transition-all;
   }
