@@ -1,9 +1,11 @@
+
 'use server';
 
 import { z } from 'zod';
-import { createUser } from '@/lib/data-access';
+import { createUser, updateUser } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
 import type { UserRole } from '@/lib/types';
+import { getSimulatedUserId } from '@/lib/auth';
 
 const userFormSchema = z.object({
   id: z.string().optional(),
@@ -69,4 +71,26 @@ export async function saveUser(
   revalidatePath('/admin/users');
   
   return { success: true, message: `Usuário "${validatedFields.data.name}" criado com sucesso!` };
+}
+
+
+export async function updateUserAvatar(avatarDataUrl: string): Promise<{ success: boolean; message: string }> {
+  const userId = getSimulatedUserId();
+  if (!userId) {
+    return { success: false, message: 'Usuário não autenticado.' };
+  }
+
+  if (!avatarDataUrl || !avatarDataUrl.startsWith('data:image')) {
+    return { success: false, message: 'Formato de imagem inválido.' };
+  }
+
+  try {
+    await updateUser(userId, { avatarUrl: avatarDataUrl });
+    revalidatePath('/profile');
+    revalidatePath('/(main)/layout'); // Revalidate layout to update UserNav
+    return { success: true, message: 'Foto de perfil atualizada com sucesso!' };
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
+    return { success: false, message: `Falha ao atualizar a foto: ${errorMessage}` };
+  }
 }

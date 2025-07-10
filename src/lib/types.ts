@@ -1,3 +1,4 @@
+
 export interface Module {
   id: string;
   title: string;
@@ -58,7 +59,7 @@ export interface User {
   gerente?: string;
   diretor?: string;
   area?: string;
-  avatarUrl: string;
+  avatarUrl?: string;
   
   // Track which courses and tracks have been completed.
   completedCourses: string[]; // List of course IDs

@@ -1,38 +1,91 @@
+
 "use client";
 
+import { useRef, useState } from "react";
 import type { User } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Building2, Briefcase, Camera, User as UserIcon } from "lucide-react";
+import { Building2, Briefcase, Camera, Loader2, User as UserIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { updateUserAvatar } from "@/actions/user-actions";
 
 
 interface ProfilePageClientProps {
     user: User;
 }
 
-export function ProfilePageClient({ user }: ProfilePageClientProps) {
+export function ProfilePageClient({ user: initialUser }: ProfilePageClientProps) {
     const { toast } = useToast();
+    const [user, setUser] = useState(initialUser);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const getInitials = (name: string): string => {
         if (!name) return '';
-        const nameParts = name.split(' ').filter(part => part); // Filter out empty strings
+        const nameParts = name.split(' ').filter(part => part);
         if (nameParts.length > 1) {
             return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
         }
-        return name.charAt(0).toUpperCase();
+        if (nameParts.length === 1 && nameParts[0].length > 0) {
+            return nameParts[0][0].toUpperCase();
+        }
+        return '';
     };
 
     const handleCameraClick = () => {
-        toast({
-            title: "Funcionalidade em desenvolvimento",
-            description: "A alteração de foto de perfil ainda não foi implementada."
-        });
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+
+        // Convert file to data URI
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            const result = reader.result as string;
+            const response = await updateUserAvatar(result);
+
+            if (response.success) {
+                // Optimistically update the UI
+                setUser(prevUser => ({ ...prevUser, avatarUrl: result }));
+                toast({
+                    title: "Sucesso!",
+                    description: response.message
+                });
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "Erro no Upload",
+                    description: response.message
+                });
+            }
+            setIsUploading(false);
+        };
+        reader.onerror = (error) => {
+            console.error("File reading error:", error);
+            toast({
+                variant: "destructive",
+                title: "Erro de Leitura",
+                description: "Não foi possível ler o arquivo de imagem."
+            });
+            setIsUploading(false);
+        };
     };
 
     return (
         <div className="container mx-auto space-y-6">
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/png, image/jpeg, image/gif"
+            />
             <div>
                 <h1 className="text-3xl font-bold">Meu Perfil</h1>
                 <p className="text-muted-foreground">
@@ -54,8 +107,9 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
                                     size="icon"
                                     className="h-12 w-12 text-white hover:bg-white/20 hover:text-white"
                                     onClick={handleCameraClick}
+                                    disabled={isUploading}
                                 >
-                                    <Camera className="h-6 w-6" />
+                                    {isUploading ? <Loader2 className="h-6 w-6 animate-spin" /> : <Camera className="h-6 w-6" />}
                                 </Button>
                             </div>
                         </div>
@@ -78,7 +132,7 @@ export function ProfilePageClient({ user }: ProfilePageClientProps) {
                             <Building2 className="h-5 w-5 text-primary" />
                             <div>
                                 <p className="text-muted-foreground">Área</p>
-                                <p className="font-semibold">{user.area}</p>
+                                <p className="font-semibold">{user.area || 'Não definida'}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
