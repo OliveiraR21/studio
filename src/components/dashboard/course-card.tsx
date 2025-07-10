@@ -12,7 +12,7 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps) {
-  return (
+  const CardContentComponent = (
     <Card 
       className={`overflow-hidden h-full flex flex-col transition-all duration-300 ease-in-out group ${!isUnlocked ? 'bg-muted/60' : 'hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50'}`}
     >
@@ -56,20 +56,28 @@ export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps)
          <div className="flex justify-between items-center w-full">
             {course.quiz ? <Badge variant="outline">Prova</Badge> : <div />}
             {isUnlocked ? (
-                <Button size="sm" asChild>
-                    <Link href={`/courses/${course.id}`}>
-                        <Play className="mr-2 h-4 w-4"/>
-                        {isCompleted ? 'Revisar' : 'Iniciar'}
-                    </Link>
-                </Button>
+                 <span className="text-xs font-semibold text-primary flex items-center gap-1">
+                    <Play className="h-3 w-3"/>
+                    {isCompleted ? 'Revisar conteúdo' : 'Iniciar curso'}
+                 </span>
             ) : (
-                <Button size="sm" disabled>
-                    <Lock className="mr-2 h-4 w-4"/>
+                 <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
+                    <Lock className="h-3 w-3"/>
                     Bloqueado
-                </Button>
+                 </span>
             )}
          </div>
       </CardFooter>
     </Card>
   );
+  
+  if (isUnlocked) {
+    return (
+        <Link href={`/courses/${course.id}`} className="h-full">
+            {CardContentComponent}
+        </Link>
+    )
+  }
+
+  return CardContentComponent;
 }
