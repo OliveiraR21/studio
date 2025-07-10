@@ -20,6 +20,14 @@ export function UserNav({ user }: { user: UserType | null }) {
   if (!user) {
     return <Skeleton className="h-9 w-9 rounded-full" />
   }
+  
+  const getInitials = (name: string) => {
+    const nameParts = name.split(' ');
+    if (nameParts.length > 1) {
+      return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
+    }
+    return name.charAt(0).toUpperCase();
+  };
 
   return (
     <DropdownMenu>
@@ -27,7 +35,7 @@ export function UserNav({ user }: { user: UserType | null }) {
         <Button variant="ghost" className="relative h-9 w-9 rounded-full" data-tour-id="user-nav">
           <Avatar className="h-9 w-9">
             <AvatarImage src={user.avatarUrl} alt={user.name} data-ai-hint="user avatar" />
-            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
