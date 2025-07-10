@@ -1,31 +1,7 @@
 
 import Link from "next/link";
 import { LoginPageClient } from "@/components/auth/login-page-client";
-import { Globe, Briefcase, Linkedin, Youtube, Info, Shield, Facebook } from "lucide-react";
-
-// Custom SVG component for the Oceano logo to match branding
-const OceanoIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        {...props}
-    >
-        <defs>
-            <linearGradient id="oceanoGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style={{ stopColor: '#00D4FF', stopOpacity: 1 }} />
-                <stop offset="100%" style={{ stopColor: '#005C7A', stopOpacity: 1 }} />
-            </linearGradient>
-        </defs>
-        <path d="M7 16a5 5 0 0 1-5-5 5 5 0 0 1 5-5" stroke="url(#oceanoGradient)" strokeWidth="2.5" />
-        <path d="M17 16a5 5 0 0 0 5-5 5 5 0 0 0-5-5" stroke="url(#oceanoGradient)" strokeWidth="2.5" />
-        <circle cx="12" cy="12" r="4" stroke="url(#oceanoGradient)" strokeWidth="2.5" />
-    </svg>
-);
+import { Globe, Briefcase, Linkedin, Youtube, Info, Shield, Facebook, Waves } from "lucide-react";
 
 
 export default async function LoginPage() {
@@ -33,7 +9,7 @@ export default async function LoginPage() {
   const footerLinks = [
     { name: "Site", href: "https://brsupply.com.br/", icon: Globe },
     { name: "Supply Manager", href: "#", icon: Briefcase },
-    { name: "Oceano", href: "https://www.oceanob2b.com/", icon: OceanoIcon },
+    { name: "Oceano", href: "https://www.oceanob2b.com/", icon: Waves },
     { name: "LinkedIn", href: "https://www.linkedin.com/company/brsupply-suprimentos-corporativos/posts/?feedView=all", icon: Linkedin },
     { name: "Youtube", href: "https://www.youtube.com/@brsupplysuprimentos", icon: Youtube },
     { name: "Facebook", href: "https://www.facebook.com/brsupply.suprimentos.corporativos", icon: Facebook },
