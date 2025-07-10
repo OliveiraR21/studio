@@ -138,10 +138,10 @@ export function MainLayoutClient({
         <SidebarInset>
           <header className="flex h-14 items-center gap-4 border-b bg-background px-4 lg:h-[60px] lg:px-6">
             <SidebarTrigger className="md:hidden" />
-            <div className="w-full flex-1">
-              {/* Future search bar can go here */}
-            </div>
             <GlobalSearch />
+            <div className="w-full flex-1">
+              {/* Future elements can go here */}
+            </div>
             <NotificationBell />
             <ThemeToggle />
             <UserNav user={user} />

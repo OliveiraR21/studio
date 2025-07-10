@@ -50,6 +50,9 @@ export async function login(prevState: AuthFormState, formData: FormData): Promi
   } catch (error) {
     return { success: false, message: 'Ocorreu um erro no servidor. Tente novamente.' };
   }
+  
+  // Revalidate the entire app to ensure user data is fresh everywhere.
+  revalidatePath('/', 'layout');
 
   // Redirect to dashboard on successful login
   redirect('/dashboard');

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { File, Loader2, Search } from 'lucide-react';
+import { File, Loader2, Search, AppWindow } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useDebounce } from '@/hooks/use-debounce';
 
@@ -12,9 +12,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from '@/components/ui/command';
 import { globalSearch, type SearchResult } from '@/actions/search-actions';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '../ui/skeleton';
 
 export function GlobalSearch() {
@@ -63,19 +63,24 @@ export function GlobalSearch() {
     command();
   }, []);
 
+  const pageResults = results.filter((r) => r.type === 'page');
+  const courseResults = results.filter((r) => r.type === 'course');
+
   return (
     <>
-      <Button
-        variant="ghost"
-        className="h-9 w-9 rounded-full border hover:bg-primary/10 text-foreground hover:text-primary hover:border-primary focus-visible:ring-0 focus-visible:ring-offset-0"
-        onClick={() => setIsOpen(true)}
-      >
-        <Search className="h-[1.2rem] w-[1.2rem]" />
-        <span className="sr-only">Pesquisar</span>
-      </Button>
+      <div className="relative w-full max-w-md lg:max-w-lg">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <CommandInput
+          className="h-10 w-full pl-10 bg-muted/50 rounded-lg"
+          placeholder="Pesquisar..."
+          onClick={() => setIsOpen(true)}
+          onValueChange={setQuery}
+          value={query}
+        />
+      </div>
       <CommandDialog open={isOpen} onOpenChange={setIsOpen}>
         <CommandInput
-          placeholder="Pesquisar por cursos..."
+          placeholder="Pesquisar por cursos, páginas e mais..."
           value={query}
           onValueChange={setQuery}
         />
@@ -91,24 +96,54 @@ export function GlobalSearch() {
             <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
           )}
           {!isLoading && results.length > 0 && (
-            <CommandGroup heading="Cursos">
-              {results.map(({ course, track }) => (
-                <CommandItem
-                  key={course.id}
-                  value={course.title}
-                  onSelect={() => {
-                    runCommand(() => router.push(`/courses/${course.id}`));
-                  }}
-                  className="!py-2"
-                >
-                  <File className="mr-2 h-4 w-4" />
-                  <div className="flex flex-col">
-                    <span>{course.title}</span>
-                    <span className="text-xs text-muted-foreground">{track.title}</span>
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            <>
+              {pageResults.length > 0 && (
+                 <CommandGroup heading="Navegação">
+                  {pageResults.map((result) => {
+                    if (result.type === 'page') {
+                      const Icon = result.icon;
+                      return (
+                        <CommandItem
+                          key={result.href}
+                          value={result.title}
+                          onSelect={() => runCommand(() => router.push(result.href))}
+                          className="!py-2"
+                        >
+                          <Icon className="mr-2 h-4 w-4" />
+                          <span>{result.title}</span>
+                        </CommandItem>
+                      )
+                    }
+                    return null;
+                  })}
+                 </CommandGroup>
+              )}
+              {pageResults.length > 0 && courseResults.length > 0 && <CommandSeparator />}
+              {courseResults.length > 0 && (
+                 <CommandGroup heading="Cursos">
+                  {courseResults.map((result) => {
+                    if (result.type === 'course') {
+                        const { course, track } = result;
+                        return (
+                          <CommandItem
+                            key={course.id}
+                            value={course.title}
+                            onSelect={() => runCommand(() => router.push(`/courses/${course.id}`))}
+                            className="!py-2"
+                          >
+                            <File className="mr-2 h-4 w-4" />
+                            <div className="flex flex-col">
+                              <span>{course.title}</span>
+                              <span className="text-xs text-muted-foreground">{track.title}</span>
+                            </div>
+                          </CommandItem>
+                        );
+                    }
+                    return null;
+                  })}
+                </CommandGroup>
+              )}
+            </>
           )}
         </CommandList>
       </CommandDialog>
