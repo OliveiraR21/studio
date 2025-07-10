@@ -12,7 +12,7 @@ import {
   AccordionItem, 
   AccordionTrigger 
 } from "@/components/ui/accordion";
-import { CheckCircle, Lock, ClipboardList, BrainCircuit, HeartHandshake, Bot } from "lucide-react";
+import { Lock, ClipboardList, BrainCircuit, HeartHandshake, Bot } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import type { Track, Course, User, Module } from "@/lib/types";
 import { CourseCard } from "@/components/dashboard/course-card";
@@ -22,6 +22,7 @@ import { UserNotFound } from "@/components/layout/user-not-found";
 import { TrackFinalActions } from "@/components/course/track-final-actions";
 import { getCurrentUser } from "@/lib/auth";
 import { userHasCourseAccess } from "@/lib/access-control";
+import { AnimatedCheckmark } from "@/components/ui/animated-checkmark";
 
 const PASSING_SCORE = 90;
 
@@ -159,15 +160,17 @@ export default async function MyCoursesPage({
                     <AccordionItem value={`track-${track.id}`} className="border-b-0">
                       <AccordionTrigger className={`p-6 hover:no-underline ${!unlocked ? 'cursor-not-allowed' : ''}`} disabled={!unlocked}>
                         <div className="flex items-center gap-4 w-full">
-                          {isCompletedEmptyTrack ? (
-                              <Icon className="h-8 w-8 text-muted-foreground flex-shrink-0" />
-                          ) : trackCompleted ? (
-                             <CheckCircle className="h-8 w-8 text-green-500 flex-shrink-0" />
-                          ) : unlocked ? (
-                            <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg flex-shrink-0">{trackIndex + 1}</div>
-                          ) : (
-                            <Lock className="h-8 w-8 text-muted-foreground flex-shrink-0" />
-                          )}
+                          <div className="w-8 h-8 flex-shrink-0 flex items-center justify-center">
+                            {isCompletedEmptyTrack ? (
+                                <Icon className="h-8 w-8 text-muted-foreground" />
+                            ) : trackCompleted ? (
+                               <AnimatedCheckmark size={32} />
+                            ) : unlocked ? (
+                              <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg flex-shrink-0">{trackIndex + 1}</div>
+                            ) : (
+                              <Lock className="h-8 w-8 text-muted-foreground" />
+                            )}
+                          </div>
                           <div className="flex-grow text-left">
                               <h3 className="text-xl font-semibold">{track.title}</h3>
                               <p className="text-sm text-muted-foreground">{track.description}</p>

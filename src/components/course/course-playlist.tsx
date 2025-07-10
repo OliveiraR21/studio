@@ -6,9 +6,10 @@ import { userHasCourseAccess } from "@/lib/access-control";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CheckCircle, Lock, Play } from "lucide-react";
+import { Lock, Play } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { AnimatedCheckmark } from "../ui/animated-checkmark";
 
 interface CoursePlaylistProps {
     allModules: Module[];
@@ -91,7 +92,7 @@ export function CoursePlaylist({ allModules, currentUser, currentCourseId, curre
                                                 const isCurrent = course.id === currentCourseId;
 
                                                 const statusIcon = isCurrent ? <Play className="h-4 w-4 text-primary" /> :
-                                                                  completed ? <CheckCircle className="h-4 w-4 text-green-500" /> :
+                                                                  completed ? <AnimatedCheckmark size={16} /> :
                                                                   !unlocked ? <Lock className="h-4 w-4 text-muted-foreground/70" /> :
                                                                   <div className="h-4 w-4 flex items-center justify-center">
                                                                     <div className="h-2 w-2 rounded-full border border-muted-foreground"></div>
@@ -109,7 +110,7 @@ export function CoursePlaylist({ allModules, currentUser, currentCourseId, curre
                                                         )}
                                                         aria-disabled={!unlocked}
                                                     >
-                                                        <div className="flex-shrink-0 pt-1">{statusIcon}</div>
+                                                        <div className="flex-shrink-0 pt-1 w-4 h-4 flex items-center justify-center">{statusIcon}</div>
                                                         <div className="flex-1">
                                                             <p className={cn("text-sm font-medium leading-tight", isCurrent && "text-primary")}>
                                                                 {course.title}

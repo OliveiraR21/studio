@@ -3,7 +3,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription }
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Course } from "@/lib/types";
-import { CheckCircle, Lock, Play } from "lucide-react";
+import { Lock, Play } from "lucide-react";
+import { AnimatedCheckmark } from "../ui/animated-checkmark";
 
 interface CourseCardProps {
   course: Course;
@@ -38,8 +39,8 @@ export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps)
             </div>
           )}
           {isCompleted && (
-             <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1 shadow-lg">
-                <CheckCircle className="h-5 w-5 text-white" />
+             <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full shadow-lg">
+                <AnimatedCheckmark size={28} />
             </div>
           )}
         </div>
