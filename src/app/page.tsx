@@ -1,14 +1,35 @@
 import Link from "next/link";
 import { LoginPageClient } from "@/components/auth/login-page-client";
-import { Globe, Briefcase, Linkedin, Youtube, Info, Shield, Facebook, Waves } from "lucide-react";
+import { Globe, Briefcase, Linkedin, Youtube, Info, Shield, Facebook } from "lucide-react";
 
 
 export default async function LoginPage() {
   
+  const OceanoIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 106 36" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2.5" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      {...props}
+    >
+      <path d="M43.75,23.82a13.63,13.63,0,0,1-27.21.75" />
+      <path d="M19.34,11.51a13.63,13.63,0,0,1,26.47-1.5" />
+      <path d="M48,10.76a13.63,13.63,0,1,1-25.12,14" />
+      <path d="M53.18,10.76a18.18,18.18,0,1,1-33.5,18.68" />
+      <path d="M63.88,29.44a13.63,13.63,0,1,1,12.25-21.78" />
+      <path d="M92,29.44a13.63,13.63,0,1,1,12.25-21.78" />
+      <path d="M104.16,21.39a8.18,8.18,0,0,1-16.36,0" />
+    </svg>
+  );
+
   const footerLinks = [
     { name: "Site", href: "https://brsupply.com.br/", icon: Globe },
     { name: "Supply Manager", href: "#", icon: Briefcase },
-    { name: "Oceano", href: "https://www.oceanob2b.com/", icon: Waves },
+    { name: "Oceano", href: "https://www.oceanob2b.com/", icon: OceanoIcon },
     { name: "LinkedIn", href: "https://www.linkedin.com/company/brsupply-suprimentos-corporativos/posts/?feedView=all", icon: Linkedin },
     { name: "Youtube", href: "https://www.youtube.com/@brsupplysuprimentos", icon: Youtube },
     { name: "Facebook", href: "https://www.facebook.com/brsupply.suprimentos.corporativos", icon: Facebook },
