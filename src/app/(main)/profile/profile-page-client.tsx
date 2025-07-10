@@ -15,8 +15,9 @@ interface ProfilePageClientProps {
 export function ProfilePageClient({ user }: ProfilePageClientProps) {
     const { toast } = useToast();
 
-    const getInitials = (name: string) => {
-        const nameParts = name.split(' ');
+    const getInitials = (name: string): string => {
+        if (!name) return '';
+        const nameParts = name.split(' ').filter(part => part); // Filter out empty strings
         if (nameParts.length > 1) {
             return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
         }
