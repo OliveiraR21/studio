@@ -37,14 +37,26 @@ export default async function MyCoursesPage({
     return <UserNotFound />
   }
 
-  // Create a new version of the modules with courses filtered by user's access rights.
-  const learningModules = allModules.map(module => ({
-    ...module,
-    tracks: module.tracks.map(track => ({
-        ...track,
-        courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
-    }))
-  }));
+  // Filter modules and tracks based on user access, unless they are Admin or Diretor
+  const learningModules = 
+    (currentUser.role === 'Admin' || currentUser.role === 'Diretor')
+      ? allModules.map(module => ({
+          ...module,
+          tracks: module.tracks.map(track => ({
+            ...track,
+            courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
+          }))
+        }))
+      : allModules.map(module => ({
+          ...module,
+          tracks: module.tracks
+            .map(track => ({
+              ...track,
+              courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
+            }))
+            .filter(track => track.courses.length > 0) // Hide tracks with no accessible courses
+        })).filter(module => module.tracks.length > 0); // Hide modules with no accessible tracks
+
 
   const nextCourse = await findNextCourseForUser(currentUser);
   

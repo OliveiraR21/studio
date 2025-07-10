@@ -19,6 +19,21 @@ interface CoursePlaylistProps {
 
 export function CoursePlaylist({ allModules, currentUser, currentCourseId, currentTrackId }: CoursePlaylistProps) {
     
+    // Filter modules and tracks based on user access, unless they are Admin or Diretor
+    const learningModules = 
+        (currentUser.role === 'Admin' || currentUser.role === 'Diretor')
+        ? allModules
+        : allModules.map(module => ({
+            ...module,
+            tracks: module.tracks
+                .map(track => ({
+                ...track,
+                courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
+                }))
+                .filter(track => track.courses.length > 0) // Hide tracks with no accessible courses
+            })).filter(module => module.tracks.length > 0); // Hide modules with no accessible tracks
+
+
     const isCourseCompleted = (courseId: string) => currentUser.completedCourses.includes(courseId);
 
     const isCourseUnlocked = (course: Course, track: Track, courseIndex: number) => {
@@ -58,7 +73,7 @@ export function CoursePlaylist({ allModules, currentUser, currentCourseId, curre
             <CardContent className="p-0">
                 <ScrollArea className="h-[calc(100vh-10rem)]">
                      <Accordion type="multiple" defaultValue={[`track-${currentTrackId}`]} className="w-full">
-                        {allModules.flatMap(module => module.tracks).map((track) => (
+                        {learningModules.flatMap(module => module.tracks).map((track) => (
                             <AccordionItem value={`track-${track.id}`} key={track.id} className="border-x-0 border-t-0 px-3">
                                 <AccordionTrigger className="text-base font-semibold hover:no-underline">
                                     <div className="flex-1 text-left">
