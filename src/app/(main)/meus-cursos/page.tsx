@@ -12,7 +12,7 @@ import {
   AccordionItem, 
   AccordionTrigger 
 } from "@/components/ui/accordion";
-import { CheckCircle, Lock, ClipboardUser, BrainCircuit, HeartHandshake, Bot } from "lucide-react";
+import { CheckCircle, Lock, ClipboardList, BrainCircuit, HeartHandshake, Bot } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import type { Track, Course, User, Module } from "@/lib/types";
 import { CourseCard } from "@/components/dashboard/course-card";
@@ -26,7 +26,7 @@ import { userHasCourseAccess } from "@/lib/access-control";
 const PASSING_SCORE = 90;
 
 const moduleIcons: Record<string, React.ElementType> = {
-    'module-integration': ClipboardUser,
+    'module-integration': ClipboardList,
     'module-hs': BrainCircuit,
     'module-ss': HeartHandshake,
     'module-hms': Bot,
@@ -110,7 +110,7 @@ export default async function MyCoursesPage({
       <Tabs defaultValue={defaultOpenModuleId}>
         <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-4 h-auto">
           {learningModules.map(module => {
-            const Icon = moduleIcons[module.id] || ClipboardUser; // Fallback icon
+            const Icon = moduleIcons[module.id] || ClipboardList; // Fallback icon
             return (
                 <TabsTrigger key={module.id} value={module.id} className="h-full flex flex-col items-start p-4 text-left">
                 <div className="flex items-center gap-3">
@@ -152,7 +152,7 @@ export default async function MyCoursesPage({
                  const trackCompleted = currentUser.completedTracks.includes(track.id);
                  const hasQuiz = track.quiz && track.quiz.questions.length > 0;
                  const isCompletedEmptyTrack = trackCompleted && track.courses.length === 0 && !hasQuiz;
-                 const Icon = moduleIcons[module.id] || ClipboardUser;
+                 const Icon = moduleIcons[module.id] || ClipboardList;
 
                  return (
                   <Card key={track.id} className={!unlocked ? 'bg-muted/50' : ''}>
