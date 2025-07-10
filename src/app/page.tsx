@@ -1,13 +1,14 @@
 
 import Link from "next/link";
 import { LoginPageClient } from "@/components/auth/login-page-client";
-import { Globe, Briefcase, Linkedin, Youtube, Info, Shield } from "lucide-react";
+import { Globe, Briefcase, Linkedin, Youtube, Info, Shield, Waves } from "lucide-react";
 
 export default async function LoginPage() {
   
   const footerLinks = [
     { name: "Site", href: "https://brsupply.com.br/", icon: Globe },
     { name: "Supply Manager", href: "#", icon: Briefcase },
+    { name: "Oceano", href: "https://www.oceanob2b.com/", icon: Waves },
     { name: "LinkedIn", href: "https://www.linkedin.com/company/brsupply-suprimentos-corporativos/posts/?feedView=all", icon: Linkedin },
     { name: "Youtube", href: "https://www.youtube.com/@brsupplysuprimentos", icon: Youtube },
     { name: "SIC", href: "#", icon: Info },
