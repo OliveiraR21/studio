@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -28,8 +29,7 @@ interface CommandDialogProps extends DialogProps {}
 const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
   return (
     <Dialog {...props}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg bg-transparent border-0 relative before:absolute before:inset-0 before:-z-10 before:rounded-lg before:bg-gradient-to-r before:from-primary before:to-blue-500 before:p-0.5 after:absolute after:inset-0 after:-z-10 after:rounded-lg after:bg-popover">
-        <DialogTitle className="sr-only">Pesquisa Global</DialogTitle>
+      <DialogContent className="overflow-hidden p-0 shadow-lg">
         <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
           {children}
         </Command>
