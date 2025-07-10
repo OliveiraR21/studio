@@ -102,3 +102,51 @@ export async function signup(prevState: AuthFormState, formData: FormData): Prom
     revalidatePath('/');
     redirect('/?message=signup_success');
 }
+
+
+// --- Forgot Password Action ---
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email({ message: "Por favor, insira um e-mail válido." }),
+});
+
+export async function requestPasswordReset(prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const validatedFields = forgotPasswordSchema.safeParse({
+    email: formData.get('email'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: validatedFields.error.flatten().fieldErrors.email?.[0] || 'E-mail inválido.',
+    };
+  }
+
+  const { email } = validatedFields.data;
+
+  try {
+    const user = await findUserByEmail(email);
+
+    if (!user) {
+        // To prevent email enumeration, we show a success message even if the user doesn't exist.
+        // In a real app, you would still proceed to "send" a fake email or log this attempt.
+         return { success: true, message: 'Se um usuário com este e-mail existir, um link de redefinição de senha foi enviado.' };
+    }
+    
+    // --- SIMULATION ---
+    // In a real application, you would:
+    // 1. Generate a secure, unique, and expiring password reset token.
+    // 2. Save the token hash to the user's record in the database.
+    // 3. Create a reset URL (e.g., /reset-password?token=...).
+    // 4. Send an email to the user with the reset URL.
+    console.log(`[SIMULAÇÃO] Enviando link de redefinição para: ${email}`);
+    
+  } catch (error) {
+    // In a real app, you'd want to log this error but probably still show a generic success message to the user.
+    console.error("Erro no processo de redefinição de senha:", error);
+    return { success: false, message: 'Ocorreu um erro no servidor. Tente novamente.' };
+  }
+
+  // Always return a success message to prevent user enumeration.
+  return { success: true, message: 'Se um usuário com este e-mail existir, um link de redefinição de senha foi enviado.' };
+}
