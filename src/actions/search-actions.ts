@@ -1,43 +1,31 @@
 'use server';
 
-import type { User, Course, Track, Module } from '@/lib/types';
+import type { User, Course, Track, Module, UserRole } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
 import { getLearningModules } from '@/lib/data-access';
 import { userHasCourseAccess } from '@/lib/access-control';
-import {
-    BarChart,
-    BookMarked,
-    File,
-    HelpCircle,
-    Home,
-    LayoutGrid,
-    Network,
-    UserCog,
-    Users,
-    Settings,
-    User as UserIcon,
-} from 'lucide-react';
 
+export type IconName = 'Home' | 'LayoutGrid' | 'UserIcon' | 'Settings' | 'HelpCircle' | 'Users' | 'UserCog' | 'Network' | 'BookMarked' | 'BarChart' | 'File';
 
 // Define a result type that can be either a course or a navigation item
 export type SearchResult = 
   | { type: 'course'; course: Course; track: Track; module: Module }
-  | { type: 'page'; title: string; href: string; icon: React.ElementType };
+  | { type: 'page'; title: string; href: string; iconName: IconName };
 
 
 // Define available static pages for searching
-const getAvailablePages = (user: User): Omit<SearchResult, 'type'>[] => {
-    const pages: { title: string; href: string, icon: React.ElementType, requiredRole?: UserRole[], managerOnly?: boolean }[] = [
-        { title: 'Meu Painel', href: '/dashboard', icon: Home },
-        { title: 'Meus Cursos', href: '/meus-cursos', icon: LayoutGrid },
-        { title: 'Meu Perfil', href: '/profile', icon: UserIcon },
-        { title: 'Configurações', href: '/settings', icon: Settings },
-        { title: 'Preciso de Ajuda', href: '/help', icon: HelpCircle },
-        { title: 'Minha Equipe', href: '/team', icon: Users, managerOnly: true },
-        { title: 'Gerenciamento de Usuários', href: '/admin/users', icon: UserCog, requiredRole: ['Admin'] },
-        { title: 'Gerenciamento de Trilhas', href: '/admin/tracks', icon: Network, requiredRole: ['Admin'] },
-        { title: 'Gerenciamento de Cursos', href: '/admin/courses', icon: BookMarked, requiredRole: ['Admin'] },
-        { title: 'Relatórios', href: '/admin/reports', icon: BarChart, requiredRole: ['Admin'] },
+const getAvailablePages = (user: User): Omit<SearchResult, 'type' | 'course' | 'track' | 'module'>[] => {
+    const pages: { title: string; href: string, iconName: IconName, requiredRole?: UserRole[], managerOnly?: boolean }[] = [
+        { title: 'Meu Painel', href: '/dashboard', iconName: 'Home' },
+        { title: 'Meus Cursos', href: '/meus-cursos', iconName: 'LayoutGrid' },
+        { title: 'Meu Perfil', href: '/profile', iconName: 'UserIcon' },
+        { title: 'Configurações', href: '/settings', iconName: 'Settings' },
+        { title: 'Preciso de Ajuda', href: '/help', iconName: 'HelpCircle' },
+        { title: 'Minha Equipe', href: '/team', iconName: 'Users', managerOnly: true },
+        { title: 'Gerenciamento de Usuários', href: '/admin/users', iconName: 'UserCog', requiredRole: ['Admin'] },
+        { title: 'Gerenciamento de Trilhas', href: '/admin/tracks', iconName: 'Network', requiredRole: ['Admin'] },
+        { title: 'Gerenciamento de Cursos', href: '/admin/courses', iconName: 'BookMarked', requiredRole: ['Admin'] },
+        { title: 'Relatórios', href: '/admin/reports', iconName: 'BarChart', requiredRole: ['Admin'] },
     ];
     
     const managerRoles = ['Supervisor', 'Coordenador', 'Gerente', 'Diretor'];

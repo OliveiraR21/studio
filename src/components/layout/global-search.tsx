@@ -2,7 +2,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { File, Loader2, Search, AppWindow } from 'lucide-react';
+import { File, Loader2, Search, AppWindow, Home, LayoutGrid, User as UserIcon, Settings, HelpCircle, Users, UserCog, Network, BookMarked, BarChart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useDebounce } from '@/hooks/use-debounce';
 
@@ -15,9 +15,24 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
-import { globalSearch, type SearchResult } from '@/actions/search-actions';
+import { globalSearch, type SearchResult, type IconName } from '@/actions/search-actions';
 import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
+
+const iconMap: Record<IconName, React.ElementType> = {
+  Home,
+  LayoutGrid,
+  UserIcon,
+  Settings,
+  HelpCircle,
+  Users,
+  UserCog,
+  Network,
+  BookMarked,
+  BarChart,
+  File,
+};
+
 
 export function GlobalSearch() {
   const router = useRouter();
@@ -104,7 +119,7 @@ export function GlobalSearch() {
                  <CommandGroup heading="Navegação">
                   {pageResults.map((result) => {
                     if (result.type === 'page') {
-                      const Icon = result.icon;
+                      const Icon = iconMap[result.iconName];
                       return (
                         <CommandItem
                           key={result.href}
@@ -127,6 +142,7 @@ export function GlobalSearch() {
                   {courseResults.map((result) => {
                     if (result.type === 'course') {
                         const { course, track } = result;
+                        const Icon = iconMap['File'];
                         return (
                           <CommandItem
                             key={course.id}
@@ -134,7 +150,7 @@ export function GlobalSearch() {
                             onSelect={() => runCommand(() => router.push(`/courses/${course.id}`))}
                             className="!py-2"
                           >
-                            <File className="mr-2 h-4 w-4" />
+                            <Icon className="mr-2 h-4 w-4" />
                             <div className="flex flex-col">
                               <span>{course.title}</span>
                               <span className="text-xs text-muted-foreground">{track.title}</span>
