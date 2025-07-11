@@ -1,4 +1,5 @@
 
+
 export interface Module {
   id: string;
   title: string;
@@ -74,6 +75,9 @@ export interface User {
   // Track scores for both course and track quizzes.
   courseScores?: { courseId: string; score: number; attempts: number }[];
   trackScores?: { trackId: string; score: number; attempts: number }[];
+
+  // Flag to check if user has completed the onboarding tour.
+  hasCompletedOnboarding?: boolean;
 }
 
 

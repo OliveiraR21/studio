@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -8,6 +9,9 @@ import {
   useEffect,
   createElement,
 } from 'react';
+import type { User } from '@/lib/types';
+import { completeOnboardingForUser } from '@/actions/user-actions';
+
 
 interface TourContextType {
   run: boolean;
@@ -16,18 +20,17 @@ interface TourContextType {
 }
 
 const TourContext = createContext<TourContextType | undefined>(undefined);
-const TOUR_STORAGE_KEY = 'brsupply-tour-completed-v1';
 
-export function TourProvider({ children }: { children: ReactNode }) {
+export function TourProvider({ user, children }: { user: User, children: ReactNode }) {
   const [run, setRun] = useState(false);
 
-  // Check on mount if the tour should run automatically.
+  // Check on mount if the tour should run automatically based on the user's DB flag.
   useEffect(() => {
-    const tourCompleted = localStorage.getItem(TOUR_STORAGE_KEY);
-    if (!tourCompleted) {
+    // We only run the tour if the user object is available and the flag is not set.
+    if (user && !user.hasCompletedOnboarding) {
       setRun(true);
     }
-  }, []);
+  }, [user]);
 
   const startTour = () => {
     // We set the state to false first to ensure Joyride remounts/restarts if it was somehow stuck.
@@ -37,7 +40,8 @@ export function TourProvider({ children }: { children: ReactNode }) {
   };
 
   const stopTour = () => {
-    localStorage.setItem(TOUR_STORAGE_KEY, 'true');
+    // This now calls a server action to permanently mark the tour as completed for the user.
+    completeOnboardingForUser();
     setRun(false);
   };
 

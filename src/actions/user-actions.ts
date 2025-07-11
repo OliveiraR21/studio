@@ -2,7 +2,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createUser, updateUser } from '@/lib/data-access';
+import { createUser, updateUser, getUserById } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
 import type { UserRole } from '@/lib/types';
 import { getSimulatedUserId } from '@/lib/auth';
@@ -141,4 +141,22 @@ export async function updateUserProfile(
         const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
         return { success: false, message: `Falha ao atualizar o perfil: ${errorMessage}` };
     }
+}
+
+export async function completeOnboardingForUser(): Promise<{ success: boolean }> {
+  const userId = getSimulatedUserId();
+  if (!userId) {
+    return { success: false };
+  }
+
+  try {
+    const user = await getUserById(userId);
+    if (user && !user.hasCompletedOnboarding) {
+      await updateUser(userId, { hasCompletedOnboarding: true });
+    }
+    return { success: true };
+  } catch (e) {
+    console.error("Failed to complete onboarding:", e);
+    return { success: false };
+  }
 }

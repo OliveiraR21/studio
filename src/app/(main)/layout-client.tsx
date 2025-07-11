@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -103,7 +104,7 @@ export function MainLayoutClient({
   }
 
   return (
-    <TourProvider>
+    <TourProvider user={user}>
       <SidebarProvider>
         <Sidebar collapsible="icon">
           <SidebarHeader>
