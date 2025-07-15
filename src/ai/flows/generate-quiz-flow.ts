@@ -49,6 +49,13 @@ Sua tarefa é criar um banco de questões de múltipla escolha com base no conte
 1.  **Foco no Conteúdo:** As perguntas devem ser **EXCLUSIVAMENTE** sobre o conteúdo apresentado na transcrição do vídeo.
 2.  **NÃO FAÇA PERGUNTAS SOBRE METADADOS:** É proibido criar perguntas sobre o título do curso, a descrição, a plataforma onde o vídeo está hospedado, ou qualquer outra informação que não seja o conhecimento ensinado no vídeo. O título e a descrição são apenas para seu contexto.
 3.  **Qualidade das Perguntas:** Crie perguntas que testem a compreensão real dos conceitos, evitando perguntas triviais.
+4.  **Qualidade das Opções:** As opções de resposta devem ser frases ou termos relevantes ao conteúdo, e não nomes genéricos como 'Opção A' ou 'Resposta B'.
+
+**O que NÃO fazer (Exemplo de resultado ruim):**
+- Pergunta: "Qual o tema principal?"
+- Opções: ["Opção A", "Opção B", "Opção C", "Opção D"]
+- Correta: "Opção A"
+Este tipo de resultado é inútil e será rejeitado.
 
 **Requisitos:**
 - Gere um banco de aproximadamente 40 perguntas.
