@@ -16,7 +16,8 @@ import { QuizViewer } from "@/components/admin/quiz-viewer";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EditCoursePage({ params }: { params: { id: string } }) {
-  const isNew = params.id === 'new';
+  const { id } = params;
+  const isNew = id === 'new';
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -41,7 +42,7 @@ export default function EditCoursePage({ params }: { params: { id: string } }) {
         setAllUsers(usersData);
 
         if (!isNew) {
-          const result = await findCourseById(params.id);
+          const result = await findCourseById(id);
           if (!result) {
             notFound();
           }
@@ -56,7 +57,7 @@ export default function EditCoursePage({ params }: { params: { id: string } }) {
       }
     }
     fetchData();
-  }, [params.id, isNew]);
+  }, [id, isNew]);
 
   if (isLoading) {
     return (
