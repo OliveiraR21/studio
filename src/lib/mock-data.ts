@@ -20,6 +20,7 @@ export const users: User[] = [
     completedTracks: [],
     courseScores: [],
     trackScores: [],
+    hasCompletedOnboarding: true,
   },
   {
     id: '2',
@@ -229,7 +230,8 @@ export const learningModules: Module[] = [
                 version: 1,
                 createdAt: fiveDaysAgo,
                 videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
-                durationInSeconds: 300
+                durationInSeconds: 300,
+                transcript: 'Bem-vindo ao treinamento do portal BRS. Nesta sessão, vamos explorar como criar um novo pedido. Primeiro, localize o botão "Novo Pedido" no canto superior direito. Ao clicar, você será direcionado para a tela de seleção de produtos. Use a barra de busca para encontrar o item desejado. Adicione a quantidade e clique em "Adicionar ao Carrinho". Repita o processo para todos os itens. Quando terminar, vá para o carrinho para revisar seu pedido. Verifique os itens, quantidades e valores. Se tudo estiver correto, clique em "Finalizar Compra". Na próxima tela, confirme o endereço de entrega e selecione o método de pagamento. Após a confirmação, seu pedido será gerado e você receberá um número de acompanhamento. Você pode visualizar o status do seu pedido a qualquer momento na seção "Meus Pedidos".'
             }]
           },
           {
@@ -434,3 +436,5 @@ export const learningModules: Module[] = [
     ]
   }
 ];
+
+    
