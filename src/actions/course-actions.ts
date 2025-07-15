@@ -2,7 +2,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createCourse, updateCourse, findCourseById, getUserById, updateUser, deleteCourse } from '@/lib/data-access';
+import { createCourse, updateCourse, findCourseById, getUserById, updateUser, deleteCourse, findTrackById } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
 import type { Course, Quiz, UserRole } from '@/lib/types';
 import { getSimulatedUserId } from '@/lib/auth';
@@ -103,7 +103,36 @@ export async function saveCourse(
     };
   }
 
-  const { id, trackId, duration, videoUrl: videoUrlOrEmbed, minimumRole, accessAreas, transcript, ...courseDetails } = validatedFields.data;
+  const { id, trackId, duration, videoUrl: videoUrlOrEmbed, minimumRole, accessAreas, transcript, order, ...courseDetails } = validatedFields.data;
+
+  // --- ORDER VALIDATION ---
+  if (order !== undefined) {
+    let finalTrackId: string | undefined = trackId;
+
+    // If we're editing an existing course, we need to find its trackId
+    if (id && !finalTrackId) {
+        const existingCourse = await findCourseById(id);
+        finalTrackId = existingCourse?.track.id;
+    }
+
+    if (finalTrackId) {
+        const trackResult = await findTrackById(finalTrackId);
+        if (trackResult) {
+            const hasDuplicateOrder = trackResult.track.courses.some(
+                course => course.order === order && course.id !== id
+            );
+            if (hasDuplicateOrder) {
+                 return {
+                    success: false,
+                    errors: { order: [`A ordem "${order}" já está em uso nesta trilha. Por favor, escolha outro número.`] },
+                    message: 'Erro de validação. O número de ordem já existe.',
+                };
+            }
+        }
+    }
+  }
+  // --- END ORDER VALIDATION ---
+
 
   let finalVideoUrl: string;
   const trimmedInput = (videoUrlOrEmbed || '').trim();
@@ -134,6 +163,7 @@ export async function saveCourse(
 
   const courseData: Omit<Course, 'id' | 'moduleId' | 'trackId' | 'createdAt'> = {
     ...courseDetails,
+    order,
     videoUrl: urlValidationResult.data,
     durationInSeconds: timeStringToSeconds(duration),
     minimumRole: minimumRole && minimumRole !== '' && minimumRole !== 'none' ? (minimumRole as UserRole) : undefined,

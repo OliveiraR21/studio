@@ -84,6 +84,18 @@ export const findCourseById = cache(async (courseId: string): Promise<{ course: 
   return Promise.resolve(null);
 });
 
+// Find a track by its ID, and include its parent module
+export async function findTrackById(trackId: string): Promise<{ track: Track, module: Module } | null> {
+    const modules = await getLearningModules();
+    for (const module of modules) {
+        const track = module.tracks.find(t => t.id === trackId);
+        if (track) {
+            return Promise.resolve({ track, module });
+        }
+    }
+    return Promise.resolve(null);
+}
+
 
 // Find a course and its parent track by the course ID
 export async function findCourseByIdWithTrack(courseId: string): Promise<{ course: Course, track: Track } | null> {
