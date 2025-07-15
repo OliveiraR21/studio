@@ -45,30 +45,23 @@ export default async function MyCoursesPage({
     return <UserNotFound />
   }
 
-  // Filter modules and tracks based on user access, unless they are Admin or Diretor
-  const learningModules = 
-    (currentUser.role === 'Admin' || currentUser.role === 'Diretor')
-      ? allModules.map(module => ({
-          ...module,
-          tracks: module.tracks.map(track => ({
-            ...track,
-            courses: track.courses
-              .filter(course => userHasCourseAccess(currentUser, course))
-              .sort((a,b) => (a.order || 0) - (b.order || 0)) // Sort courses by order
-          })).sort((a,b) => (a.order || 0) - (b.order || 0)) // Sort tracks by order
+  // Filter modules and tracks based on user access.
+  // This logic is now consistent for all users, with admins/directors seeing all accessible courses.
+  const learningModules = allModules.map(module => ({
+      ...module,
+      tracks: module.tracks
+        .map(track => ({
+          ...track,
+          // Filter courses within each track based on user's access rights.
+          courses: track.courses
+            .filter(course => userHasCourseAccess(currentUser, course))
+            .sort((a,b) => (a.order || Infinity) - (b.order || Infinity)) // Sort courses by order
         }))
-      : allModules.map(module => ({
-          ...module,
-          tracks: module.tracks
-            .map(track => ({
-              ...track,
-              courses: track.courses
-                .filter(course => userHasCourseAccess(currentUser, course))
-                .sort((a,b) => (a.order || 0) - (b.order || 0)) // Sort courses by order
-            }))
-            .filter(track => track.courses.length > 0) // Hide tracks with no accessible courses
-            .sort((a, b) => (a.order || 0) - (b.order || 0)) // Sort tracks by order
-        })).filter(module => module.tracks.length > 0); // Hide modules with no accessible tracks
+        // For non-admin/director roles, hide tracks that become empty after course filtering.
+        .filter(track => (currentUser.role === 'Admin' || currentUser.role === 'Diretor') ? true : track.courses.length > 0)
+        // CRITICAL FIX: Sort tracks by order for ALL users.
+        .sort((a, b) => (a.order || Infinity) - (b.order || Infinity)) 
+    })).filter(module => module.tracks.length > 0); // Hide modules that become empty after track filtering.
 
 
   const nextCourse = await findNextCourseForUser(currentUser);
