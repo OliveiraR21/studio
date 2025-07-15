@@ -146,6 +146,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-integration',
         title: 'Integração de Novos Colaboradores',
         description: 'Conheça a cultura e os processos comerciais da Br Supply.',
+        order: 1,
         courses: [
           {
             id: 'course-culture-intro',
@@ -153,11 +154,18 @@ export const learningModules: Module[] = [
             trackId: 'track-integration-main',
             title: 'Apresentação Cultura Br Supply',
             description: 'Uma introdução à cultura, valores e missão da Br Supply.',
-            videoUrl: 'https://app.heygen.com/embeds/603bafc3779141ec87c7eb529ce6452d',
+            order: 1,
             thumbnailUrl: '/br-supply-logo.png',
             createdAt: oneYearAgo,
-            likes: 0,
-            dislikes: 0,
+            likes: 12,
+            dislikes: 1,
+            currentVersion: 1,
+            versions: [{
+                version: 1,
+                createdAt: oneYearAgo,
+                videoUrl: 'https://app.heygen.com/embeds/603bafc3779141ec87c7eb529ce6452d',
+                durationInSeconds: 120,
+            }]
           },
           {
             id: 'course-commercial-intro',
@@ -165,12 +173,19 @@ export const learningModules: Module[] = [
             trackId: 'track-integration-main',
             title: 'Integração Comercial',
             description: 'Visão geral dos processos e estratégias da área comercial.',
-            videoUrl: 'https://app.heygen.com/embeds/4a2fc4bc9d834679afa3a4c046731c2a',
+            order: 2,
             thumbnailUrl: '/br-supply-logo.png',
             accessAreas: ['Comercial', 'Logística'],
             createdAt: oneYearAgo,
-            likes: 0,
+            likes: 15,
             dislikes: 0,
+            currentVersion: 1,
+            versions: [{
+                version: 1,
+                createdAt: oneYearAgo,
+                videoUrl: 'https://app.heygen.com/embeds/4a2fc4bc9d834679afa3a4c046731c2a',
+                durationInSeconds: 240,
+            }]
           },
         ],
         quiz: { questions: [] }
@@ -186,6 +201,7 @@ export const learningModules: Module[] = [
         id: 'track-hs-pe',
         moduleId: 'module-hs',
         title: 'Planejamento de Estoques',
+        order: 1,
         description: 'Aprenda a otimizar os níveis de estoque para garantir a disponibilidade de produtos.',
         courses: [],
         quiz: { questions: [] }
@@ -194,6 +210,7 @@ export const learningModules: Module[] = [
         id: 'track-hs-cp',
         moduleId: 'module-hs',
         title: 'Ciclo do Pedido',
+        order: 2,
         description: 'Entenda todas as etapas do ciclo de vida de um pedido, da criação à entrega.',
         courses: [
           {
@@ -202,11 +219,18 @@ export const learningModules: Module[] = [
             trackId: 'track-hs-cp',
             title: 'Treinamento Portal | BRS',
             description: 'Aprenda a navegar e utilizar o portal BRS para gerenciar o ciclo de pedidos de forma eficiente, desde a criação até o acompanhamento da entrega.',
-            videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
+            order: 1,
             thumbnailUrl: '/br-supply-logo.png',
             createdAt: fiveDaysAgo,
-            likes: 0,
+            likes: 8,
             dislikes: 0,
+            currentVersion: 1,
+            versions: [{
+                version: 1,
+                createdAt: fiveDaysAgo,
+                videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
+                durationInSeconds: 300
+            }]
           },
           {
             id: 'course-erp-proprio',
@@ -214,18 +238,26 @@ export const learningModules: Module[] = [
             trackId: 'track-hs-cp',
             title: 'ERP Próprio',
             description: 'Aprenda sobre o funcionamento e as funcionalidades do nosso ERP interno.',
-            videoUrl: "https://app.heygen.com/embeds/4a0496a306f649da864f402150d52ff7",
+            order: 2,
             thumbnailUrl: '/br-supply-logo.png',
             minimumRole: 'Supervisor',
             createdAt: today,
-            likes: 0,
-            dislikes: 0,
+            likes: 5,
+            dislikes: 2,
+            currentVersion: 1,
+            versions: [{
+                version: 1,
+                createdAt: today,
+                videoUrl: "https://app.heygen.com/embeds/4a0496a306f649da864f402150d52ff7",
+                durationInSeconds: 450
+            }]
           },
         ],
         quiz: { questions: [] }
       },
       {
         id: 'track-hs-pnc',
+        order: 3,
         moduleId: 'module-hs',
         title: 'Pedidos Não Conformes',
         description: 'Saiba como identificar, tratar e prevenir pedidos que não seguem os padrões.',
@@ -234,6 +266,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-hs-co',
+        order: 4,
         moduleId: 'module-hs',
         title: 'Cadastros Operacionais',
         description: 'Domine os processos de cadastro que são a base para as operações da empresa.',
@@ -242,6 +275,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-hs-fat',
+        order: 5,
         moduleId: 'module-hs',
         title: 'Faturamento',
         description: 'Compreenda o processo de faturamento, desde a emissão da nota até a contabilização.',
@@ -250,6 +284,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-hs-inad',
+        order: 6,
         moduleId: 'module-hs',
         title: 'Inadimplência',
         description: 'Aprenda a gerenciar e reduzir os índices de inadimplência dos clientes.',
@@ -258,6 +293,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-hs-sc',
+        order: 7,
         moduleId: 'module-hs',
         title: 'Satisfação de Clientes',
         description: 'Desenvolva técnicas para medir e melhorar a satisfação dos nossos clientes.',
@@ -266,6 +302,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-hs-mb',
+        order: 8,
         moduleId: 'module-hs',
         title: 'Margem Bruta (MB)',
         description: 'Entenda como calcular e analisar a margem bruta para a tomada de decisões.',
@@ -281,6 +318,7 @@ export const learningModules: Module[] = [
     tracks: [
       {
         id: 'track-ss-lid',
+        order: 1,
         moduleId: 'module-ss',
         title: 'Liderança',
         description: 'Desenvolva habilidades para inspirar, motivar e guiar equipes ao sucesso.',
@@ -289,6 +327,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-ss-te',
+        order: 2,
         moduleId: 'module-ss',
         title: 'Trabalho em Equipe',
         description: 'Aprenda a colaborar de forma eficaz, promovendo um ambiente produtivo e harmonioso.',
@@ -297,6 +336,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-ss-ie',
+        order: 3,
         moduleId: 'module-ss',
         title: 'Inteligência Emocional',
         description: 'Gerencie suas emoções e entenda as dos outros para construir relacionamentos mais fortes.',
@@ -305,6 +345,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-ss-pc',
+        order: 4,
         moduleId: 'module-ss',
         title: 'Pensamento Crítico',
         description: 'Desenvolva a capacidade de analisar informações e tomar decisões baseadas em lógica.',
@@ -313,6 +354,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-ss-in',
+        order: 5,
         moduleId: 'module-ss',
         title: 'Inovação',
         description: 'Aprenda a gerar e implementar novas ideias para resolver problemas e criar valor.',
@@ -321,6 +363,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-ss-or',
+        order: 6,
         moduleId: 'module-ss',
         title: 'Orientação para Resultados',
         description: 'Mantenha o foco em metas e objetivos para alcançar resultados excepcionais.',
@@ -336,6 +379,7 @@ export const learningModules: Module[] = [
     tracks: [
       {
         id: 'track-hms-intro',
+        order: 1,
         moduleId: 'module-hms',
         title: 'Introdução',
         description: 'Conceitos fundamentais sobre a colaboração entre humanos e inteligência artificial.',
@@ -344,6 +388,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-hms-lial',
+        order: 2,
         moduleId: 'module-hms',
         title: 'Literacia de IA para Líderes',
         description: 'Entenda o potencial da IA para tomar decisões estratégicas na liderança.',
@@ -352,6 +397,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-hms-pe',
+        order: 3,
         moduleId: 'module-hms',
         title: 'Prompt Engineering',
         description: 'Aprenda a arte de criar instruções eficazes para obter os melhores resultados de IAs generativas.',
@@ -360,6 +406,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-hms-iacs',
+        order: 4,
         moduleId: 'module-hms',
         title: 'IA e Cybersecurity',
         description: 'Descubra como a IA está transformando a segurança digital, tanto na defesa quanto nas ameaças.',
@@ -368,6 +415,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-hms-ait',
+        order: 5,
         moduleId: 'module-hms',
         title: 'AI Tools',
         description: 'Explore uma gama de ferramentas de IA para aumentar a produtividade no dia a dia.',
@@ -376,6 +424,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-hms-cp',
+        order: 6,
         moduleId: 'module-hms',
         title: 'Copilot',
         description: 'Domine o Microsoft Copilot para otimizar suas tarefas no ambiente de trabalho.',
