@@ -1,7 +1,8 @@
+
 "use client";
 
-import type { Module } from "@/lib/types";
-import { useState } from "react";
+import type { Module, Track } from "@/lib/types";
+import { useState, useActionState, useEffect } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -35,28 +36,104 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, FileText, PlusCircle } from "lucide-react";
+import { Edit, Trash2, FileText, PlusCircle, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { saveTrack } from "@/actions/track-actions";
+import { useFormStatus } from "react-dom";
 
 interface TrackManagementClientProps {
     modules: Module[];
 }
 
+interface EditTrackDialogProps {
+    track: Track;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      Salvar Alterações
+    </Button>
+  );
+}
+
+function EditTrackDialog({ track, open, onOpenChange }: EditTrackDialogProps) {
+    const { toast } = useToast();
+    const initialState = { message: '', errors: {}, success: false };
+    const [state, dispatch] = useActionState(saveTrack, initialState);
+
+    useEffect(() => {
+        if (state.success) {
+            toast({ title: 'Sucesso!', description: state.message });
+            onOpenChange(false); // Close dialog on success
+        } else if (state.message) {
+            toast({ variant: 'destructive', title: 'Erro', description: state.message });
+        }
+    }, [state, toast, onOpenChange]);
+
+    // This key is used to reset the form state when a new track is selected for editing
+    const formKey = track ? track.id : 'new-track';
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-[525px]">
+                <DialogHeader>
+                    <DialogTitle>Editar Trilha</DialogTitle>
+                    <DialogDescription>
+                        Altere os detalhes da trilha e a sua ordem de exibição no módulo.
+                    </DialogDescription>
+                </DialogHeader>
+                 <form key={formKey} action={dispatch} className="grid gap-4 py-4">
+                    <input type="hidden" name="id" value={track.id} />
+                    <input type="hidden" name="moduleId" value={track.moduleId} />
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="title" className="text-right">Título</Label>
+                        <Input id="title" name="title" className="col-span-3" required defaultValue={track.title} />
+                    </div>
+                    {state?.errors?.title && <p className="col-span-4 text-sm text-destructive -mt-2 text-right">{state.errors.title[0]}</p>}
+                    
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="description" className="text-right">Descrição</Label>
+                        <Textarea id="description" name="description" className="col-span-3" required defaultValue={track.description} />
+                    </div>
+                     {state?.errors?.description && <p className="col-span-4 text-sm text-destructive -mt-2 text-right">{state.errors.description[0]}</p>}
+
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="order" className="text-right">Ordem</Label>
+                        <Input id="order" name="order" type="number" className="col-span-3" defaultValue={track.order} />
+                    </div>
+                     {state?.errors?.order && <p className="col-span-4 text-sm text-destructive -mt-2 text-right">{state.errors.order[0]}</p>}
+
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button type="button" variant="outline">Cancelar</Button>
+                        </DialogClose>
+                        <SubmitButton />
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+
 export function TrackManagementClient({ modules }: TrackManagementClientProps) {
   const { toast } = useToast();
   const [isModuleDialogOpen, setIsModuleDialogOpen] = useState(false);
   const [isTrackDialogOpen, setIsTrackDialogOpen] = useState(false);
+  const [editingTrack, setEditingTrack] = useState<Track | null>(null);
 
-  const handleActionClick = () => {
-    toast({
-      title: "Funcionalidade em desenvolvimento",
-      description: "A edição e exclusão de dados ainda não foram implementadas.",
-    });
+  const handleEditClick = (track: Track) => {
+    setEditingTrack(track);
   };
 
   const handleNewModuleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -84,6 +161,13 @@ export function TrackManagementClient({ modules }: TrackManagementClientProps) {
       description: "Esta funcionalidade ainda está em desenvolvimento. A trilha não foi salva permanentemente.",
     });
     setIsTrackDialogOpen(false);
+  };
+  
+  const handleActionClick = () => {
+    toast({
+      title: "Funcionalidade em desenvolvimento",
+      description: "A exclusão de dados ainda não foi implementada.",
+    });
   };
 
   return (
@@ -199,6 +283,7 @@ export function TrackManagementClient({ modules }: TrackManagementClientProps) {
                                   <Table>
                                       <TableHeader>
                                           <TableRow>
+                                              <TableHead className="w-12">Ordem</TableHead>
                                               <TableHead>Título da Trilha</TableHead>
                                               <TableHead>Nº de Cursos</TableHead>
                                               <TableHead>Prova Final</TableHead>
@@ -206,8 +291,9 @@ export function TrackManagementClient({ modules }: TrackManagementClientProps) {
                                           </TableRow>
                                       </TableHeader>
                                       <TableBody>
-                                          {module.tracks.map(track => (
+                                          {module.tracks.sort((a,b) => (a.order || Infinity) - (b.order || Infinity)).map(track => (
                                               <TableRow key={track.id}>
+                                                  <TableCell className="text-center font-mono text-muted-foreground">{track.order || '-'}</TableCell>
                                                   <TableCell className="font-medium">{track.title}</TableCell>
                                                   <TableCell>{track.courses.length}</TableCell>
                                                   <TableCell>
@@ -259,7 +345,7 @@ export function TrackManagementClient({ modules }: TrackManagementClientProps) {
                                                       )}
                                                   </TableCell>
                                                   <TableCell className="text-right">
-                                                      <Button variant="ghost" size="icon" onClick={handleActionClick}>
+                                                      <Button variant="ghost" size="icon" onClick={() => handleEditClick(track)}>
                                                           <Edit className="h-4 w-4" />
                                                           <span className="sr-only">Editar Trilha</span>
                                                       </Button>
@@ -272,7 +358,7 @@ export function TrackManagementClient({ modules }: TrackManagementClientProps) {
                                           ))}
                                           {module.tracks.length === 0 && (
                                               <TableRow>
-                                                  <TableCell colSpan={4} className="text-center text-muted-foreground py-4">
+                                                  <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
                                                       Nenhuma trilha neste módulo.
                                                   </TableCell>
                                               </TableRow>
@@ -286,6 +372,18 @@ export function TrackManagementClient({ modules }: TrackManagementClientProps) {
               </Accordion>
           </CardContent>
       </Card>
+      
+      {editingTrack && (
+        <EditTrackDialog
+            track={editingTrack}
+            open={!!editingTrack}
+            onOpenChange={(open) => {
+                if (!open) {
+                    setEditingTrack(null);
+                }
+            }}
+        />
+      )}
     </>
   );
 }

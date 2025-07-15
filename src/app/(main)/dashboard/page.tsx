@@ -53,7 +53,7 @@ export default async function DashboardPage() {
 
   // Correctly calculate the number of *valid* completed tracks.
   // A track is only considered completable if it has courses or a quiz.
-  const allTracks = allModules.flatMap(m => m.tracks);
+  const allTracks = allModules.flatMap(m => m.tracks.sort((a,b) => (a.order || 0) - (b.order || 0)));
   const totalCompletableTracks = allTracks.filter(track => track.courses.length > 0 || (track.quiz && track.quiz.questions.length > 0)).length;
 
   const validCompletedTracks = currentUser.completedTracks.filter(trackId => {

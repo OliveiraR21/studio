@@ -1,4 +1,5 @@
 
+
 // In-memory data store
 import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
@@ -83,6 +84,14 @@ export const findCourseById = cache(async (courseId: string): Promise<{ course: 
   }
   return Promise.resolve(null);
 });
+
+// Find a module by its ID.
+export async function findModuleById(moduleId: string): Promise<Module | null> {
+    const modules = await getLearningModules();
+    const module = modules.find(m => m.id === moduleId);
+    return Promise.resolve(module || null);
+}
+
 
 // Find a track by its ID, and include its parent module
 export async function findTrackById(trackId: string): Promise<{ track: Track, module: Module } | null> {
@@ -230,6 +239,29 @@ export async function deleteCourse(courseId: string): Promise<boolean> {
     }
 
     return Promise.resolve(true);
+}
+
+
+// Updates a track in the in-memory store.
+export async function updateTrack(
+  trackId: string,
+  trackData: Partial<Omit<Track, 'id' | 'moduleId'>>
+): Promise<void> {
+  let trackToUpdate: Track | undefined;
+  for (const mod of global.a_modules) {
+    const foundTrack = mod.tracks.find((t) => t.id === trackId);
+    if (foundTrack) {
+      trackToUpdate = foundTrack;
+      break;
+    }
+  }
+
+  if (!trackToUpdate) {
+    throw new Error(`Track with ID ${trackId} not found for update.`);
+  }
+
+  Object.assign(trackToUpdate, trackData);
+  return Promise.resolve();
 }
 
 
