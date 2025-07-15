@@ -154,7 +154,6 @@ export const learningModules: Module[] = [
             moduleId: 'module-integration',
             trackId: 'track-integration-main',
             title: 'Apresentação Cultura Br Supply',
-            order: 1,
             description: 'Uma introdução à cultura, valores e missão da Br Supply.',
             videoUrl: 'https://app.heygen.com/embeds/603bafc3779141ec87c7eb529ce6452d',
             durationInSeconds: 120,
@@ -162,13 +161,13 @@ export const learningModules: Module[] = [
             createdAt: oneYearAgo,
             likes: 12,
             dislikes: 1,
+            order: 1,
           },
           {
             id: 'course-commercial-intro',
             moduleId: 'module-integration',
             trackId: 'track-integration-main',
             title: 'Integração Comercial',
-            order: 2,
             description: 'Visão geral dos processos e estratégias da área comercial.',
             videoUrl: 'https://app.heygen.com/embeds/4a2fc4bc9d834679afa3a4c046731c2a',
             durationInSeconds: 240,
@@ -177,6 +176,7 @@ export const learningModules: Module[] = [
             createdAt: oneYearAgo,
             likes: 15,
             dislikes: 0,
+            order: 2,
           },
         ],
         quiz: { questions: [] }
@@ -209,7 +209,6 @@ export const learningModules: Module[] = [
             moduleId: 'module-hs',
             trackId: 'track-hs-cp',
             title: 'Treinamento Portal | BRS',
-            order: 1,
             description: 'Aprenda a navegar e utilizar o portal BRS para gerenciar o ciclo de pedidos de forma eficiente, desde a criação até o acompanhamento da entrega.',
             videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
             durationInSeconds: 300,
@@ -217,14 +216,14 @@ export const learningModules: Module[] = [
             createdAt: fiveDaysAgo,
             likes: 8,
             dislikes: 0,
-            transcript: 'Bem-vindo ao treinamento do portal BRS. Nesta sessão, vamos explorar como criar um novo pedido. Primeiro, localize o botão "Novo Pedido" no canto superior direito. Ao clicar, você será direcionado para a tela de seleção de produtos. Use a barra de busca para encontrar o item desejado. Adicione a quantidade e clique em "Adicionar ao Carrinho". Repita o processo para todos os itens. Quando terminar, vá para o carrinho para revisar seu pedido. Verifique os itens, quantidades e valores. Se tudo estiver correto, clique em "Finalizar Compra". Na próxima tela, confirme o endereço de entrega e selecione o método de pagamento. Após a confirmação, seu pedido será gerado e você receberá um número de acompanhamento. Você pode visualizar o status do seu pedido a qualquer momento na seção "Meus Pedidos".'
+            transcript: 'Bem-vindo ao treinamento do portal BRS. Nesta sessão, vamos explorar como criar um novo pedido. Primeiro, localize o botão "Novo Pedido" no canto superior direito. Ao clicar, você será direcionado para a tela de seleção de produtos. Use a barra de busca para encontrar o item desejado. Adicione a quantidade e clique em "Adicionar ao Carrinho". Repita o processo para todos os itens. Quando terminar, vá para o carrinho para revisar seu pedido. Verifique os itens, quantidades e valores. Se tudo estiver correto, clique em "Finalizar Compra". Na próxima tela, confirme o endereço de entrega e selecione o método de pagamento. Após a confirmação, seu pedido será gerado e você receberá um número de acompanhamento. Você pode visualizar o status do seu pedido a qualquer momento na seção "Meus Pedidos".',
+            order: 1,
           },
           {
             id: 'course-erp-proprio',
             moduleId: 'module-hs',
             trackId: 'track-hs-cp',
             title: 'ERP Próprio',
-            order: 2,
             description: 'Aprenda sobre o funcionamento e as funcionalidades do nosso ERP interno.',
             videoUrl: "https://app.heygen.com/embeds/4a0496a306f649da864f402150d52ff7",
             durationInSeconds: 450,
@@ -233,6 +232,7 @@ export const learningModules: Module[] = [
             createdAt: today,
             likes: 5,
             dislikes: 2,
+            order: 2,
           },
         ],
         quiz: { questions: [] }
@@ -288,6 +288,24 @@ export const learningModules: Module[] = [
         moduleId: 'module-hs',
         title: 'Margem Bruta (MB)',
         description: 'Entenda como calcular e analisar a margem bruta para a tomada de decisões.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hs-cv',
+        order: 9,
+        moduleId: 'module-hs',
+        title: 'Comunicação Verbal',
+        description: 'Desenvolva suas habilidades de comunicação verbal para apresentações e interações eficazes.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hs-ce',
+        order: 10,
+        moduleId: 'module-hs',
+        title: 'Comunicação Escrita',
+        description: 'Aprimore sua escrita para e-mails, relatórios e outros documentos profissionais.',
         courses: [],
         quiz: { questions: [] }
       },
