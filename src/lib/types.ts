@@ -24,6 +24,7 @@ export interface Course {
   trackId: string;
   title: string;
   description: string;
+  order?: number;
   videoUrl: string;
   durationInSeconds?: number;
   thumbnailUrl?: string;

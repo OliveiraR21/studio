@@ -52,7 +52,9 @@ export default async function MyCoursesPage({
           ...module,
           tracks: module.tracks.map(track => ({
             ...track,
-            courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
+            courses: track.courses
+              .filter(course => userHasCourseAccess(currentUser, course))
+              .sort((a,b) => (a.order || 0) - (b.order || 0)) // Sort courses by order
           })).sort((a,b) => (a.order || 0) - (b.order || 0)) // Sort tracks by order
         }))
       : allModules.map(module => ({
@@ -60,7 +62,9 @@ export default async function MyCoursesPage({
           tracks: module.tracks
             .map(track => ({
               ...track,
-              courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
+              courses: track.courses
+                .filter(course => userHasCourseAccess(currentUser, course))
+                .sort((a,b) => (a.order || 0) - (b.order || 0)) // Sort courses by order
             }))
             .filter(track => track.courses.length > 0) // Hide tracks with no accessible courses
             .sort((a, b) => (a.order || 0) - (b.order || 0)) // Sort tracks by order

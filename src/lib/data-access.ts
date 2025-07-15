@@ -109,7 +109,7 @@ export async function findNextCourseForUser(user: User): Promise<(Course & {trac
 
         for (const track of sortedTracks) {
             // Sort courses by order
-            const sortedCourses = [...track.courses];
+            const sortedCourses = [...track.courses].sort((a, b) => (a.order || 0) - (b.order || 0));
             
             for (const course of sortedCourses) {
                 if (!user.completedCourses.includes(course.id)) {
@@ -157,6 +157,7 @@ export async function createCourse(
         minimumRole: courseData.minimumRole,
         accessAreas: courseData.accessAreas,
         thumbnailUrl: courseData.thumbnailUrl,
+        order: courseData.order,
         likes: 0,
         dislikes: 0,
         createdAt: new Date(),

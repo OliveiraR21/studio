@@ -262,18 +262,33 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
         </div>
       )}
 
-      <div className="space-y-2">
-          <Label htmlFor="title">Título do Curso</Label>
-          <Input
-          id="title"
-          name="title"
-          defaultValue={course?.title}
-          placeholder="Ex: Introdução à Segurança no Trabalho"
-          required
-          />
-          {state.errors?.title && (
-          <p className="text-sm text-destructive">{state.errors.title[0]}</p>
-          )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+            <Label htmlFor="title">Título do Curso</Label>
+            <Input
+            id="title"
+            name="title"
+            defaultValue={course?.title}
+            placeholder="Ex: Introdução à Segurança no Trabalho"
+            required
+            />
+            {state.errors?.title && (
+            <p className="text-sm text-destructive">{state.errors.title[0]}</p>
+            )}
+        </div>
+         <div className="space-y-2">
+            <Label htmlFor="order">Ordem na Trilha</Label>
+            <Input
+              id="order"
+              name="order"
+              type="number"
+              defaultValue={course?.order}
+              placeholder="Ex: 1"
+            />
+            {state.errors?.order && (
+              <p className="text-sm text-destructive">{state.errors.order[0]}</p>
+            )}
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -332,33 +347,35 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
         )}
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="thumbnailUrl">URL da Capa (Opcional)</Label>
-        <Input
-          id="thumbnailUrl"
-          name="thumbnailUrl"
-          type="text"
-          defaultValue={course?.thumbnailUrl || ''}
-          placeholder="/capa.png ou https://exemplo.com/imagem.png"
-        />
-        {state.errors?.thumbnailUrl && (
-          <p className="text-sm text-destructive">{state.errors.thumbnailUrl[0]}</p>
-        )}
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label htmlFor="thumbnailUrl">URL da Capa (Opcional)</Label>
+          <Input
+            id="thumbnailUrl"
+            name="thumbnailUrl"
+            type="text"
+            defaultValue={course?.thumbnailUrl || ''}
+            placeholder="/capa.png ou https://exemplo.com/imagem.png"
+          />
+          {state.errors?.thumbnailUrl && (
+            <p className="text-sm text-destructive">{state.errors.thumbnailUrl[0]}</p>
+          )}
+        </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="duration">Duração (hh:mm:ss)</Label>
-        <p className="text-xs text-muted-foreground">Este campo é preenchido automaticamente para vídeos do YouTube.</p>
-        <Input
-          id="duration"
-          name="duration"
-          type="text"
-          defaultValue={formatSecondsToHHMMSS(course?.durationInSeconds)}
-          placeholder="Ex: 00:05:00"
-        />
-        {state.errors?.duration && (
-          <p className="text-sm text-destructive">{state.errors.duration[0]}</p>
-        )}
+        <div className="space-y-2">
+          <Label htmlFor="duration">Duração (hh:mm:ss)</Label>
+          <p className="text-xs text-muted-foreground">Este campo é preenchido automaticamente para vídeos do YouTube.</p>
+          <Input
+            id="duration"
+            name="duration"
+            type="text"
+            defaultValue={formatSecondsToHHMMSS(course?.durationInSeconds)}
+            placeholder="Ex: 00:05:00"
+          />
+          {state.errors?.duration && (
+            <p className="text-sm text-destructive">{state.errors.duration[0]}</p>
+          )}
+        </div>
       </div>
 
       <Separator />

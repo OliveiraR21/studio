@@ -19,6 +19,10 @@ const courseFormSchema = z.object({
   description: z.string().min(10, 'A descrição precisa ter pelo menos 10 caracteres.'),
   videoUrl: z.string().min(1, "A URL do vídeo ou código de incorporação é obrigatório."),
   thumbnailUrl: z.string().optional(),
+  order: z.preprocess(
+    (val) => (val === '' ? undefined : Number(val)),
+    z.number({ invalid_type_error: 'A ordem deve ser um número.' }).optional()
+  ),
   duration: z.string().optional()
     .refine((val) => {
         if (!val || val.trim() === '') return true; // Allow empty string
@@ -51,6 +55,7 @@ export type CourseFormState = {
     thumbnailUrl?: string[];
     duration?: string[];
     trackId?: string[];
+    order?: string[];
     minimumRole?: string[];
     accessAreas?: string[];
     transcript?: string[];
@@ -81,6 +86,7 @@ export async function saveCourse(
     videoUrl: formData.get('videoUrl'),
     thumbnailUrl: formData.get('thumbnailUrl'),
     duration: formData.get('duration'),
+    order: formData.get('order'),
     trackId: formData.get('trackId') || undefined,
     minimumRole: formData.get('minimumRole'),
     accessAreas: formData.get('accessAreas'),

@@ -80,6 +80,7 @@ export function CourseListClient({ modules }: CourseListClientProps) {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-12">Ordem</TableHead>
             <TableHead>Título do Curso</TableHead>
             <TableHead>Trilha</TableHead>
             <TableHead>Questionário</TableHead>
@@ -88,11 +89,12 @@ export function CourseListClient({ modules }: CourseListClientProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {allCourses.map((course) => {
+          {allCourses.sort((a,b) => (a.order || Infinity) - (b.order || Infinity)).map((course) => {
             const totalVotes = (course.likes || 0) + (course.dislikes || 0);
 
             return (
               <TableRow key={course.id}>
+                <TableCell className="text-center font-mono text-muted-foreground">{course.order || '-'}</TableCell>
                 <TableCell className="font-medium">
                   <Link href={`/courses/${course.id}`} className="hover:underline">
                     {course.title}
