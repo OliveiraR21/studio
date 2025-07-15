@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, use } from "react";
 import { findCourseById, getLearningModules, getUsers } from "@/lib/data-access";
 import { CourseForm } from "@/components/admin/course-form";
 import { notFound } from "next/navigation";
@@ -15,8 +15,8 @@ import type { Course, Module, User } from "@/lib/types";
 import { QuizViewer } from "@/components/admin/quiz-viewer";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function EditCoursePage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function EditCoursePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const isNew = id === 'new';
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
