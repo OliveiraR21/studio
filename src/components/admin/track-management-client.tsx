@@ -75,7 +75,11 @@ function EditTrackDialog({ track, open, onOpenChange }: EditTrackDialogProps) {
         if (state.success) {
             toast({ title: 'Sucesso!', description: state.message });
             onOpenChange(false); // Close dialog on success
-        } else if (state.message) {
+        } else if (state.message && state.errors && Object.keys(state.errors).length > 0) {
+            // Toast for validation errors is now optional as they appear in the form.
+            // You can re-enable this if you want both.
+        }
+         else if (state.message) {
             toast({ variant: 'destructive', title: 'Erro', description: state.message });
         }
     }, [state, toast, onOpenChange]);
@@ -92,28 +96,29 @@ function EditTrackDialog({ track, open, onOpenChange }: EditTrackDialogProps) {
                         Altere os detalhes da trilha e a sua ordem de exibição no módulo.
                     </DialogDescription>
                 </DialogHeader>
-                 <form key={formKey} action={dispatch} className="grid gap-4 py-4">
+                 <form key={formKey} action={dispatch} className="space-y-4 py-4">
                     <input type="hidden" name="id" value={track.id} />
                     <input type="hidden" name="moduleId" value={track.moduleId} />
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="title" className="text-right">Título</Label>
-                        <Input id="title" name="title" className="col-span-3" required defaultValue={track.title} />
-                    </div>
-                    {state?.errors?.title && <p className="col-span-4 text-sm text-destructive -mt-2 text-right">{state.errors.title[0]}</p>}
                     
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="description" className="text-right">Descrição</Label>
-                        <Textarea id="description" name="description" className="col-span-3" required defaultValue={track.description} />
+                    <div className="space-y-2">
+                        <Label htmlFor="title">Título</Label>
+                        <Input id="title" name="title" required defaultValue={track.title} />
+                        {state?.errors?.title && <p className="text-sm text-destructive">{state.errors.title[0]}</p>}
                     </div>
-                     {state?.errors?.description && <p className="col-span-4 text-sm text-destructive -mt-2 text-right">{state.errors.description[0]}</p>}
-
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="order" className="text-right">Ordem</Label>
-                        <Input id="order" name="order" type="number" className="col-span-3" defaultValue={track.order} />
+                    
+                    <div className="space-y-2">
+                        <Label htmlFor="description">Descrição</Label>
+                        <Textarea id="description" name="description" required defaultValue={track.description} />
+                        {state?.errors?.description && <p className="text-sm text-destructive">{state.errors.description[0]}</p>}
                     </div>
-                     {state?.errors?.order && <p className="col-span-4 text-sm text-destructive -mt-2 text-right">{state.errors.order[0]}</p>}
 
-                    <DialogFooter>
+                    <div className="space-y-2">
+                        <Label htmlFor="order">Ordem</Label>
+                        <Input id="order" name="order" type="number" defaultValue={track.order} />
+                        {state?.errors?.order && <p className="text-sm text-destructive">{state.errors.order[0]}</p>}
+                    </div>
+
+                    <DialogFooter className="pt-4">
                         <DialogClose asChild>
                             <Button type="button" variant="outline">Cancelar</Button>
                         </DialogClose>
