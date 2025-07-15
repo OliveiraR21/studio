@@ -4,7 +4,7 @@
 import { z } from 'zod';
 import { createCourse, updateCourse, findCourseById, getUserById, updateUser, deleteCourse } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
-import type { Course, Quiz, UserRole } from '@/lib/types';
+import type { Course, Quiz, UserRole, CourseVersion } from '@/lib/types';
 import { getSimulatedUserId } from '@/lib/auth';
 
 // Helper to extract src from iframe
@@ -30,6 +30,10 @@ const courseFormSchema = z.object({
         return parts[1] < 60 && parts[2] < 60;
     }, { message: "Minutos e segundos devem ser menores que 60." }),
   trackId: z.string().optional(),
+  order: z.preprocess(
+    (a) => parseInt(z.string().parse(a), 10),
+    z.number().min(0, 'A ordem deve ser um número positivo.')
+  ).optional(),
   minimumRole: z.enum(['', 'none', 'Assistente', 'Analista', 'Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin']).optional(),
   accessAreas: z.string().optional(),
   transcript: z.string().optional(), // Added for YouTube transcript
@@ -51,6 +55,7 @@ export type CourseFormState = {
     thumbnailUrl?: string[];
     duration?: string[];
     trackId?: string[];
+    order?: string[];
     minimumRole?: string[];
     accessAreas?: string[];
     transcript?: string[];
@@ -82,6 +87,7 @@ export async function saveCourse(
     thumbnailUrl: formData.get('thumbnailUrl'),
     duration: formData.get('duration'),
     trackId: formData.get('trackId') || undefined,
+    order: formData.get('order') || '0',
     minimumRole: formData.get('minimumRole'),
     accessAreas: formData.get('accessAreas'),
     transcript: formData.get('transcript') || undefined,
@@ -97,7 +103,7 @@ export async function saveCourse(
     };
   }
 
-  const { id, trackId, duration, videoUrl: videoUrlOrEmbed, minimumRole, accessAreas, ...courseDetails } = validatedFields.data;
+  const { id, trackId, duration, videoUrl: videoUrlOrEmbed, order, minimumRole, accessAreas, ...courseDetails } = validatedFields.data;
 
   let finalVideoUrl: string;
   const trimmedInput = (videoUrlOrEmbed || '').trim();
@@ -126,22 +132,27 @@ export async function saveCourse(
   }
 
 
-  const courseData = {
+  const courseData: Omit<Course, 'id' | 'moduleId' | 'trackId' | 'createdAt' | 'versions' | 'currentVersion' | 'voters'> = {
     ...courseDetails,
-    videoUrl: urlValidationResult.data, // Use validated and cleaned URL
-    durationInSeconds: timeStringToSeconds(duration),
+    order: order || 0,
     minimumRole: minimumRole && minimumRole !== '' && minimumRole !== 'none' ? (minimumRole as UserRole) : undefined,
     accessAreas: accessAreas ? accessAreas.split(',').map(a => a.trim()).filter(Boolean) : undefined,
   };
+  
+  const versionData: Omit<CourseVersion, 'version' | 'createdAt'> = {
+     videoUrl: urlValidationResult.data,
+     durationInSeconds: timeStringToSeconds(duration),
+     transcript: courseDetails.transcript,
+  }
 
 
   try {
     if (id) {
       // For updates, we don't change the trackId, so it's not passed.
-      await updateCourse(id, courseData);
+      await updateCourse(id, courseData, versionData);
     } else {
       // The schema refinement ensures trackId is present for new courses.
-      await createCourse({ trackId: trackId!, ...courseData });
+      await createCourse({ trackId: trackId!, ...courseData }, versionData);
     }
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
@@ -162,7 +173,25 @@ export async function saveQuiz(courseId: string, quiz: Quiz): Promise<{ success:
   }
   
   try {
-    await updateCourse(courseId, { quiz });
+    const course = await findCourseById(courseId);
+    if (!course) {
+      throw new Error(`Curso com ID ${courseId} não encontrado.`);
+    }
+
+    const currentVersion = course.course.versions.find(v => v.version === course.course.currentVersion);
+    if (!currentVersion) {
+        throw new Error(`Versão atual do curso não encontrada.`);
+    }
+
+    const updatedVersion: CourseVersion = {
+        ...currentVersion,
+        quiz,
+    };
+
+    const newVersions = course.course.versions.map(v => v.version === course.course.currentVersion ? updatedVersion : v);
+
+    await updateCourse(courseId, {}, {}, newVersions);
+
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
     return { success: false, message: `Falha ao salvar o questionário: ${errorMessage}` };
@@ -214,7 +243,7 @@ export async function recordCourseFeedback(
   const updateData = { likes: currentLikes, dislikes: currentDislikes };
 
   try {
-    await updateCourse(courseId, updateData);
+    await updateCourse(courseId, updateData, {});
     if (newFeedback === 'dislike' && feedbackText && feedbackText.trim() !== '') {
         console.log(`\n[Feedback Recebido] Curso ID: ${courseId}`);
         console.log(`Motivo: "${feedbackText}"\n`);
@@ -255,7 +284,7 @@ export async function completeCourseForUser(
         let voters = course.course.voters || [];
         if (!voters.includes(userId)) {
             voters.push(userId);
-            await updateCourse(courseId, { voters });
+            await updateCourse(courseId, { voters }, {});
         }
     }
 

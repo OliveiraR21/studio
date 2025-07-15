@@ -53,7 +53,7 @@ function SubmitButton({ isNew }: { isNew: boolean }) {
   return (
     <Button type="submit" disabled={pending}>
       {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      {isNew ? 'Criar Curso' : 'Salvar Alterações'}
+      {isNew ? 'Criar Curso' : 'Salvar Nova Versão'}
     </Button>
   );
 }
@@ -75,6 +75,9 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
   const isNew = course === null;
   const router = useRouter();
   const { toast } = useToast();
+  
+  const currentVersionDetails = course?.versions.find(v => v.version === course.currentVersion);
+
 
   const initialState = { message: '', errors: {}, success: false };
   const [state, dispatch] = useActionState(saveCourse, initialState);
@@ -262,18 +265,34 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
         </div>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor="title">Título do Curso</Label>
-        <Input
-          id="title"
-          name="title"
-          defaultValue={course?.title}
-          placeholder="Ex: Introdução à Segurança no Trabalho"
-          required
-        />
-        {state.errors?.title && (
-          <p className="text-sm text-destructive">{state.errors.title[0]}</p>
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+            <Label htmlFor="title">Título do Curso</Label>
+            <Input
+            id="title"
+            name="title"
+            defaultValue={course?.title}
+            placeholder="Ex: Introdução à Segurança no Trabalho"
+            required
+            />
+            {state.errors?.title && (
+            <p className="text-sm text-destructive">{state.errors.title[0]}</p>
+            )}
+        </div>
+        <div className="space-y-2">
+            <Label htmlFor="order">Ordem na Trilha</Label>
+            <Input
+                id="order"
+                name="order"
+                type="number"
+                defaultValue={course?.order ?? 0}
+                placeholder="0"
+                required
+            />
+            {state.errors?.order && (
+                <p className="text-sm text-destructive">{state.errors.order[0]}</p>
+            )}
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -299,7 +318,7 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
           <Textarea
             id="videoUrl"
             name="videoUrl"
-            defaultValue={course?.videoUrl || ''}
+            defaultValue={currentVersionDetails?.videoUrl || ''}
             placeholder="Cole a URL do YouTube para preencher automaticamente os campos, ou a URL/código de outra plataforma."
             required
             rows={4}
@@ -353,7 +372,7 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
           id="duration"
           name="duration"
           type="text"
-          defaultValue={formatSecondsToHHMMSS(course?.durationInSeconds)}
+          defaultValue={formatSecondsToHHMMSS(currentVersionDetails?.durationInSeconds)}
           placeholder="Ex: 00:05:00"
         />
         {state.errors?.duration && (

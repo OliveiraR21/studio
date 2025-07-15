@@ -12,9 +12,10 @@ export interface Track {
   moduleId: string;
   title: string;
   description: string;
+  order?: number;
   courses: Course[];
-  // Every track must have a final quiz.
-  quiz: Quiz;
+  // Every track can have a final quiz.
+  quiz?: Quiz;
 }
 
 export interface Course {
@@ -23,19 +24,28 @@ export interface Course {
   trackId: string;
   title: string;
   description: string;
-  videoUrl: string;
+  order: number;
   thumbnailUrl?: string;
-  durationInSeconds?: number;
   createdAt: Date;
-  // A course can optionally have a quiz.
-  quiz?: Quiz;
   likes?: number;
   dislikes?: number;
   voters?: string[]; // list of user IDs who have voted, for simulation
   // Access control fields
   minimumRole?: UserRole;
   accessAreas?: string[];
+  
+  // Versioning
+  versions: CourseVersion[];
+  currentVersion: number;
+}
+
+export interface CourseVersion {
+  version: number;
+  createdAt: Date;
+  videoUrl: string;
+  durationInSeconds?: number;
   transcript?: string; // For YouTube video transcript
+  quiz?: Quiz;
 }
 
 export interface Quiz {

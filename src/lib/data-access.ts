@@ -1,6 +1,6 @@
 
 // In-memory data store
-import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats } from './types';
+import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, CourseVersion, Quiz } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
 import { userHasCourseAccess } from './access-control';
 import { differenceInDays } from 'date-fns';
@@ -71,7 +71,7 @@ export async function findUserByEmail(email: string): Promise<User | null> {
 
 
 // Find a course by its ID, and include its parent module and track.
-export async function findCourseById(courseId: string): Promise<{ course: Course, track: Track, module: Module } | null> {
+export const findCourseById = cache(async (courseId: string): Promise<{ course: Course, track: Track, module: Module } | null> => {
   const modules = await getLearningModules();
   for (const module of modules) {
     for (const track of module.tracks) {
@@ -82,7 +82,7 @@ export async function findCourseById(courseId: string): Promise<{ course: Course
     }
   }
   return Promise.resolve(null);
-}
+});
 
 
 // Find a course and its parent track by the course ID
@@ -104,8 +104,14 @@ export async function findCourseByIdWithTrack(courseId: string): Promise<{ cours
 export async function findNextCourseForUser(user: User): Promise<(Course & {trackId: string}) | null> {
     const modules = await getLearningModules();
     for (const module of modules) {
-        for (const track of module.tracks) {
-            for (const course of track.courses) {
+        // Sort tracks by order if available
+        const sortedTracks = [...module.tracks].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+        for (const track of sortedTracks) {
+            // Sort courses by order
+            const sortedCourses = [...track.courses].sort((a, b) => a.order - b.order);
+            
+            for (const course of sortedCourses) {
                 if (!user.completedCourses.includes(course.id)) {
                     // Check for access control using the hierarchical helper
                     if (userHasCourseAccess(user, course)) {
@@ -121,7 +127,10 @@ export async function findNextCourseForUser(user: User): Promise<(Course & {trac
 // --- Mutation Functions ---
 
 // Creates a course in the in-memory store.
-export async function createCourse(courseData: { trackId: string; title: string; description: string; videoUrl: string; thumbnailUrl?: string; durationInSeconds?: number; minimumRole?: UserRole; accessAreas?: string[]; transcript?: string; }): Promise<Course> {
+export async function createCourse(
+    courseData: Omit<Course, 'id' | 'moduleId' | 'trackId' | 'createdAt' | 'versions' | 'currentVersion'> & { trackId: string },
+    versionData: Omit<CourseVersion, 'version' | 'createdAt'>
+): Promise<Course> {
     let parentModule: Module | undefined;
     let parentTrack: Track | undefined;
 
@@ -138,40 +147,91 @@ export async function createCourse(courseData: { trackId: string; title: string;
         throw new Error(`Track with ID ${courseData.trackId} not found.`);
     }
 
+    const firstVersion: CourseVersion = {
+        ...versionData,
+        version: 1,
+        createdAt: new Date(),
+    };
+
     const newCourse: Course = {
         id: `course-${Date.now()}-${Math.random()}`,
         moduleId: parentModule.id,
+        trackId: courseData.trackId,
+        title: courseData.title,
+        description: courseData.description,
+        order: courseData.order,
+        minimumRole: courseData.minimumRole,
+        accessAreas: courseData.accessAreas,
+        thumbnailUrl: courseData.thumbnailUrl,
         likes: 0,
         dislikes: 0,
         createdAt: new Date(),
-        ...courseData,
+        versions: [firstVersion],
+        currentVersion: 1,
     };
+
     parentTrack.courses.push(newCourse);
     return Promise.resolve(newCourse);
 }
 
 // Updates a course in the in-memory store.
-export async function updateCourse(courseId: string, courseData: Partial<Omit<Course, 'id' | 'trackId' | 'moduleId'>>): Promise<void> {
+export async function updateCourse(
+    courseId: string, 
+    courseData: Partial<Omit<Course, 'id' | 'trackId' | 'moduleId' | 'versions' | 'currentVersion'>>,
+    newVersionData: Partial<Omit<CourseVersion, 'version' | 'createdAt' | 'quiz'>>,
+    replaceVersions?: CourseVersion[] // For quiz updates
+): Promise<void> {
     let courseToUpdate: Course | undefined;
+    let trackRef: Track | undefined;
+
     for (const mod of global.a_modules) {
         for (const track of mod.tracks) {
             const courseIndex = track.courses.findIndex(c => c.id === courseId);
             if (courseIndex !== -1) {
-                // Update the course in place to ensure the global store is modified
-                track.courses[courseIndex] = { ...track.courses[courseIndex], ...courseData };
                 courseToUpdate = track.courses[courseIndex];
+                trackRef = track;
                 break;
             }
         }
         if (courseToUpdate) break;
     }
 
-    if (!courseToUpdate) {
+    if (!courseToUpdate || !trackRef) {
         throw new Error(`Course with ID ${courseId} not found for update.`);
     }
 
+    // Update base course properties
+    Object.assign(courseToUpdate, courseData);
+
+    // If a quiz update is happening, just replace the versions array
+    if (replaceVersions) {
+        courseToUpdate.versions = replaceVersions;
+        return Promise.resolve();
+    }
+    
+    const hasVersionData = Object.keys(newVersionData).length > 0;
+
+    if (hasVersionData) {
+        const nextVersionNumber = courseToUpdate.currentVersion + 1;
+        
+        const lastVersion = courseToUpdate.versions.find(v => v.version === courseToUpdate.currentVersion);
+
+        const newVersion: CourseVersion = {
+            version: nextVersionNumber,
+            createdAt: new Date(),
+            videoUrl: newVersionData.videoUrl || lastVersion?.videoUrl || '',
+            durationInSeconds: newVersionData.durationInSeconds ?? lastVersion?.durationInSeconds,
+            transcript: newVersionData.transcript ?? lastVersion?.transcript,
+            quiz: lastVersion?.quiz, // Carry over quiz from last version by default
+        };
+
+        courseToUpdate.versions.push(newVersion);
+        courseToUpdate.currentVersion = nextVersionNumber;
+    }
+    
     return Promise.resolve();
 }
+
 
 // Deletes a course from the in-memory store.
 export async function deleteCourse(courseId: string): Promise<boolean> {
@@ -293,8 +353,9 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
   allModules.forEach(module => {
     module.tracks.forEach(track => {
       track.courses.forEach(course => {
-        if (course.quiz && course.quiz.questions.length > 0) {
-          course.quiz.questions.forEach(question => {
+        const currentVersion = course.versions.find(v => v.version === course.currentVersion);
+        if (currentVersion?.quiz && currentVersion.quiz.questions.length > 0) {
+          currentVersion.quiz.questions.forEach(question => {
             allQuestions.push({ question, course });
           });
         }

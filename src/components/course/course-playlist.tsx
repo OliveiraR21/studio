@@ -85,10 +85,13 @@ export function CoursePlaylist({ allModules, currentUser, currentCourseId, curre
                                     <div className="flex flex-col gap-1">
                                         {track.courses
                                             .filter(course => userHasCourseAccess(currentUser, course))
+                                            .sort((a, b) => a.order - b.order)
                                             .map((course, index) => {
                                                 const unlocked = isCourseUnlocked(course, track, index);
                                                 const completed = isCourseCompleted(course.id);
                                                 const isCurrent = course.id === currentCourseId;
+                                                const currentVersion = course.versions.find(v => v.version === course.currentVersion);
+
 
                                                 const statusIcon = isCurrent ? <Play className="h-4 w-4 text-primary" /> :
                                                                   completed ? <CheckCircle className="h-4 w-4 text-green-500" /> :
@@ -115,7 +118,7 @@ export function CoursePlaylist({ allModules, currentUser, currentCourseId, curre
                                                                 {course.title}
                                                             </p>
                                                             <p className="text-xs text-muted-foreground">
-                                                                {Math.round((course.durationInSeconds || 0) / 60)} min
+                                                                {Math.round((currentVersion?.durationInSeconds || 0) / 60)} min
                                                             </p>
                                                         </div>
                                                     </Link>

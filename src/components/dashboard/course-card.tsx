@@ -1,4 +1,5 @@
 
+
 import Link from "next/link";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,8 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps) {
+  const currentVersion = course.versions.find(v => v.version === course.currentVersion);
+  
   const CardContentComponent = (
     <Card 
       className={`overflow-hidden h-full flex flex-col transition-all duration-300 ease-in-out group ${!isUnlocked ? 'bg-muted/60' : 'hover:shadow-lg hover:shadow-primary/20 hover:border-primary/50'}`}
@@ -55,7 +58,7 @@ export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps)
       </CardContent>
       <CardFooter className="p-4 pt-0">
          <div className="flex justify-between items-center w-full">
-            {course.quiz ? <Badge variant="outline">Prova</Badge> : <div />}
+            {currentVersion?.quiz ? <Badge variant="outline">Prova</Badge> : <div />}
             {isUnlocked ? (
                  <span className="text-xs font-semibold text-primary flex items-center gap-1">
                     <Play className="h-3 w-3"/>

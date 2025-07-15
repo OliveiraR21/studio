@@ -1,4 +1,5 @@
 
+
 import { findCourseById, getLearningModules, getUsers } from "@/lib/data-access";
 import { CourseForm } from "@/components/admin/course-form";
 import { notFound } from "next/navigation";
@@ -23,6 +24,8 @@ export default async function EditCoursePage({ params }: { params: { id: string 
     }
     course = result.course;
   }
+  
+  const currentVersion = course?.versions.find(v => v.version === course.currentVersion);
 
   return (
     <div className="container mx-auto space-y-6">
@@ -40,7 +43,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
           <CardDescription>
             {isNew 
               ? 'Preencha os detalhes abaixo para adicionar um novo curso à plataforma.' 
-              : `Você está editando o curso: "${course?.title}".`}
+              : `Você está editando o curso: "${course?.title}". Salvar criará a versão ${course!.currentVersion + 1}.`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -48,8 +51,8 @@ export default async function EditCoursePage({ params }: { params: { id: string 
         </CardContent>
       </Card>
 
-      {!isNew && course?.quiz && (
-        <QuizViewer quiz={course.quiz} courseTitle={course.title!} />
+      {!isNew && currentVersion?.quiz && (
+        <QuizViewer quiz={currentVersion.quiz} courseTitle={course!.title!} />
       )}
 
       {!isNew && course && (
@@ -57,8 +60,8 @@ export default async function EditCoursePage({ params }: { params: { id: string 
             courseId={course.id}
             title={course.title}
             description={course.description}
-            hasExistingQuiz={!!course.quiz}
-            transcript={course.transcript}
+            hasExistingQuiz={!!currentVersion?.quiz}
+            transcript={currentVersion?.transcript}
         />
       )}
     </div>

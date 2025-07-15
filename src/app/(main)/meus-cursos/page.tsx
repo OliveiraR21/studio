@@ -1,4 +1,5 @@
 
+
 import { getLearningModules, findNextCourseForUser } from "@/lib/data-access";
 import { 
   Tabs, 
@@ -52,7 +53,7 @@ export default async function MyCoursesPage({
           tracks: module.tracks.map(track => ({
             ...track,
             courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
-          }))
+          })).sort((a,b) => (a.order || 0) - (b.order || 0)) // Sort tracks by order
         }))
       : allModules.map(module => ({
           ...module,
@@ -62,6 +63,7 @@ export default async function MyCoursesPage({
               courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
             }))
             .filter(track => track.courses.length > 0) // Hide tracks with no accessible courses
+            .sort((a, b) => (a.order || 0) - (b.order || 0)) // Sort tracks by order
         })).filter(module => module.tracks.length > 0); // Hide modules with no accessible tracks
 
 
@@ -91,10 +93,11 @@ export default async function MyCoursesPage({
     return (completedCount / track.courses.length) * 100;
   }
 
-  const isCourseUnlocked = (course: Course, isParentTrackUnlocked: boolean, previousCourse?: Course) => {
+  const isCourseUnlocked = (course: Course, sortedCourses: Course[], isParentTrackUnlocked: boolean, courseIndex: number) => {
     if (!isParentTrackUnlocked) return false;
-    if (!previousCourse) return true; // First course in a track is unlocked if the track is.
+    if (courseIndex === 0) return true; // First course in a track is unlocked if the track is.
     
+    const previousCourse = sortedCourses[courseIndex - 1];
     // The single source of truth is whether the previous course is in the completed list.
     return isCourseCompleted(previousCourse.id);
   }
@@ -153,6 +156,8 @@ export default async function MyCoursesPage({
                  const hasQuiz = track.quiz && track.quiz.questions.length > 0;
                  const isCompletedEmptyTrack = trackCompleted && track.courses.length === 0 && !hasQuiz;
                  const Icon = moduleIcons[module.id] || ClipboardList;
+                 
+                 const sortedCourses = [...track.courses].sort((a,b) => a.order - b.order);
 
                  return (
                   <Card key={track.id} className={!unlocked ? 'bg-muted/50' : ''}>
@@ -165,7 +170,7 @@ export default async function MyCoursesPage({
                             ) : trackCompleted ? (
                                <CheckCircle className="h-8 w-8 text-green-500" />
                             ) : unlocked ? (
-                              <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg flex-shrink-0">{trackIndex + 1}</div>
+                              <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg flex-shrink-0">{track.order || trackIndex + 1}</div>
                             ) : (
                               <Lock className="h-8 w-8 text-muted-foreground" />
                             )}
@@ -188,9 +193,8 @@ export default async function MyCoursesPage({
                             <>
                               <h4 className="text-md font-semibold mb-4">Cursos da Trilha</h4>
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                                {track.courses.map((course, courseIndex) => {
-                                    const previousCourse = courseIndex > 0 ? track.courses[courseIndex - 1] : undefined;
-                                    const courseUnlocked = isCourseUnlocked(course, unlocked, previousCourse);
+                                {sortedCourses.map((course, courseIndex) => {
+                                    const courseUnlocked = isCourseUnlocked(course, sortedCourses, unlocked, courseIndex);
                                     const completed = isCourseCompleted(course.id);
                                     
                                     return (

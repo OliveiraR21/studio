@@ -30,8 +30,11 @@ interface CoursePageClientProps {
 export function CoursePageClient({ course, track, isAlreadyCompleted, initialFeedback, allModules, currentUser }: CoursePageClientProps) {
   const router = useRouter();
   const { toast } = useToast();
+  
+  const currentVersion = course.versions.find(v => v.version === course.currentVersion);
+  const courseQuiz = currentVersion?.quiz;
 
-  const [view, setView] = useState<'video' | 'quiz'>(course.quiz ? 'video' : 'video');
+  const [view, setView] = useState<'video' | 'quiz'>(courseQuiz ? 'video' : 'video');
   const [quizFinished, setQuizFinished] = useState(false);
   const [lastScore, setLastScore] = useState<number | null>(null);
   
@@ -43,7 +46,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
   const [dislikes, setDislikes] = useState(course.dislikes || 0);
   const [isLiking, setIsLiking] = useState(false);
 
-  if (!course || !track) {
+  if (!course || !track || !currentVersion) {
     notFound();
   }
   
@@ -147,7 +150,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
     setQuizFinished(false);
   }
 
-  const courseHasQuiz = !!course.quiz;
+  const courseHasQuiz = !!courseQuiz;
   // The complete button should only show if the course is not quiz-based AND is not already completed.
   const showCompleteButton = !courseHasQuiz && completionStep === 'in_progress' && !isAlreadyCompleted;
   const showFinalizeButton = courseHasQuiz && quizFinished && completionStep === 'in_progress' && !isAlreadyCompleted;
@@ -204,7 +207,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
             {completionStep === 'in_progress' && (
               <>
                 {view === 'video' && lastScore === null && (
-                    <CoursePlayer videoUrl={course.videoUrl} title={course.title} />
+                    <CoursePlayer videoUrl={currentVersion.videoUrl} title={course.title} />
                 )}
                 
                 {view === 'video' && lastScore !== null && (
@@ -232,7 +235,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
                   )
                 )}
 
-                {view === 'quiz' && course.quiz && (
+                {view === 'quiz' && courseQuiz && (
                     <Card>
                         <CardHeader>
                             <CardTitle>Hora do Questionário!</CardTitle>
@@ -241,7 +244,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <QuizComponent quiz={course.quiz} onQuizComplete={handleQuizComplete} />
+                            <QuizComponent quiz={courseQuiz} onQuizComplete={handleQuizComplete} />
                         </CardContent>
                     </Card>
                 )}
@@ -275,10 +278,10 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
             )}
 
             {completionStep === 'completed' && (
-              <CoursePlayer videoUrl={course.videoUrl} title={course.title} />
+              <CoursePlayer videoUrl={currentVersion.videoUrl} title={course.title} />
             )}
             
-            {course.quiz ? (
+            {courseQuiz ? (
                 <div className="flex justify-center gap-4">
                     <Button 
                         className="w-full" 

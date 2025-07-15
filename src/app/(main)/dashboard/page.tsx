@@ -1,4 +1,5 @@
 
+
 import { getLearningModules, findCourseById, findNextCourseForUser, getUsers } from "@/lib/data-access";
 import { 
   Card, 
@@ -97,9 +98,18 @@ export default async function DashboardPage() {
   const nextCourse = await findNextCourseForUser(currentUser);
 
   // Calculate training hours based on accessible courses
-  const totalDuration = accessibleCourses.reduce((acc, course) => acc + (course.durationInSeconds || 0), 0);
+  const totalDuration = accessibleCourses.reduce((acc, course) => {
+    const currentVersion = course.versions.find(v => v.version === course.currentVersion);
+    return acc + (currentVersion?.durationInSeconds || 0);
+  }, 0);
+  
   const completedCourses = accessibleCourses.filter(course => currentUser.completedCourses.includes(course.id));
-  const completedDuration = completedCourses.reduce((acc, course) => acc + (course.durationInSeconds || 0), 0);
+  
+  const completedDuration = completedCourses.reduce((acc, course) => {
+      const currentVersion = course.versions.find(v => v.version === course.currentVersion);
+      return acc + (currentVersion?.durationInSeconds || 0);
+  }, 0);
+
   const pendingDuration = totalDuration - completedDuration;
 
   const completedTimePercentage = totalDuration > 0 ? Math.round((completedDuration / totalDuration) * 100) : 0;
