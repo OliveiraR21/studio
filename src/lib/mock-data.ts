@@ -155,18 +155,12 @@ export const learningModules: Module[] = [
             trackId: 'track-integration-main',
             title: 'Apresentação Cultura Br Supply',
             description: 'Uma introdução à cultura, valores e missão da Br Supply.',
-            order: 1,
+            videoUrl: 'https://app.heygen.com/embeds/603bafc3779141ec87c7eb529ce6452d',
+            durationInSeconds: 120,
             thumbnailUrl: '/br-supply-logo.png',
             createdAt: oneYearAgo,
             likes: 12,
             dislikes: 1,
-            currentVersion: 1,
-            versions: [{
-                version: 1,
-                createdAt: oneYearAgo,
-                videoUrl: 'https://app.heygen.com/embeds/603bafc3779141ec87c7eb529ce6452d',
-                durationInSeconds: 120,
-            }]
           },
           {
             id: 'course-commercial-intro',
@@ -174,19 +168,13 @@ export const learningModules: Module[] = [
             trackId: 'track-integration-main',
             title: 'Integração Comercial',
             description: 'Visão geral dos processos e estratégias da área comercial.',
-            order: 2,
+            videoUrl: 'https://app.heygen.com/embeds/4a2fc4bc9d834679afa3a4c046731c2a',
+            durationInSeconds: 240,
             thumbnailUrl: '/br-supply-logo.png',
             accessAreas: ['Comercial', 'Logística'],
             createdAt: oneYearAgo,
             likes: 15,
             dislikes: 0,
-            currentVersion: 1,
-            versions: [{
-                version: 1,
-                createdAt: oneYearAgo,
-                videoUrl: 'https://app.heygen.com/embeds/4a2fc4bc9d834679afa3a4c046731c2a',
-                durationInSeconds: 240,
-            }]
           },
         ],
         quiz: { questions: [] }
@@ -220,19 +208,13 @@ export const learningModules: Module[] = [
             trackId: 'track-hs-cp',
             title: 'Treinamento Portal | BRS',
             description: 'Aprenda a navegar e utilizar o portal BRS para gerenciar o ciclo de pedidos de forma eficiente, desde a criação até o acompanhamento da entrega.',
-            order: 1,
+            videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
+            durationInSeconds: 300,
             thumbnailUrl: '/br-supply-logo.png',
             createdAt: fiveDaysAgo,
             likes: 8,
             dislikes: 0,
-            currentVersion: 1,
-            versions: [{
-                version: 1,
-                createdAt: fiveDaysAgo,
-                videoUrl: 'https://app.heygen.com/embeds/bd56c8797da44842a812774797b10fbd',
-                durationInSeconds: 300,
-                transcript: 'Bem-vindo ao treinamento do portal BRS. Nesta sessão, vamos explorar como criar um novo pedido. Primeiro, localize o botão "Novo Pedido" no canto superior direito. Ao clicar, você será direcionado para a tela de seleção de produtos. Use a barra de busca para encontrar o item desejado. Adicione a quantidade e clique em "Adicionar ao Carrinho". Repita o processo para todos os itens. Quando terminar, vá para o carrinho para revisar seu pedido. Verifique os itens, quantidades e valores. Se tudo estiver correto, clique em "Finalizar Compra". Na próxima tela, confirme o endereço de entrega e selecione o método de pagamento. Após a confirmação, seu pedido será gerado e você receberá um número de acompanhamento. Você pode visualizar o status do seu pedido a qualquer momento na seção "Meus Pedidos".'
-            }]
+            transcript: 'Bem-vindo ao treinamento do portal BRS. Nesta sessão, vamos explorar como criar um novo pedido. Primeiro, localize o botão "Novo Pedido" no canto superior direito. Ao clicar, você será direcionado para a tela de seleção de produtos. Use a barra de busca para encontrar o item desejado. Adicione a quantidade e clique em "Adicionar ao Carrinho". Repita o processo para todos os itens. Quando terminar, vá para o carrinho para revisar seu pedido. Verifique os itens, quantidades e valores. Se tudo estiver correto, clique em "Finalizar Compra". Na próxima tela, confirme o endereço de entrega e selecione o método de pagamento. Após a confirmação, seu pedido será gerado e você receberá um número de acompanhamento. Você pode visualizar o status do seu pedido a qualquer momento na seção "Meus Pedidos".'
           },
           {
             id: 'course-erp-proprio',
@@ -240,19 +222,13 @@ export const learningModules: Module[] = [
             trackId: 'track-hs-cp',
             title: 'ERP Próprio',
             description: 'Aprenda sobre o funcionamento e as funcionalidades do nosso ERP interno.',
-            order: 2,
+            videoUrl: "https://app.heygen.com/embeds/4a0496a306f649da864f402150d52ff7",
+            durationInSeconds: 450,
             thumbnailUrl: '/br-supply-logo.png',
             minimumRole: 'Supervisor',
             createdAt: today,
             likes: 5,
             dislikes: 2,
-            currentVersion: 1,
-            versions: [{
-                version: 1,
-                createdAt: today,
-                videoUrl: "https://app.heygen.com/embeds/4a0496a306f649da864f402150d52ff7",
-                durationInSeconds: 450
-            }]
           },
         ],
         quiz: { questions: [] }

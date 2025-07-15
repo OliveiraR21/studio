@@ -25,8 +25,6 @@ export default async function EditCoursePage({ params }: { params: { id: string 
     course = result.course;
   }
   
-  const currentVersion = course?.versions.find(v => v.version === course.currentVersion);
-
   return (
     <div className="container mx-auto space-y-6">
       <div className="mb-6">
@@ -43,7 +41,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
           <CardDescription>
             {isNew 
               ? 'Preencha os detalhes abaixo para adicionar um novo curso à plataforma.' 
-              : `Você está editando o curso: "${course?.title}". Salvar criará a versão ${course!.currentVersion + 1}.`}
+              : `Você está editando o curso: "${course?.title}".`}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -51,8 +49,8 @@ export default async function EditCoursePage({ params }: { params: { id: string 
         </CardContent>
       </Card>
 
-      {!isNew && currentVersion?.quiz && (
-        <QuizViewer quiz={currentVersion.quiz} courseTitle={course!.title!} />
+      {!isNew && course?.quiz && (
+        <QuizViewer quiz={course.quiz} courseTitle={course!.title!} />
       )}
 
       {!isNew && course && (
@@ -60,8 +58,8 @@ export default async function EditCoursePage({ params }: { params: { id: string 
             courseId={course.id}
             title={course.title}
             description={course.description}
-            hasExistingQuiz={!!currentVersion?.quiz}
-            transcript={currentVersion?.transcript}
+            hasExistingQuiz={!!course.quiz}
+            transcript={course.transcript}
         />
       )}
     </div>

@@ -93,11 +93,11 @@ export default async function MyCoursesPage({
     return (completedCount / track.courses.length) * 100;
   }
 
-  const isCourseUnlocked = (course: Course, sortedCourses: Course[], isParentTrackUnlocked: boolean, courseIndex: number) => {
+  const isCourseUnlocked = (course: Course, coursesInTrack: Course[], isParentTrackUnlocked: boolean, courseIndex: number) => {
     if (!isParentTrackUnlocked) return false;
     if (courseIndex === 0) return true; // First course in a track is unlocked if the track is.
     
-    const previousCourse = sortedCourses[courseIndex - 1];
+    const previousCourse = coursesInTrack[courseIndex - 1];
     // The single source of truth is whether the previous course is in the completed list.
     return isCourseCompleted(previousCourse.id);
   }
@@ -157,8 +157,6 @@ export default async function MyCoursesPage({
                  const isCompletedEmptyTrack = trackCompleted && track.courses.length === 0 && !hasQuiz;
                  const Icon = moduleIcons[module.id] || ClipboardList;
                  
-                 const sortedCourses = [...track.courses].sort((a,b) => a.order - b.order);
-
                  return (
                   <Card key={track.id} className={!unlocked ? 'bg-muted/50' : ''}>
                     <AccordionItem value={`track-${track.id}`} className="border-b-0">
@@ -193,8 +191,8 @@ export default async function MyCoursesPage({
                             <>
                               <h4 className="text-md font-semibold mb-4">Cursos da Trilha</h4>
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                                {sortedCourses.map((course, courseIndex) => {
-                                    const courseUnlocked = isCourseUnlocked(course, sortedCourses, unlocked, courseIndex);
+                                {track.courses.map((course, courseIndex) => {
+                                    const courseUnlocked = isCourseUnlocked(course, track.courses, unlocked, courseIndex);
                                     const completed = isCourseCompleted(course.id);
                                     
                                     return (

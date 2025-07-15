@@ -31,8 +31,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
   const router = useRouter();
   const { toast } = useToast();
   
-  const currentVersion = course.versions.find(v => v.version === course.currentVersion);
-  const courseQuiz = currentVersion?.quiz;
+  const courseQuiz = course?.quiz;
 
   const [view, setView] = useState<'video' | 'quiz'>(courseQuiz ? 'video' : 'video');
   const [quizFinished, setQuizFinished] = useState(false);
@@ -46,7 +45,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
   const [dislikes, setDislikes] = useState(course.dislikes || 0);
   const [isLiking, setIsLiking] = useState(false);
 
-  if (!course || !track || !currentVersion) {
+  if (!course || !track) {
     notFound();
   }
   
@@ -207,7 +206,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
             {completionStep === 'in_progress' && (
               <>
                 {view === 'video' && lastScore === null && (
-                    <CoursePlayer videoUrl={currentVersion.videoUrl} title={course.title} />
+                    <CoursePlayer videoUrl={course.videoUrl} title={course.title} />
                 )}
                 
                 {view === 'video' && lastScore !== null && (
@@ -278,7 +277,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
             )}
 
             {completionStep === 'completed' && (
-              <CoursePlayer videoUrl={currentVersion.videoUrl} title={course.title} />
+              <CoursePlayer videoUrl={course.videoUrl} title={course.title} />
             )}
             
             {courseQuiz ? (

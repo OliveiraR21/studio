@@ -14,7 +14,6 @@ interface CourseCardProps {
 }
 
 export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps) {
-  const currentVersion = course.versions.find(v => v.version === course.currentVersion);
   
   const CardContentComponent = (
     <Card 
@@ -58,7 +57,7 @@ export function CourseCard({ course, isUnlocked, isCompleted }: CourseCardProps)
       </CardContent>
       <CardFooter className="p-4 pt-0">
          <div className="flex justify-between items-center w-full">
-            {currentVersion?.quiz ? <Badge variant="outline">Prova</Badge> : <div />}
+            {course.quiz ? <Badge variant="outline">Prova</Badge> : <div />}
             {isUnlocked ? (
                  <span className="text-xs font-semibold text-primary flex items-center gap-1">
                     <Play className="h-3 w-3"/>

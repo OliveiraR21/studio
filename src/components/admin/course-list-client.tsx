@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Course, CourseVersion } from "@/lib/types";
+import type { Course } from "@/lib/types";
 import { useTransition } from "react";
 import {
   Table,
@@ -33,28 +33,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Edit, Trash2, FileText, ThumbsUp, Loader2, ThumbsDown, History } from "lucide-react";
+import { Edit, Trash2, FileText, ThumbsUp, Loader2, ThumbsDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { deleteCourseAction } from "@/actions/course-actions";
 import type { Module } from "@/lib/types";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+
 
 interface CourseListClientProps {
     modules: Module[];
 }
-
-const formatSecondsToHHMMSS = (totalSeconds: number | undefined) => {
-  if (totalSeconds === undefined || totalSeconds === null || totalSeconds < 0 || isNaN(totalSeconds))
-    return 'N/A';
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = Math.floor(totalSeconds % 60);
-  const pad = (num: number) => num.toString().padStart(2, '0');
-  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-};
-
 
 export function CourseListClient({ modules }: CourseListClientProps) {
   const { toast } = useToast();
@@ -94,17 +82,14 @@ export function CourseListClient({ modules }: CourseListClientProps) {
           <TableRow>
             <TableHead>Título do Curso</TableHead>
             <TableHead>Trilha</TableHead>
-            <TableHead>Ordem</TableHead>
-            <TableHead>Versão</TableHead>
             <TableHead>Questionário</TableHead>
             <TableHead>Avaliações</TableHead>
-            <TableHead className="w-[200px] text-right">Ações</TableHead>
+            <TableHead className="w-[150px] text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {allCourses.sort((a,b) => a.order - b.order).map((course) => {
+          {allCourses.map((course) => {
             const totalVotes = (course.likes || 0) + (course.dislikes || 0);
-            const currentVersion = course.versions.find(v => v.version === course.currentVersion);
 
             return (
               <TableRow key={course.id}>
@@ -117,13 +102,7 @@ export function CourseListClient({ modules }: CourseListClientProps) {
                     <Badge variant="secondary">{course.trackTitle}</Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">{course.order}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge>v{course.currentVersion}</Badge>
-                </TableCell>
-                <TableCell>
-                    {currentVersion?.quiz ? (
+                    {course.quiz ? (
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="sm">
@@ -140,7 +119,7 @@ export function CourseListClient({ modules }: CourseListClientProps) {
                           </DialogHeader>
                           <div className="max-h-[60vh] overflow-y-auto p-1 pr-4">
                               <div className="grid gap-6 py-4">
-                              {currentVersion.quiz.questions.map((q, index) => (
+                              {course.quiz.questions.map((q, index) => (
                                   <div key={index} className="space-y-2">
                                   <p className="font-semibold">
                                       {index + 1}. {q.text}
@@ -187,36 +166,6 @@ export function CourseListClient({ modules }: CourseListClientProps) {
                   )}
                 </TableCell>
                 <TableCell className="text-right">
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <History className="h-4 w-4" />
-                                <span className="sr-only">Histórico</span>
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[625px]">
-                            <DialogHeader>
-                                <DialogTitle>Histórico de Versões: {course.title}</DialogTitle>
-                                <DialogDescription>
-                                    Visualize todas as versões do curso. A versão atual está destacada.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="max-h-[60vh] overflow-y-auto p-1 pr-4">
-                                <div className="space-y-4">
-                                    {course.versions.sort((a,b) => b.version - a.version).map((version: CourseVersion) => (
-                                        <div key={version.version} className={cn("p-4 rounded-lg border", version.version === course.currentVersion && "bg-muted/50 border-primary/50")}>
-                                            <div className="flex justify-between items-center mb-2">
-                                                <h4 className="font-bold">Versão {version.version}</h4>
-                                                <p className="text-xs text-muted-foreground">{format(version.createdAt, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</p>
-                                            </div>
-                                            <p className="text-sm"><strong>URL:</strong> <span className="text-muted-foreground break-all">{version.videoUrl}</span></p>
-                                            <p className="text-sm"><strong>Duração:</strong> <span className="text-muted-foreground">{formatSecondsToHHMMSS(version.durationInSeconds)}</span></p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </DialogContent>
-                    </Dialog>
                     <Button variant="ghost" size="icon" asChild>
                         <Link href={`/admin/courses/${course.id}/edit`}>
                             <Edit className="h-4 w-4" />

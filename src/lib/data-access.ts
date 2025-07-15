@@ -1,6 +1,6 @@
 
 // In-memory data store
-import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, CourseVersion, Quiz } from './types';
+import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
 import { userHasCourseAccess } from './access-control';
 import { differenceInDays } from 'date-fns';
@@ -109,7 +109,7 @@ export async function findNextCourseForUser(user: User): Promise<(Course & {trac
 
         for (const track of sortedTracks) {
             // Sort courses by order
-            const sortedCourses = [...track.courses].sort((a, b) => a.order - b.order);
+            const sortedCourses = [...track.courses];
             
             for (const course of sortedCourses) {
                 if (!user.completedCourses.includes(course.id)) {
@@ -128,8 +128,7 @@ export async function findNextCourseForUser(user: User): Promise<(Course & {trac
 
 // Creates a course in the in-memory store.
 export async function createCourse(
-    courseData: Omit<Course, 'id' | 'moduleId' | 'trackId' | 'createdAt' | 'versions' | 'currentVersion'> & { trackId: string },
-    versionData: Omit<CourseVersion, 'version' | 'createdAt'>
+    courseData: Omit<Course, 'id' | 'moduleId' | 'trackId' | 'createdAt'> & { trackId: string }
 ): Promise<Course> {
     let parentModule: Module | undefined;
     let parentTrack: Track | undefined;
@@ -147,27 +146,22 @@ export async function createCourse(
         throw new Error(`Track with ID ${courseData.trackId} not found.`);
     }
 
-    const firstVersion: CourseVersion = {
-        ...versionData,
-        version: 1,
-        createdAt: new Date(),
-    };
-
     const newCourse: Course = {
         id: `course-${Date.now()}-${Math.random()}`,
         moduleId: parentModule.id,
         trackId: courseData.trackId,
         title: courseData.title,
         description: courseData.description,
-        order: courseData.order,
+        videoUrl: courseData.videoUrl,
+        durationInSeconds: courseData.durationInSeconds,
         minimumRole: courseData.minimumRole,
         accessAreas: courseData.accessAreas,
         thumbnailUrl: courseData.thumbnailUrl,
         likes: 0,
         dislikes: 0,
         createdAt: new Date(),
-        versions: [firstVersion],
-        currentVersion: 1,
+        quiz: courseData.quiz,
+        transcript: courseData.transcript,
     };
 
     parentTrack.courses.push(newCourse);
@@ -177,57 +171,27 @@ export async function createCourse(
 // Updates a course in the in-memory store.
 export async function updateCourse(
     courseId: string, 
-    courseData: Partial<Omit<Course, 'id' | 'trackId' | 'moduleId' | 'versions' | 'currentVersion'>>,
-    newVersionData: Partial<Omit<CourseVersion, 'version' | 'createdAt' | 'quiz'>>,
-    replaceVersions?: CourseVersion[] // For quiz updates
+    courseData: Partial<Omit<Course, 'id' | 'trackId' | 'moduleId'>>
 ): Promise<void> {
     let courseToUpdate: Course | undefined;
-    let trackRef: Track | undefined;
 
     for (const mod of global.a_modules) {
         for (const track of mod.tracks) {
             const courseIndex = track.courses.findIndex(c => c.id === courseId);
             if (courseIndex !== -1) {
                 courseToUpdate = track.courses[courseIndex];
-                trackRef = track;
                 break;
             }
         }
         if (courseToUpdate) break;
     }
 
-    if (!courseToUpdate || !trackRef) {
+    if (!courseToUpdate) {
         throw new Error(`Course with ID ${courseId} not found for update.`);
     }
 
     // Update base course properties
     Object.assign(courseToUpdate, courseData);
-
-    // If a quiz update is happening, just replace the versions array
-    if (replaceVersions) {
-        courseToUpdate.versions = replaceVersions;
-        return Promise.resolve();
-    }
-    
-    const hasVersionData = Object.keys(newVersionData).length > 0;
-
-    if (hasVersionData) {
-        const nextVersionNumber = courseToUpdate.currentVersion + 1;
-        
-        const lastVersion = courseToUpdate.versions.find(v => v.version === courseToUpdate.currentVersion);
-
-        const newVersion: CourseVersion = {
-            version: nextVersionNumber,
-            createdAt: new Date(),
-            videoUrl: newVersionData.videoUrl || lastVersion?.videoUrl || '',
-            durationInSeconds: newVersionData.durationInSeconds ?? lastVersion?.durationInSeconds,
-            transcript: newVersionData.transcript ?? lastVersion?.transcript,
-            quiz: lastVersion?.quiz, // Carry over quiz from last version by default
-        };
-
-        courseToUpdate.versions.push(newVersion);
-        courseToUpdate.currentVersion = nextVersionNumber;
-    }
     
     return Promise.resolve();
 }
@@ -353,9 +317,8 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
   allModules.forEach(module => {
     module.tracks.forEach(track => {
       track.courses.forEach(course => {
-        const currentVersion = course.versions.find(v => v.version === course.currentVersion);
-        if (currentVersion?.quiz && currentVersion.quiz.questions.length > 0) {
-          currentVersion.quiz.questions.forEach(question => {
+        if (course.quiz && course.quiz.questions.length > 0) {
+          course.quiz.questions.forEach(question => {
             allQuestions.push({ question, course });
           });
         }

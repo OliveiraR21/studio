@@ -24,28 +24,18 @@ export interface Course {
   trackId: string;
   title: string;
   description: string;
-  order: number;
+  videoUrl: string;
+  durationInSeconds?: number;
   thumbnailUrl?: string;
   createdAt: Date;
   likes?: number;
   dislikes?: number;
   voters?: string[]; // list of user IDs who have voted, for simulation
+  quiz?: Quiz;
   // Access control fields
   minimumRole?: UserRole;
   accessAreas?: string[];
-  
-  // Versioning
-  versions: CourseVersion[];
-  currentVersion: number;
-}
-
-export interface CourseVersion {
-  version: number;
-  createdAt: Date;
-  videoUrl: string;
-  durationInSeconds?: number;
-  transcript?: string; // For YouTube video transcript
-  quiz?: Quiz;
+  transcript?: string;
 }
 
 export interface Quiz {

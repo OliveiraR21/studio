@@ -99,15 +99,13 @@ export default async function DashboardPage() {
 
   // Calculate training hours based on accessible courses
   const totalDuration = accessibleCourses.reduce((acc, course) => {
-    const currentVersion = course.versions.find(v => v.version === course.currentVersion);
-    return acc + (currentVersion?.durationInSeconds || 0);
+    return acc + (course.durationInSeconds || 0);
   }, 0);
   
   const completedCourses = accessibleCourses.filter(course => currentUser.completedCourses.includes(course.id));
   
   const completedDuration = completedCourses.reduce((acc, course) => {
-      const currentVersion = course.versions.find(v => v.version === course.currentVersion);
-      return acc + (currentVersion?.durationInSeconds || 0);
+      return acc + (course.durationInSeconds || 0);
   }, 0);
 
   const pendingDuration = totalDuration - completedDuration;
