@@ -45,19 +45,27 @@ const prompt = ai.definePrompt({
 
 Sua tarefa é criar um banco de questões de múltipla escolha com base no conteúdo de um curso fornecido.
 
-Gere um banco de aproximadamente 40 perguntas. Cada pergunta deve ter 4 opções, e uma delas deve ser a resposta correta. As perguntas devem testar a compreensão dos principais conceitos apresentados.
+**Instruções Cruciais:**
+1.  **Foco no Conteúdo:** As perguntas devem ser **EXCLUSIVAMENTE** sobre o conteúdo apresentado na transcrição do vídeo.
+2.  **NÃO FAÇA PERGUNTAS SOBRE METADADOS:** É proibido criar perguntas sobre o título do curso, a descrição, a plataforma onde o vídeo está hospedado, ou qualquer outra informação que não seja o conhecimento ensinado no vídeo. O título e a descrição são apenas para seu contexto.
+3.  **Qualidade das Perguntas:** Crie perguntas que testem a compreensão real dos conceitos, evitando perguntas triviais.
 
-Para cada pergunta, você deve atribuir um nível de dificuldade: 'Fácil', 'Intermediário' ou 'Difícil'. Tente criar uma distribuição equilibrada entre os níveis de dificuldade.
+**Requisitos:**
+- Gere um banco de aproximadamente 40 perguntas.
+- Cada pergunta deve ter 4 opções de múltipla escolha.
+- Uma das opções deve ser a resposta correta.
+- Atribua um nível de dificuldade para cada pergunta: 'Fácil', 'Intermediário' ou 'Difícil', buscando uma distribuição equilibrada.
 
 {{#if transcript}}
-Use a seguinte transcrição do vídeo como a fonte PRIMÁRIA de informação para criar as perguntas. O título e a descrição podem ser usados como contexto adicional.
-Transcrição do Vídeo: {{{transcript}}}
+Use a seguinte transcrição do vídeo como a **ÚNICA** fonte de informação para criar as perguntas.
+**Transcrição do Vídeo:** {{{transcript}}}
 {{else}}
-Você não tem acesso ao vídeo, então deve basear as perguntas estritamente no título e na descrição fornecidos.
+Você não tem acesso à transcrição, então deve basear as perguntas estritamente no título e na descrição fornecidos. Neste caso, e somente neste, você pode criar perguntas sobre o conteúdo implícito no título e na descrição.
 {{/if}}
 
-Título do Curso: {{{title}}}
-Descrição do Curso: {{{description}}}
+**Contexto Adicional (NÃO usar para criar perguntas):**
+- Título do Curso: {{{title}}}
+- Descrição do Curso: {{{description}}}
 
 Seu resultado deve ser um objeto JSON que siga estritamente o esquema de saída fornecido.`,
 });
