@@ -436,5 +436,3 @@ export const learningModules: Module[] = [
     ]
   }
 ];
-
-    
