@@ -1,5 +1,8 @@
 
 
+'use client';
+
+import { useState, useEffect, useCallback } from "react";
 import { findCourseById, getLearningModules, getUsers } from "@/lib/data-access";
 import { CourseForm } from "@/components/admin/course-form";
 import { notFound } from "next/navigation";
@@ -8,23 +11,72 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { QuizGenerator } from "@/components/admin/quiz-generator";
-import type { Course } from "@/lib/types";
+import type { Course, Module, User } from "@/lib/types";
 import { QuizViewer } from "@/components/admin/quiz-viewer";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default async function EditCoursePage({ params }: { params: { id: string } }) {
+export default function EditCoursePage({ params }: { params: { id: string } }) {
   const isNew = params.id === 'new';
-  let course: Course | null = null;
-  const modules = await getLearningModules();
-  const allUsers = await getUsers();
-
-  if (!isNew) {
-    const result = await findCourseById(params.id);
-    if (!result) {
-      notFound();
-    }
-    course = result.course;
-  }
+  const [course, setCourse] = useState<Course | null>(null);
+  const [modules, setModules] = useState<Module[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
+  // State to hold the transcript fetched from YouTube in CourseForm
+  const [liveTranscript, setLiveTranscript] = useState<string | undefined>(undefined);
+
+  const handleYouTubeDataFetched = useCallback((transcript: string) => {
+    setLiveTranscript(transcript);
+  }, []);
+
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      try {
+        const [modulesData, usersData] = await Promise.all([
+          getLearningModules(),
+          getUsers()
+        ]);
+        setModules(modulesData);
+        setAllUsers(usersData);
+
+        if (!isNew) {
+          const result = await findCourseById(params.id);
+          if (!result) {
+            notFound();
+          }
+          setCourse(result.course);
+          setLiveTranscript(result.course.transcript); // Initialize with saved transcript
+        }
+      } catch (error) {
+        console.error("Failed to fetch data", error);
+        // Handle error state appropriately
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, [params.id, isNew]);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto space-y-6">
+        <div className="mb-6">
+          <Skeleton className="h-10 w-64" />
+        </div>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-8 w-1/3" />
+            <Skeleton className="h-4 w-2/3" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-64 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto space-y-6">
       <div className="mb-6">
@@ -45,7 +97,12 @@ export default async function EditCoursePage({ params }: { params: { id: string 
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <CourseForm course={course} modules={modules} allUsers={allUsers} />
+          <CourseForm 
+            course={course} 
+            modules={modules} 
+            allUsers={allUsers} 
+            onYouTubeDataFetched={handleYouTubeDataFetched}
+          />
         </CardContent>
       </Card>
 
@@ -59,7 +116,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
             title={course.title}
             description={course.description}
             hasExistingQuiz={!!course.quiz}
-            transcript={course.transcript}
+            transcript={liveTranscript ?? course.transcript}
         />
       )}
     </div>

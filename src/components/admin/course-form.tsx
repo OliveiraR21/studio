@@ -44,6 +44,7 @@ interface CourseFormProps {
   course: Course | null;
   modules: Module[];
   allUsers: User[];
+  onYouTubeDataFetched?: (transcript: string) => void;
 }
 
 const ALL_ROLES: UserRole[] = ['Assistente', 'Analista', 'Supervisor', 'Coordenador', 'Gerente', 'Diretor', 'Admin'];
@@ -71,7 +72,7 @@ const formatSecondsToHHMMSS = (totalSeconds: number | undefined) => {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 };
 
-export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
+export function CourseForm({ course, modules, allUsers, onYouTubeDataFetched }: CourseFormProps) {
   const isNew = course === null;
   const router = useRouter();
   const { toast } = useToast();
@@ -136,6 +137,9 @@ export function CourseForm({ course, modules, allUsers }: CourseFormProps) {
         (formRef.current.elements.namedItem('thumbnailUrl') as HTMLInputElement).value = thumbnailUrl;
       }
       setYouTubeData({ imported: true, transcript: transcript });
+      if (transcript && onYouTubeDataFetched) {
+        onYouTubeDataFetched(transcript);
+      }
       toast({ title: 'Sucesso!', description: 'Dados do vídeo do YouTube importados.' });
     } else {
       setYouTubeData({ imported: false });

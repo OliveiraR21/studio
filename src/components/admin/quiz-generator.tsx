@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Quiz, QuestionDifficulty } from '@/lib/types';
 import { generateQuiz } from '@/ai/flows/generate-quiz-flow';
 import { saveQuiz } from '@/actions/course-actions';
@@ -51,6 +51,12 @@ export function QuizGenerator({ courseId, title, description, hasExistingQuiz, t
   const [isSaving, setIsSaving] = useState(false);
   const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
   const [transcript, setTranscript] = useState(initialTranscript || "");
+
+  useEffect(() => {
+    if (initialTranscript) {
+      setTranscript(initialTranscript);
+    }
+  }, [initialTranscript]);
 
   const handleGenerate = async () => {
     setIsLoading(true);
