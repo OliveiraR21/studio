@@ -1,23 +1,66 @@
 # Br Supply Academy Stream
 
-This is a Next.js application for the Br Supply Academy Stream platform.
+Esta é uma aplicação Next.js para a plataforma de e-learning Br Supply Academy Stream, desenvolvida com o auxílio do Firebase Studio.
 
-## Getting Started
+## Visão Geral da Tecnologia
 
-This project is configured to run with local mock data, so no external services like Firebase are required for it to work.
+- **Framework:** Next.js (com App Router)
+- **Linguagem:** TypeScript
+- **Estilização:** Tailwind CSS com componentes ShadCN UI
+- **Funcionalidades de IA:** Google AI via Genkit
+- **Banco de Dados (Simulado):** Dados locais em `src/lib/mock-data.ts`
 
-### 1. Install Dependencies
+## Pré-requisitos
+
+- Node.js (versão 20 ou superior)
+- npm
+
+## Como Executar o Projeto Localmente
+
+Este projeto está configurado para funcionar com dados simulados locais, então nenhum serviço externo (como Firebase) é necessário para a operação básica.
+
+### 1. Instale as Dependências
+
+Na raiz do projeto, execute o seguinte comando para instalar todos os pacotes necessários:
 
 ```bash
 npm install
 ```
 
-### 2. Run the Development Server
+### 2. Configure as Variáveis de Ambiente
 
-Start the development server:
+Crie uma cópia do arquivo `.env.example` (se existir) ou crie um novo arquivo chamado `.env` na raiz do projeto. Para as funcionalidades de IA, você precisará de chaves de API do Google.
+
+```.env
+# Chave da API do Google para as funcionalidades de IA (Genkit)
+GOOGLE_API_KEY="SUA_CHAVE_DE_API_DO_GOOGLE_AQUI"
+
+# Chave da API do YouTube para buscar detalhes de vídeos
+YOUTUBE_API_KEY="SUA_CHAVE_DE_API_DO_YOUTUBE_AQUI"
+```
+
+### 3. Execute os Servidores de Desenvolvimento
+
+Para uma experiência de desenvolvimento completa, você precisará executar dois servidores simultaneamente em terminais separados.
+
+#### Terminal 1: Iniciar a Aplicação Next.js
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:9002](http://localhost:9002) with your browser to see the result. The application will load with pre-configured test users and courses, simulating an "Admin" login.
+Abra [http://localhost:9003](http://localhost:9003) no seu navegador para ver a aplicação.
+
+#### Terminal 2: Iniciar o Servidor Genkit (para IA)
+
+Para que as funcionalidades de IA (como o gerador de questionários) funcionem, execute o servidor Genkit:
+
+```bash
+npm run genkit:watch
+```
+
+Este comando irá iniciar o servidor de IA e observará as alterações nos arquivos de fluxo.
+
+---
+
+Com essas instruções, o projeto está pronto para ser versionado e compartilhado.
