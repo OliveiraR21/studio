@@ -1,11 +1,22 @@
 
 
+
 // In-memory data store
 import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
 import { userHasCourseAccess } from './access-control';
 import { differenceInDays } from 'date-fns';
 import { cache } from 'react';
+
+// --- EXEMPLO DE MIGRAÇÃO PARA BANCO DE DADOS (usando Prisma) ---
+// Quando chegar a hora de usar um banco de dados real, a gente faria algo assim:
+// 1. Instalaria o Prisma: `npm install prisma @prisma/client`
+// 2. Inicializaria o Prisma: `npx prisma init`
+// 3. Modelaria o banco no arquivo `prisma/schema.prisma`
+// 4. Importaria o cliente do Prisma aqui:
+// import { PrismaClient } from '@prisma/client';
+// const prisma = new PrismaClient();
+// 5. Substituiria as funções abaixo para usar `prisma.user.findMany()`, etc.
 
 // A simple in-memory database.
 // In a real app, you would use a database like Firestore or Prisma.
@@ -50,22 +61,38 @@ if (!global.a_modules) {
 
 // Fetch all learning modules and their nested tracks/courses
 export const getLearningModules = cache(async (): Promise<Module[]> => {
+  // EXEMPLO COM PRISMA:
+  // return prisma.module.findMany({
+  //   include: {
+  //     tracks: {
+  //       include: {
+  //         courses: true,
+  //       },
+  //     },
+  //   },
+  // });
   return Promise.resolve(global.a_modules);
 });
 
 // Fetch all users
 export const getUsers = cache(async (): Promise<User[]> => {
+    // EXEMPLO COM PRISMA:
+    // return prisma.user.findMany();
     return Promise.resolve(global.a_users);
 });
 
 // Fetch a single user by ID
 export const getUserById = cache(async (userId: string): Promise<User | null> => {
+    // EXEMPLO COM PRISMA:
+    // return prisma.user.findUnique({ where: { id: userId } });
     const user = global.a_users.find(u => u.id === userId);
     return Promise.resolve(user || null);
 });
 
 // Fetch a single user by Email
 export async function findUserByEmail(email: string): Promise<User | null> {
+    // EXEMPLO COM PRISMA:
+    // return prisma.user.findUnique({ where: { email: email.toLowerCase() } });
     const user = global.a_users.find(u => u.email.toLowerCase() === email.toLowerCase());
     return Promise.resolve(user || null);
 }
