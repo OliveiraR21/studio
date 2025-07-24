@@ -1,6 +1,5 @@
 
 
-
 // In-memory data store
 import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
@@ -414,16 +413,26 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
   }).sort((a, b) => b.errorRate - a.errorRate) // Sort by highest error rate
   .slice(0, 10); // Take top 10
 
-  // 2. Engagement Stats (Simulated)
-  const engagementStats: EngagementStats = {
-    avgSessionTime: "25 min",
-    peakTime: "14h - 16h",
-    completionRate: 82, // Percentage
-  };
-
-  // 3. Totals
+  // 2. Totals
   const totalUsers = allUsers.length;
   const totalCourses = allModules.flatMap(m => m.tracks.flatMap(t => t.courses)).length;
+  
+  // 3. Engagement Stats (Calculate real completion rate)
+  let totalCompletionPercentage = 0;
+  if (totalCourses > 0 && totalUsers > 0) {
+      allUsers.forEach(user => {
+          const userCompletionPercentage = (user.completedCourses.length / totalCourses) * 100;
+          totalCompletionPercentage += userCompletionPercentage;
+      });
+  }
+
+  const averageCompletionRate = totalUsers > 0 ? Math.round(totalCompletionPercentage / totalUsers) : 0;
+  
+  const engagementStats: EngagementStats = {
+    avgSessionTime: "25 min", // Simulated
+    peakTime: "14h - 16h", // Simulated
+    completionRate: averageCompletionRate, // Real data
+  };
   
   return Promise.resolve({
     questionProficiency,
