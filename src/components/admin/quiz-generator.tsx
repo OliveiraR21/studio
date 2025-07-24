@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Quiz, QuestionDifficulty } from '@/lib/types';
-import { generateQuiz } from '@/ai/flows/generate-quiz-flow';
+import { generateQuiz, type GenerateQuizResult } from '@/ai/flows/generate-quiz-flow';
 import { saveQuiz } from '@/actions/course-actions';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -62,7 +62,7 @@ export function QuizGenerator({ courseId, title, description, hasExistingQuiz, t
     setIsLoading(true);
     setGeneratedQuiz(null);
 
-    const result = await generateQuiz({ title, description, transcript });
+    const result: GenerateQuizResult = await generateQuiz({ title, description, transcript });
     
     if (result.success) {
       setGeneratedQuiz(result.quiz);
@@ -169,7 +169,7 @@ export function QuizGenerator({ courseId, title, description, hasExistingQuiz, t
                 As perguntas foram geradas por IA. Verifique se estão corretas e fazem sentido antes de salvar.
               </AlertDescription>
             </Alert>
-            <div className="space-y-4 max-h-[60vh] sm:max-h-[70vh] overflow-y-auto p-1 pr-4">
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto p-1 pr-4">
               {generatedQuiz.questions.map((q, index) => (
                 <div key={index} className="space-y-2 rounded-lg border bg-background p-4">
                   <div className="flex justify-between items-start">
