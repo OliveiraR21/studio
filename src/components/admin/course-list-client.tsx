@@ -106,9 +106,9 @@ function QuizCell({ course }: { course: Course & { trackTitle: string } }) {
                     Gerar
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl">
+            <DialogContent className="sm:max-w-4xl">
                  <DialogHeader>
-                    <DialogTitle>Gerar Questionário com IA</DialogTitle>
+                    <DialogTitle>Gerador de Questionário com IA</DialogTitle>
                     <DialogDescription>
                         A IA irá gerar um questionário com base no título, descrição e transcrição do curso.
                     </DialogDescription>
