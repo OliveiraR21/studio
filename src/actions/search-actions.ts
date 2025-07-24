@@ -10,12 +10,12 @@ export type IconName = 'Home' | 'LayoutGrid' | 'UserIcon' | 'Settings' | 'HelpCi
 
 // Define a result type that can be either a course or a navigation item
 export type SearchResult = 
-  | { type: 'course'; course: Course; track: Track; module: Module; isLocked: boolean }
+  | { type: 'course'; course: Course; track: Track; module: Module; isLocked: boolean; prerequisiteCourseTitle?: string }
   | { type: 'page'; title: string; href: string; iconName: IconName };
 
 
 // Define available static pages for searching
-const getAvailablePages = (user: User): Omit<SearchResult, 'type' | 'course' | 'track' | 'module' | 'isLocked'>[] => {
+const getAvailablePages = (user: User): Omit<SearchResult, 'type' | 'course' | 'track' | 'module' | 'isLocked' | 'prerequisiteCourseTitle'>[] => {
     const pages: { title: string; href: string, iconName: IconName, requiredRole?: UserRole[], managerOnly?: boolean }[] = [
         { title: 'Meu Painel', href: '/dashboard', iconName: 'Home' },
         { title: 'Meus Cursos', href: '/meus-cursos', iconName: 'LayoutGrid' },
@@ -61,7 +61,10 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
   const modules = await getLearningModules();
   for (const module of modules) {
     for (const track of module.tracks) {
-      for (const [index, course] of track.courses.entries()) {
+      // Create a sorted list of courses for the current track
+      const sortedCourses = [...track.courses].sort((a,b) => (a.order || Infinity) - (b.order || Infinity));
+
+      for (const [index, course] of sortedCourses.entries()) {
         const hasAccessByRole = userHasCourseAccess(currentUser, course);
         // If user doesn't have access by role/area, skip this course entirely.
         if (!hasAccessByRole) continue;
@@ -70,19 +73,23 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
         const descriptionMatch = course.description.toLowerCase().includes(lowerCaseQuery);
 
         if (titleMatch || descriptionMatch) {
-            // Check if the course is sequentially unlocked.
-            // This is checked separately from role/area access.
-            const previousCourse = index > 0 ? track.courses[index - 1] : undefined;
+            const previousCourse = index > 0 ? sortedCourses[index - 1] : undefined;
             const isSequentiallyUnlocked = !previousCourse || currentUser.completedCourses.includes(previousCourse.id);
             
-            // The course is added to results if it matches, but with a lock status.
-            results.push({ 
+            const searchResult: SearchResult = { 
                 type: 'course', 
                 course, 
                 track, 
                 module, 
                 isLocked: !isSequentiallyUnlocked 
-            });
+            };
+
+            // If the course is locked and there is a prerequisite, add its title to the result.
+            if (!isSequentiallyUnlocked && previousCourse) {
+                searchResult.prerequisiteCourseTitle = previousCourse.title;
+            }
+
+            results.push(searchResult);
         }
       }
     }

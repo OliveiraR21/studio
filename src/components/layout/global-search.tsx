@@ -145,7 +145,7 @@ export function GlobalSearch() {
                  <CommandGroup heading="Cursos">
                   {courseResults.map((result) => {
                     if (result.type === 'course') {
-                        const { course, track, isLocked } = result;
+                        const { course, track, isLocked, prerequisiteCourseTitle } = result;
                         const Icon = isLocked ? iconMap['Lock'] : iconMap['File'];
                         return (
                           <CommandItem
@@ -156,14 +156,21 @@ export function GlobalSearch() {
                                     runCommand(() => router.push(`/courses/${course.id}`))
                                 }
                             }}
-                            className={cn("!py-2", isLocked && "text-muted-foreground cursor-not-allowed")}
+                            className={cn("!py-2 flex-col items-start", isLocked && "text-muted-foreground cursor-not-allowed")}
                             disabled={isLocked}
                           >
-                            <Icon className="mr-2 h-4 w-4" />
-                            <div className="flex flex-col">
-                              <span>{course.title}</span>
-                              <span className="text-xs text-muted-foreground">{track.title}</span>
+                            <div className="flex items-center">
+                              <Icon className="mr-2 h-4 w-4" />
+                              <div className="flex flex-col">
+                                <span>{course.title}</span>
+                                <span className="text-xs text-muted-foreground">{track.title}</span>
+                              </div>
                             </div>
+                            {isLocked && prerequisiteCourseTitle && (
+                                <div className="text-xs text-amber-600 dark:text-amber-500 ml-6 mt-1">
+                                    Para liberar, conclua: {prerequisiteCourseTitle}
+                                </div>
+                            )}
                           </CommandItem>
                         );
                     }
