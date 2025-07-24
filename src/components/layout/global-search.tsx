@@ -157,8 +157,7 @@ export function GlobalSearch() {
                                     runCommand(() => router.push(`/courses/${course.id}`))
                                 }
                             }}
-                            className={cn("!py-2 flex-col items-start", isLocked && "text-muted-foreground cursor-not-allowed")}
-                            disabled={isLocked}
+                            className={cn("!py-2 flex-col items-start", isLocked && "text-muted-foreground cursor-default")}
                           >
                             <div className="flex items-center">
                               <Icon className="mr-2 h-4 w-4" />
@@ -173,10 +172,7 @@ export function GlobalSearch() {
                                     <Link 
                                         href={`/courses/${prerequisiteCourseId}`} 
                                         className="underline font-semibold text-primary hover:text-primary/80"
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // Prevent the CommandItem's onSelect from firing.
-                                            runCommand(() => router.push(`/courses/${prerequisiteCourseId}`));
-                                        }}
+                                        onClick={() => runCommand(() => router.push(`/courses/${prerequisiteCourseId}`))}
                                     >
                                         {prerequisiteCourseTitle}
                                     </Link>
