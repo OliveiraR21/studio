@@ -2,7 +2,7 @@
 "use client";
 
 import type { Course, Quiz } from "@/lib/types";
-import { useTransition, useState } from "react";
+import { useTransition, useState, useRef } from "react";
 import {
   Table,
   TableBody,
@@ -49,7 +49,7 @@ interface CourseListClientProps {
 // Componente interno para a célula do Questionário, para manter o código limpo.
 function QuizCell({ course }: { course: Course & { trackTitle: string } }) {
     const [dialogOpen, setDialogOpen] = useState(false);
-    const quizGeneratorRef = React.useRef<QuizGeneratorHandles>(null);
+    const quizGeneratorRef = useRef<QuizGeneratorHandles>(null);
 
     // Se já existe um quiz, mostra um botão para visualizá-lo.
     if (course.quiz) {
@@ -108,7 +108,7 @@ function QuizCell({ course }: { course: Course & { trackTitle: string } }) {
                     Gerar
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-4xl flex flex-col max-h-[90vh]">
+            <DialogContent className="flex flex-col max-h-[90vh] sm:max-w-4xl">
                  <DialogHeader>
                     <div className="flex items-center gap-3">
                       <Wand2 className="h-6 w-6 text-primary" />
