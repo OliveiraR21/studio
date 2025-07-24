@@ -84,7 +84,7 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
                 isLocked: !isSequentiallyUnlocked 
             };
 
-            // If the course is locked and there is a prerequisite, add its title to the result.
+            // If the course is locked and there is a prerequisite, add its title and id to the result.
             if (!isSequentiallyUnlocked && previousCourse) {
                 searchResult.prerequisiteCourseTitle = previousCourse.title;
                 searchResult.prerequisiteCourseId = previousCourse.id;
