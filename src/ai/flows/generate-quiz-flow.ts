@@ -32,8 +32,20 @@ const GenerateQuizOutputSchema = z.object({
 export type GenerateQuizOutput = z.infer<typeof GenerateQuizOutputSchema>;
 
 
-export async function generateQuiz(input: GenerateQuizInput): Promise<GenerateQuizOutput> {
-  return generateQuizFlow(input);
+// Define a union type for the return value
+export type GenerateQuizResult = 
+  | { success: true; quiz: GenerateQuizOutput }
+  | { success: false; message: string };
+
+
+export async function generateQuiz(input: GenerateQuizInput): Promise<GenerateQuizResult> {
+    try {
+        const quiz = await generateQuizFlow(input);
+        return { success: true, quiz };
+    } catch (e: any) {
+        // Return a structured error object instead of throwing
+        return { success: false, message: e.message || 'Ocorreu um erro desconhecido.' };
+    }
 }
 
 const prompt = ai.definePrompt({

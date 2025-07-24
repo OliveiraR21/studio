@@ -62,28 +62,24 @@ export function QuizGenerator({ courseId, title, description, hasExistingQuiz, t
     setIsLoading(true);
     setGeneratedQuiz(null);
 
-    try {
-      const result = await generateQuiz({ title, description, transcript });
-      setGeneratedQuiz(result);
+    const result = await generateQuiz({ title, description, transcript });
+    
+    if (result.success) {
+      setGeneratedQuiz(result.quiz);
       toast({
         title: 'Questionário gerado!',
-        description:
-          'Revise as perguntas e salve se estiverem de acordo.',
+        description: 'Revise as perguntas e salve se estiverem de acordo.',
       });
-    } catch (error) {
-      console.error('AI quiz generation failed:', error);
-      let description = 'Não foi possível gerar o questionário. Tente novamente.';
-      if (error instanceof Error && (error.message.includes('503') || error.message.toLowerCase().includes('overloaded'))) {
-        description = 'O serviço de IA está sobrecarregado no momento. Por favor, aguarde alguns instantes e tente novamente.';
-      }
+    } else {
+      console.error('AI quiz generation failed:', result.message);
       toast({
         variant: 'destructive',
         title: 'Ocorreu um erro na Geração',
-        description: description,
+        description: result.message,
       });
-    } finally {
-      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   const handleSave = async () => {
@@ -173,7 +169,7 @@ export function QuizGenerator({ courseId, title, description, hasExistingQuiz, t
                 As perguntas foram geradas por IA. Verifique se estão corretas e fazem sentido antes de salvar.
               </AlertDescription>
             </Alert>
-            <div className="space-y-4 max-h-[70vh] overflow-y-auto p-1 pr-4">
+            <div className="space-y-4 max-h-[60vh] sm:max-h-[70vh] overflow-y-auto p-1 pr-4">
               {generatedQuiz.questions.map((q, index) => (
                 <div key={index} className="space-y-2 rounded-lg border bg-background p-4">
                   <div className="flex justify-between items-start">
