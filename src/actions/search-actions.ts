@@ -10,12 +10,12 @@ export type IconName = 'Home' | 'LayoutGrid' | 'UserIcon' | 'Settings' | 'HelpCi
 
 // Define a result type that can be either a course or a navigation item
 export type SearchResult = 
-  | { type: 'course'; course: Course; track: Track; module: Module; isLocked: boolean; prerequisiteCourseTitle?: string }
+  | { type: 'course'; course: Course; track: Track; module: Module; isLocked: boolean; prerequisiteCourseTitle?: string; prerequisiteCourseId?: string; }
   | { type: 'page'; title: string; href: string; iconName: IconName };
 
 
 // Define available static pages for searching
-const getAvailablePages = (user: User): Omit<SearchResult, 'type' | 'course' | 'track' | 'module' | 'isLocked' | 'prerequisiteCourseTitle'>[] => {
+const getAvailablePages = (user: User): Omit<SearchResult, 'type' | 'course' | 'track' | 'module' | 'isLocked' | 'prerequisiteCourseTitle' | 'prerequisiteCourseId'>[] => {
     const pages: { title: string; href: string, iconName: IconName, requiredRole?: UserRole[], managerOnly?: boolean }[] = [
         { title: 'Meu Painel', href: '/dashboard', iconName: 'Home' },
         { title: 'Meus Cursos', href: '/meus-cursos', iconName: 'LayoutGrid' },
@@ -87,6 +87,7 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
             // If the course is locked and there is a prerequisite, add its title to the result.
             if (!isSequentiallyUnlocked && previousCourse) {
                 searchResult.prerequisiteCourseTitle = previousCourse.title;
+                searchResult.prerequisiteCourseId = previousCourse.id;
             }
 
             results.push(searchResult);

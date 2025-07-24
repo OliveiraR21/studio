@@ -19,6 +19,7 @@ import { globalSearch, type SearchResult, type IconName } from '@/actions/search
 import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 const iconMap: Record<IconName, React.ElementType> = {
   Home,
@@ -145,7 +146,7 @@ export function GlobalSearch() {
                  <CommandGroup heading="Cursos">
                   {courseResults.map((result) => {
                     if (result.type === 'course') {
-                        const { course, track, isLocked, prerequisiteCourseTitle } = result;
+                        const { course, track, isLocked, prerequisiteCourseTitle, prerequisiteCourseId } = result;
                         const Icon = isLocked ? iconMap['Lock'] : iconMap['File'];
                         return (
                           <CommandItem
@@ -168,7 +169,17 @@ export function GlobalSearch() {
                             </div>
                             {isLocked && prerequisiteCourseTitle && (
                                 <div className="text-xs text-amber-600 dark:text-amber-500 ml-6 mt-1">
-                                    Para liberar, conclua: {prerequisiteCourseTitle}
+                                    Para liberar, conclua:{" "}
+                                    <Link 
+                                        href={`/courses/${prerequisiteCourseId}`} 
+                                        className="underline font-semibold hover:text-amber-400"
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent the CommandItem's onSelect
+                                            runCommand(() => router.push(`/courses/${prerequisiteCourseId}`));
+                                        }}
+                                    >
+                                        {prerequisiteCourseTitle}
+                                    </Link>
                                 </div>
                             )}
                           </CommandItem>
