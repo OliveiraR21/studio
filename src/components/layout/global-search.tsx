@@ -168,13 +168,13 @@ export function GlobalSearch() {
                               </div>
                             </div>
                             {isLocked && prerequisiteCourseTitle && (
-                                <div className="text-xs text-amber-600 dark:text-amber-500 ml-6 mt-1">
+                                <div className="text-xs text-muted-foreground ml-6 mt-1">
                                     Para liberar, conclua:{" "}
                                     <Link 
                                         href={`/courses/${prerequisiteCourseId}`} 
-                                        className="underline font-semibold hover:text-amber-400"
+                                        className="underline font-semibold text-primary hover:text-primary/80"
                                         onClick={(e) => {
-                                            e.stopPropagation(); // Prevent the CommandItem's onSelect
+                                            e.stopPropagation(); // Prevent the CommandItem's onSelect from firing.
                                             runCommand(() => router.push(`/courses/${prerequisiteCourseId}`));
                                         }}
                                     >
