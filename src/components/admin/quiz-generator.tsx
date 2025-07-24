@@ -1,41 +1,37 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef, useTransition } from 'react';
 import type { Quiz, QuestionDifficulty } from '@/lib/types';
 import { generateQuiz, type GenerateQuizResult } from '@/ai/flows/generate-quiz-flow';
 import { saveQuiz } from '@/actions/course-actions';
 import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from '@/components/ui/card';
-import { Wand2, Loader2, Save, RefreshCw } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useRouter } from 'next/navigation';
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
+import { Wand2 } from 'lucide-react';
 
 interface QuizGeneratorProps {
   courseId: string;
   title: string;
   description: string;
   hasExistingQuiz: boolean;
-  transcript?: string; // Optional transcript from YouTube
+  transcript?: string;
+  onQuizSaved?: () => void;
 }
 
-const difficultyBadgeVariant: Record<QuestionDifficulty, "default" | "secondary" | "destructive"> = {
-    'Fácil': 'default',
-    'Intermediário': 'secondary',
-    'Difícil': 'destructive'
-};
+export interface QuizGeneratorHandles {
+  save: () => void;
+  regenerate: () => void;
+  isSaving: boolean;
+  isGenerating: boolean;
+  hasGeneratedQuiz: boolean;
+}
 
 const difficultyBadgeColor: Record<QuestionDifficulty, string> = {
     'Fácil': 'bg-green-500/80 hover:bg-green-500/90',
@@ -43,116 +39,108 @@ const difficultyBadgeColor: Record<QuestionDifficulty, string> = {
     'Difícil': 'bg-red-600/80 hover:bg-red-600/90',
 };
 
+export const QuizGenerator = forwardRef<QuizGeneratorHandles, QuizGeneratorProps>(
+  ({ courseId, title, description, hasExistingQuiz, transcript: initialTranscript, onQuizSaved }, ref) => {
+    const { toast } = useToast();
+    const router = useRouter();
+    const [isGenerating, startGenerating] = useTransition();
+    const [isSaving, startSaving] = useTransition();
 
-export function QuizGenerator({ courseId, title, description, hasExistingQuiz, transcript: initialTranscript }: QuizGeneratorProps) {
-  const { toast } = useToast();
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
-  const [transcript, setTranscript] = useState(initialTranscript || "");
+    const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
+    const [transcript, setTranscript] = useState(initialTranscript || "");
 
-  useEffect(() => {
-    if (initialTranscript) {
-      setTranscript(initialTranscript);
-    }
-  }, [initialTranscript]);
-
-  const handleGenerate = async () => {
-    setIsLoading(true);
-    setGeneratedQuiz(null);
-
-    const result: GenerateQuizResult = await generateQuiz({ title, description, transcript });
-    
-    if (result.success) {
-      setGeneratedQuiz(result.quiz);
-      toast({
-        title: 'Questionário gerado!',
-        description: 'Revise as perguntas e salve se estiverem de acordo.',
-      });
-    } else {
-      console.error('AI quiz generation failed:', result.message);
-      toast({
-        variant: 'destructive',
-        title: 'Ocorreu um erro na Geração',
-        description: result.message,
-      });
-    }
-
-    setIsLoading(false);
-  };
-
-  const handleSave = async () => {
-    if (!generatedQuiz) return;
-    setIsSaving(true);
-    
-    try {
-      const result = await saveQuiz(courseId, generatedQuiz);
-
-      if (result.success) {
-        toast({
-          title: "Sucesso!",
-          description: result.message,
-        });
-        setGeneratedQuiz(null); // Clear the generated form
-        router.refresh(); // Refresh the page to show the saved quiz
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Erro ao Salvar",
-          description: result.message,
-        });
+    useEffect(() => {
+      if (initialTranscript) {
+        setTranscript(initialTranscript);
       }
-    } catch (error) {
-        console.error('Failed to save quiz:', error);
-        toast({
-            variant: 'destructive',
-            title: 'Ocorreu um erro',
-            description:
-            'Não foi possível salvar o questionário. Tente novamente.',
-        });
-    } finally {
-        setIsSaving(false);
-    }
-  };
+    }, [initialTranscript]);
 
-  return (
-    <Card className="border-primary/20 bg-primary/5">
-      <CardHeader>
-        <div className="flex items-center gap-3">
-            <Wand2 className="h-6 w-6 text-primary" />
-            <div>
-                <CardTitle>Gerador de Questionário com IA</CardTitle>
-                <CardDescription>
-                  {hasExistingQuiz
-                    ? 'Gere um novo questionário para substituir o existente. '
-                    : 'Crie um questionário automaticamente com base nos detalhes do curso. '}
-                  Forneça uma transcrição para maior precisão.
-                </CardDescription>
-            </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {isLoading && (
-          <div className="flex items-center justify-center p-8 text-center">
+    const handleGenerate = async () => {
+      startGenerating(async () => {
+        setGeneratedQuiz(null);
+
+        const result: GenerateQuizResult = await generateQuiz({ title, description, transcript });
+        
+        if (result.success) {
+          setGeneratedQuiz(result.quiz);
+          toast({
+            title: 'Questionário gerado!',
+            description: 'Revise as perguntas e salve se estiverem de acordo.',
+          });
+        } else {
+          console.error('AI quiz generation failed:', result.message);
+          toast({
+            variant: 'destructive',
+            title: 'Ocorreu um erro na Geração',
+            description: result.message,
+          });
+        }
+      });
+    };
+
+    const handleSave = async () => {
+      if (!generatedQuiz) return;
+      startSaving(async () => {
+        try {
+          const result = await saveQuiz(courseId, generatedQuiz);
+
+          if (result.success) {
+            toast({
+              title: "Sucesso!",
+              description: result.message,
+            });
+            setGeneratedQuiz(null);
+            router.refresh();
+            if (onQuizSaved) onQuizSaved();
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Erro ao Salvar",
+              description: result.message,
+            });
+          }
+        } catch (error) {
+            console.error('Failed to save quiz:', error);
+            toast({
+                variant: 'destructive',
+                title: 'Ocorreu um erro',
+                description: 'Não foi possível salvar o questionário. Tente novamente.',
+            });
+        }
+      });
+    };
+
+    useImperativeHandle(ref, () => ({
+      save: handleSave,
+      regenerate: handleGenerate,
+      isSaving: isSaving,
+      isGenerating: isGenerating,
+      hasGeneratedQuiz: !!generatedQuiz,
+    }));
+
+    return (
+      <div className="flex-grow overflow-y-auto pr-4 -mr-4">
+        {isGenerating && (
+          <div className="flex flex-col items-center justify-center p-8 text-center h-full">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="ml-4 font-semibold">A IA está gerando as perguntas... Por favor, aguarde.</p>
+            <p className="ml-4 font-semibold mt-4">A IA está gerando as perguntas... Por favor, aguarde.</p>
+            <p className="text-sm text-muted-foreground">Isso pode levar até 30 segundos.</p>
           </div>
         )}
 
-        {!isLoading && !generatedQuiz && (
+        {!isGenerating && !generatedQuiz && (
             <div className="flex flex-col items-center justify-center gap-4 text-center p-4">
                 <div className="w-full space-y-2 text-left">
-                  <Label htmlFor="transcript">Transcrição do Vídeo (Opcional)</Label>
+                  <Label htmlFor="transcript">Transcrição do Vídeo (Opcional, mas recomendado)</Label>
                   <Textarea
                     id="transcript"
                     value={transcript}
                     onChange={(e) => setTranscript(e.target.value)}
                     placeholder="Cole a legenda ou um resumo detalhado do conteúdo do vídeo aqui para obter perguntas mais precisas e aprofundadas. Se uma URL do YouTube foi usada, este campo pode ter sido preenchido automaticamente."
-                    rows={6}
+                    rows={8}
                     className="bg-background/50"
                   />
-                  <p className="text-xs text-muted-foreground">Se este campo for deixado em branco, a IA usará apenas o título e a descrição.</p>
+                  <p className="text-xs text-muted-foreground">Se este campo for deixado em branco, a IA usará apenas o título e a descrição do curso.</p>
                 </div>
                 <Button onClick={handleGenerate} className="mt-4">
                     <Wand2 className="mr-2 h-4 w-4" />
@@ -161,15 +149,15 @@ export function QuizGenerator({ courseId, title, description, hasExistingQuiz, t
             </div>
         )}
 
-        {!isLoading && generatedQuiz && (
+        {!isGenerating && generatedQuiz && (
           <div className="space-y-6">
             <Alert>
-              <AlertTitle>Revise o Questionário</AlertTitle>
+              <AlertTitle>Revise o Questionário Gerado</AlertTitle>
               <AlertDescription>
-                As perguntas foram geradas por IA. Verifique se estão corretas e fazem sentido antes de salvar.
+                Verifique se as perguntas e respostas estão corretas antes de salvar. Você pode gerar novamente se não estiver satisfeito.
               </AlertDescription>
             </Alert>
-            <div className="space-y-4 max-h-[60vh] overflow-y-auto p-1 pr-4">
+            <div className="space-y-4">
               {generatedQuiz.questions.map((q, index) => (
                 <div key={index} className="space-y-2 rounded-lg border bg-background p-4">
                   <div className="flex justify-between items-start">
@@ -177,7 +165,7 @@ export function QuizGenerator({ courseId, title, description, hasExistingQuiz, t
                       {index + 1}. {q.text}
                     </p>
                     {q.difficulty && (
-                        <Badge className={cn("text-xs", difficultyBadgeColor[q.difficulty])}>
+                        <Badge className={cn("text-xs shrink-0", difficultyBadgeColor[q.difficulty])}>
                             {q.difficulty}
                         </Badge>
                     )}
@@ -202,19 +190,9 @@ export function QuizGenerator({ courseId, title, description, hasExistingQuiz, t
             </div>
           </div>
         )}
-      </CardContent>
-       {generatedQuiz && !isLoading && (
-        <CardFooter className="flex justify-end gap-3 border-t pt-6">
-            <Button variant="ghost" onClick={handleGenerate} disabled={isSaving}>
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Gerar Novamente
-            </Button>
-            <Button onClick={handleSave} disabled={isSaving}>
-                {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                {isSaving ? 'Salvando...' : 'Salvar Questionário'}
-            </Button>
-        </CardFooter>
-      )}
-    </Card>
-  );
-}
+      </div>
+    );
+  }
+);
+
+QuizGenerator.displayName = 'QuizGenerator';

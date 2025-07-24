@@ -26,6 +26,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -33,12 +34,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Edit, Trash2, FileText, ThumbsUp, Loader2, ThumbsDown, Wand2 } from "lucide-react";
+import { Edit, Trash2, FileText, ThumbsUp, Loader2, ThumbsDown, Wand2, Save, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { deleteCourseAction } from "@/actions/course-actions";
 import type { Module } from "@/lib/types";
-import { QuizGenerator } from "./quiz-generator";
+import { QuizGenerator, type QuizGeneratorHandles } from "./quiz-generator";
 
 
 interface CourseListClientProps {
@@ -48,6 +49,7 @@ interface CourseListClientProps {
 // Componente interno para a célula do Questionário, para manter o código limpo.
 function QuizCell({ course }: { course: Course & { trackTitle: string } }) {
     const [dialogOpen, setDialogOpen] = useState(false);
+    const quizGeneratorRef = React.useRef<QuizGeneratorHandles>(null);
 
     // Se já existe um quiz, mostra um botão para visualizá-lo.
     if (course.quiz) {
@@ -106,20 +108,44 @@ function QuizCell({ course }: { course: Course & { trackTitle: string } }) {
                     Gerar
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-4xl">
+            <DialogContent className="sm:max-w-4xl flex flex-col max-h-[90vh]">
                  <DialogHeader>
-                    <DialogTitle>Gerador de Questionário com IA</DialogTitle>
-                    <DialogDescription>
-                        A IA irá gerar um questionário com base no título, descrição e transcrição do curso.
-                    </DialogDescription>
+                    <div className="flex items-center gap-3">
+                      <Wand2 className="h-6 w-6 text-primary" />
+                      <div>
+                        <DialogTitle>Gerador de Questionário com IA</DialogTitle>
+                        <DialogDescription>
+                            A IA irá gerar um questionário com base no título, descrição e transcrição do curso. Salvar substituirá qualquer questionário existente.
+                        </DialogDescription>
+                      </div>
+                    </div>
                 </DialogHeader>
                  <QuizGenerator 
+                    ref={quizGeneratorRef}
                     courseId={course.id}
                     title={course.title}
                     description={course.description}
                     hasExistingQuiz={!!course.quiz}
                     transcript={course.transcript}
+                    onQuizSaved={() => setDialogOpen(false)}
                 />
+                <DialogFooter>
+                    <Button 
+                        variant="ghost" 
+                        onClick={() => quizGeneratorRef.current?.regenerate()}
+                        disabled={quizGeneratorRef.current?.isGenerating || !quizGeneratorRef.current?.hasGeneratedQuiz}
+                    >
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                        Gerar Novamente
+                    </Button>
+                    <Button 
+                        onClick={() => quizGeneratorRef.current?.save()} 
+                        disabled={quizGeneratorRef.current?.isSaving || !quizGeneratorRef.current?.hasGeneratedQuiz}
+                    >
+                        {quizGeneratorRef.current?.isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                        {quizGeneratorRef.current?.isSaving ? 'Salvando...' : 'Salvar Questionário'}
+                    </Button>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
