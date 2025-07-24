@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import type { AnalyticsData } from "@/lib/types";
@@ -17,8 +18,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  Cell,
 } from "recharts";
-import { Clock, Users, AreaChart, AlertCircle, Download } from "lucide-react";
+import { Clock, Users, AreaChart, AlertCircle, Download, Users2 } from "lucide-react";
 import Link from 'next/link';
 import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -38,6 +40,28 @@ interface AnalyticsClientProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
+    const isManagerChart = 'managerName' in data;
+    
+    if (isManagerChart) {
+      return (
+         <div className="rounded-lg border bg-background p-2 shadow-sm max-w-sm">
+            <div className="flex flex-col space-y-1">
+                <span className="text-[0.70rem] uppercase text-muted-foreground">
+                    Gestor
+                </span>
+                <p className="font-bold text-primary">{data.managerName}</p>
+            </div>
+            <div className="border-t pt-2 mt-2">
+                <span className="text-[0.70rem] uppercase text-muted-foreground">
+                Progresso Médio da Equipe
+                </span>
+                <p className="font-bold text-foreground">{`${data.completionRate}%`}</p>
+            </div>
+        </div>
+      );
+    }
+    
+    // Original Tooltip for Question Proficiency
     return (
       <div className="rounded-lg border bg-background p-2 shadow-sm max-w-sm">
         <div className="flex flex-col space-y-1 mb-2">
@@ -72,9 +96,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export function AnalyticsClient({ data }: AnalyticsClientProps) {
   const { toast } = useToast();
-  const { engagementStats, questionProficiency, totalUsers } = data;
+  const { engagementStats, questionProficiency, managerCompletionRate, totalUsers } = data;
 
-  const chartData = questionProficiency.map(q => ({
+  const proficiencyChartData = questionProficiency.map(q => ({
     name: q.questionText.length > 50 ? `${q.questionText.substring(0, 50)}...` : q.questionText,
     fullQuestion: q.questionText,
     errorRate: q.errorRate,
@@ -82,6 +106,11 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
     courseTitle: q.courseTitle,
     courseId: q.courseId,
   })).sort((a, b) => b.errorRate - a.errorRate);
+  
+  const managerChartData = managerCompletionRate.map((m, index) => ({
+      ...m,
+      fill: `var(--chart-${(index % 5) + 1})`
+  }));
 
   const handleDownloadProficiency = () => {
     const headers = ["Questão", "Curso", "Taxa de Erro (%)"];
@@ -137,7 +166,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleDownloadProficiency}
-                  disabled={chartData.length === 0}
+                  disabled={proficiencyChartData.length === 0}
                 >
                   Proficiência por Questão
                 </DropdownMenuItem>
@@ -192,48 +221,103 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
         </Card>
       </div>
 
-      {/* Question Proficiency Report */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Proficiência por Questão</CardTitle>
-          <CardDescription>
-            As 10 perguntas de quiz com a maior taxa de erro simulada. Isso pode indicar conteúdo que precisa de revisão ou perguntas que podem ser melhoradas.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {chartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart
-                layout="vertical"
-                data={chartData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                <XAxis type="number" domain={[0, 100]} unit="%" />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  width={250}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip
-                  cursor={{ fill: 'hsl(var(--muted))' }}
-                  content={<CustomTooltip />}
-                />
-                <Bar dataKey="successRate" stackId="a" fill="hsla(145, 63%, 42%, 0.2)" stroke="hsl(145, 63%, 42%)" strokeWidth={1} />
-                <Bar dataKey="errorRate" stackId="a" fill="hsla(0, 100%, 70%, 0.2)" stroke="hsl(0, 84.2%, 60.2%)" strokeWidth={1} radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-             <div className="flex flex-col items-center justify-center text-center p-6 gap-3 text-muted-foreground">
-                <AlertCircle className="h-10 w-10" />
-                <p className="font-semibold">Nenhum dado de questionário encontrado</p>
-                <p className="text-sm">Crie cursos com questionários para ver este relatório.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+       <div className="grid gap-6 md:grid-cols-2">
+            {/* Manager Performance Report */}
+            <Card>
+                <CardHeader>
+                <div className="flex items-center gap-3">
+                    <Users2 className="h-6 w-6" />
+                    <div>
+                        <CardTitle>Desempenho por Equipe</CardTitle>
+                        <CardDescription>
+                            Taxa média de conclusão de cursos por equipe de cada gestor.
+                        </CardDescription>
+                    </div>
+                </div>
+                </CardHeader>
+                <CardContent>
+                {managerChartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={350}>
+                        <BarChart layout="vertical" data={managerChartData} margin={{ left: 30 }}>
+                            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                            <XAxis type="number" domain={[0, 100]} unit="%" />
+                            <YAxis
+                                type="category"
+                                dataKey="managerName"
+                                width={120}
+                                tickLine={false}
+                                axisLine={false}
+                            />
+                            <Tooltip
+                                cursor={{ fill: 'hsl(var(--muted))' }}
+                                content={<CustomTooltip />}
+                            />
+                            <Bar dataKey="completionRate" radius={[0, 4, 4, 0]}>
+                                {managerChartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                                ))}
+                            </Bar>
+                        </BarChart>
+                    </ResponsiveContainer>
+                ) : (
+                    <div className="flex flex-col items-center justify-center text-center p-6 gap-3 text-muted-foreground">
+                        <AlertCircle className="h-10 w-10" />
+                        <p className="font-semibold">Nenhum dado de gestor encontrado</p>
+                        <p className="text-sm">Cadastre gestores e equipes para ver este relatório.</p>
+                    </div>
+                )}
+                </CardContent>
+            </Card>
+
+            {/* Question Proficiency Report */}
+            <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                      <AlertCircle className="h-6 w-6 text-amber-500" />
+                      <div>
+                        <CardTitle>Proficiência por Questão</CardTitle>
+                        <CardDescription>
+                            As 10 perguntas com a maior taxa de erro simulada.
+                        </CardDescription>
+                      </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                {proficiencyChartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={350}>
+                    <BarChart
+                        layout="vertical"
+                        data={proficiencyChartData}
+                        margin={{ left: 10 }}
+                    >
+                        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                        <XAxis type="number" domain={[0, 100]} unit="%" />
+                        <YAxis
+                        type="category"
+                        dataKey="name"
+                        width={200}
+                        tickLine={false}
+                        axisLine={false}
+                        tick={{ fontSize: 12 }}
+                        />
+                        <Tooltip
+                        cursor={{ fill: 'hsl(var(--muted))' }}
+                        content={<CustomTooltip />}
+                        />
+                        <Bar dataKey="successRate" stackId="a" fill="hsla(145, 63%, 42%, 0.2)" stroke="hsl(145, 63%, 42%)" strokeWidth={1} />
+                        <Bar dataKey="errorRate" stackId="a" fill="hsla(0, 100%, 70%, 0.2)" stroke="hsl(0, 84.2%, 60.2%)" strokeWidth={1} radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                    </ResponsiveContainer>
+                ) : (
+                    <div className="flex flex-col items-center justify-center text-center p-6 gap-3 text-muted-foreground">
+                        <AlertCircle className="h-10 w-10" />
+                        <p className="font-semibold">Nenhum dado de questionário encontrado</p>
+                        <p className="text-sm">Crie cursos com questionários para ver este relatório.</p>
+                    </div>
+                )}
+                </CardContent>
+            </Card>
+       </div>
     </div>
   );
 }

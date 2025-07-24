@@ -1,7 +1,8 @@
 
 
+
 // In-memory data store
-import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats } from './types';
+import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerCompletionRate } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
 import { userHasCourseAccess } from './access-control';
 import { differenceInDays } from 'date-fns';
@@ -375,6 +376,25 @@ export async function getNotificationsForUser(user: User): Promise<Notification[
     return notifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
 
+
+const getSubordinates = (managerName: string, allUsers: User[]): User[] => {
+    const directReports = allUsers.filter(u => 
+        u.supervisor === managerName ||
+        u.coordenador === managerName ||
+        u.gerente === managerName ||
+        u.diretor === managerName
+    );
+
+    let allSubordinates = [...directReports];
+
+    directReports.forEach(report => {
+        const subordinatesOfReport = getSubordinates(report.name, allUsers);
+        allSubordinates = [...allSubordinates, ...subordinatesOfReport];
+    });
+    
+    return [...new Map(allSubordinates.map(item => [item.id, item])).values()];
+};
+
 // --- Analytics Functions ---
 
 // NOTE: The data generated here is for demonstration purposes.
@@ -382,6 +402,7 @@ export async function getNotificationsForUser(user: User): Promise<Notification[
 export async function getAnalyticsData(): Promise<AnalyticsData> {
   const allModules = await getLearningModules();
   const allUsers = await getUsers();
+  const totalCourses = allModules.flatMap(m => m.tracks.flatMap(t => t.courses)).length || 1;
 
   // 1. Calculate Question Proficiency (Simulated)
   const allQuestions: { question: Question, course: Course }[] = [];
@@ -415,28 +436,46 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
 
   // 2. Totals
   const totalUsers = allUsers.length;
-  const totalCourses = allModules.flatMap(m => m.tracks.flatMap(t => t.courses)).length;
   
   // 3. Engagement Stats (Calculate real completion rate)
-  let totalCompletionPercentage = 0;
-  if (totalCourses > 0 && totalUsers > 0) {
-      allUsers.forEach(user => {
-          const userCompletionPercentage = (user.completedCourses.length / totalCourses) * 100;
-          totalCompletionPercentage += userCompletionPercentage;
-      });
-  }
+  const totalCompletionSum = allUsers.reduce((sum, user) => {
+      const userCompletionPercentage = (user.completedCourses.length / totalCourses) * 100;
+      return sum + userCompletionPercentage;
+  }, 0);
 
-  const averageCompletionRate = totalUsers > 0 ? Math.round(totalCompletionPercentage / totalUsers) : 0;
+  const averageCompletionRate = totalUsers > 0 ? Math.round(totalCompletionSum / totalUsers) : 0;
   
   const engagementStats: EngagementStats = {
     avgSessionTime: "25 min", // Simulated
     peakTime: "14h - 16h", // Simulated
-    completionRate: averageCompletionRate, // Real data
+    completionRate: averageCompletionRate,
   };
   
+  // 4. Manager/Team Completion Rate
+  const managerRoles: UserRole[] = ['Supervisor', 'Coordenador', 'Gerente', 'Diretor'];
+  const managers = allUsers.filter(u => managerRoles.includes(u.role));
+  
+  const managerCompletionRate: ManagerCompletionRate[] = managers.map(manager => {
+      const teamMembers = getSubordinates(manager.name, allUsers);
+      
+      if (teamMembers.length === 0) {
+          return { managerName: manager.name, completionRate: 0 };
+      }
+      
+      const teamCompletionSum = teamMembers.reduce((sum, member) => {
+          const memberCompletionPercentage = (member.completedCourses.length / totalCourses) * 100;
+          return sum + memberCompletionPercentage;
+      }, 0);
+      
+      const averageRate = Math.round(teamCompletionSum / teamMembers.length);
+      return { managerName: manager.name, completionRate: averageRate };
+  }).sort((a, b) => b.completionRate - a.completionRate); // Sort by highest completion rate
+
+
   return Promise.resolve({
     questionProficiency,
     engagementStats,
+    managerCompletionRate,
     totalUsers,
     totalCourses,
   });
