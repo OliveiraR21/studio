@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import type { AnalyticsData } from "@/lib/types";
@@ -226,7 +225,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
         </Card>
       </div>
 
-       <div className="grid gap-6 md:grid-cols-2">
+       <div className="grid gap-6 lg:grid-cols-1">
             {/* Manager Performance Report */}
             <Card>
                 <CardHeader>
