@@ -114,7 +114,7 @@ export function TeamManagementClient({ teamMembers, allCoursesCount }: TeamManag
       0
     );
     return Math.round(totalProgress / filteredMembers.length);
-  }, [filteredMembers, calculateCompletionPercentage]);
+  }, [filteredMembers, totalCourses]);
 
   const teamAverageScore = useMemo(() => {
     if (filteredMembers.length === 0) return 0;
