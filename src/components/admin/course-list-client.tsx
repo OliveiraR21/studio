@@ -83,6 +83,8 @@ export function CourseListClient({ modules }: CourseListClientProps) {
             <TableHead className="w-12">Ordem</TableHead>
             <TableHead>Título do Curso</TableHead>
             <TableHead>Trilha</TableHead>
+            <TableHead>Cargos</TableHead>
+            <TableHead>Áreas</TableHead>
             <TableHead>Questionário</TableHead>
             <TableHead>Avaliações</TableHead>
             <TableHead className="w-[150px] text-right">Ações</TableHead>
@@ -102,6 +104,24 @@ export function CourseListClient({ modules }: CourseListClientProps) {
                 </TableCell>
                 <TableCell>
                     <Badge variant="secondary">{course.trackTitle}</Badge>
+                </TableCell>
+                <TableCell>
+                  {course.minimumRole ? (
+                    <Badge variant="outline">{course.minimumRole}</Badge>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">Todos</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                   {course.accessAreas && course.accessAreas.length > 0 ? (
+                      <div className="flex flex-wrap gap-1 max-w-xs">
+                          {course.accessAreas.map(area => (
+                              <Badge key={area} variant="outline">{area}</Badge>
+                          ))}
+                      </div>
+                  ) : (
+                        <span className="text-xs text-muted-foreground">Todas</span>
+                  )}
                 </TableCell>
                 <TableCell>
                     {course.quiz ? (
