@@ -70,7 +70,8 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
         if (!hasAccessByRole) continue;
 
         const titleMatch = course.title.toLowerCase().includes(lowerCaseQuery);
-        const descriptionMatch = course.description.toLowerCase().includes(lowerCaseQuery);
+        // Safely check description
+        const descriptionMatch = course.description && course.description.toLowerCase().includes(lowerCaseQuery);
 
         if (titleMatch || descriptionMatch) {
             const previousCourse = index > 0 ? sortedCourses[index - 1] : undefined;
