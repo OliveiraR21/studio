@@ -114,21 +114,12 @@ export function TeamManagementClient({ teamMembers, allCoursesCount }: TeamManag
       0
     );
     return Math.round(totalProgress / filteredMembers.length);
-  }, [filteredMembers, totalCourses]);
-
-  const teamAverageScore = useMemo(() => {
-    if (filteredMembers.length === 0) return 0;
-    const totalScore = filteredMembers.reduce(
-      (sum, member) => sum + calculateAverageScore(member),
-      0
-    );
-    return Math.round(totalScore / filteredMembers.length);
-  }, [filteredMembers]);
+  }, [filteredMembers, totalCourses, calculateCompletionPercentage]);
 
   return (
       <div className="space-y-6">
         {/* Dashboard Section */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
             <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Membros Filtrados</CardTitle>
@@ -141,22 +132,12 @@ export function TeamManagementClient({ teamMembers, allCoursesCount }: TeamManag
             </Card>
             <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Progresso Médio</CardTitle>
+                <CardTitle className="text-sm font-medium">Progresso Médio da Equipe</CardTitle>
                 <AreaChart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{teamAverageProgress}%</div>
                 <Progress value={teamAverageProgress} className="h-2 mt-2" />
-            </CardContent>
-            </Card>
-            <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Média das Notas</CardTitle>
-                <GaugeCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">{teamAverageScore}%</div>
-                <p className="text-xs text-muted-foreground">Média das notas da equipe filtrada</p>
             </CardContent>
             </Card>
         </div>

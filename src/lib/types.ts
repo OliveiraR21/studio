@@ -104,15 +104,16 @@ export interface EngagementStats {
   completionRate: number; // e.g., 82
 }
 
-export interface ManagerCompletionRate {
+export interface ManagerPerformance {
     managerName: string;
     completionRate: number;
+    averageScore: number;
 }
 
 export interface AnalyticsData {
   questionProficiency: QuestionProficiency[];
   engagementStats: EngagementStats;
-  managerCompletionRate: ManagerCompletionRate[];
+  managerPerformance: ManagerPerformance[];
   totalUsers: number;
   totalCourses: number;
 }

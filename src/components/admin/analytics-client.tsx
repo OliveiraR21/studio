@@ -18,7 +18,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-  Cell,
+  Legend
 } from "recharts";
 import { Clock, Users, AreaChart, AlertCircle, Download, Users2 } from "lucide-react";
 import Link from 'next/link';
@@ -45,17 +45,25 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     if (isManagerChart) {
       return (
          <div className="rounded-lg border bg-background p-2 shadow-sm max-w-sm">
-            <div className="flex flex-col space-y-1">
+            <div className="flex flex-col space-y-1 mb-2">
                 <span className="text-[0.70rem] uppercase text-muted-foreground">
                     Gestor
                 </span>
                 <p className="font-bold text-primary">{data.managerName}</p>
             </div>
-            <div className="border-t pt-2 mt-2">
-                <span className="text-[0.70rem] uppercase text-muted-foreground">
-                Progresso Médio da Equipe
-                </span>
-                <p className="font-bold text-foreground">{`${data.completionRate}%`}</p>
+             <div className="grid grid-cols-2 gap-2 border-t pt-2">
+                <div className="flex flex-col space-y-1">
+                    <span className="text-[0.70rem] uppercase text-muted-foreground">
+                    Progresso Médio
+                    </span>
+                    <p className="font-bold text-foreground">{`${data.completionRate}%`}</p>
+                </div>
+                 <div className="flex flex-col space-y-1">
+                    <span className="text-[0.70rem] uppercase text-muted-foreground">
+                    Nota Média
+                    </span>
+                    <p className="font-bold text-foreground">{`${data.averageScore}%`}</p>
+                </div>
             </div>
         </div>
       );
@@ -96,7 +104,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export function AnalyticsClient({ data }: AnalyticsClientProps) {
   const { toast } = useToast();
-  const { engagementStats, questionProficiency, managerCompletionRate, totalUsers } = data;
+  const { engagementStats, questionProficiency, managerPerformance, totalUsers } = data;
 
   const proficiencyChartData = questionProficiency.map(q => ({
     name: q.questionText.length > 50 ? `${q.questionText.substring(0, 50)}...` : q.questionText,
@@ -107,10 +115,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
     courseId: q.courseId,
   })).sort((a, b) => b.errorRate - a.errorRate);
   
-  const managerChartData = managerCompletionRate.map((m, index) => ({
-      ...m,
-      fill: `var(--chart-${(index % 5) + 1})`
-  }));
+  const managerChartData = managerPerformance;
 
   const handleDownloadProficiency = () => {
     const headers = ["Questão", "Curso", "Taxa de Erro (%)"];
@@ -230,7 +235,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                     <div>
                         <CardTitle>Desempenho por Equipe</CardTitle>
                         <CardDescription>
-                            Taxa média de conclusão de cursos por equipe de cada gestor.
+                            Progresso de conclusão e média de notas por equipe de cada gestor.
                         </CardDescription>
                     </div>
                 </div>
@@ -238,25 +243,17 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                 <CardContent>
                 {managerChartData.length > 0 ? (
                     <ResponsiveContainer width="100%" height={350}>
-                        <BarChart layout="vertical" data={managerChartData} margin={{ left: 30 }}>
-                            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                            <XAxis type="number" domain={[0, 100]} unit="%" />
-                            <YAxis
-                                type="category"
-                                dataKey="managerName"
-                                width={120}
-                                tickLine={false}
-                                axisLine={false}
-                            />
+                        <BarChart data={managerChartData} margin={{ left: 30 }}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="managerName" tick={{ fontSize: 12 }} />
+                            <YAxis type="number" domain={[0, 100]} unit="%" />
                             <Tooltip
                                 cursor={{ fill: 'hsl(var(--muted))' }}
                                 content={<CustomTooltip />}
                             />
-                            <Bar dataKey="completionRate" radius={[0, 4, 4, 0]}>
-                                {managerChartData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                                ))}
-                            </Bar>
+                            <Legend wrapperStyle={{fontSize: "12px"}} />
+                            <Bar dataKey="completionRate" name="Progresso" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="averageScore" name="Nota Média" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
                 ) : (

@@ -1,8 +1,9 @@
 
 
 
+
 // In-memory data store
-import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerCompletionRate } from './types';
+import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerPerformance } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
 import { userHasCourseAccess } from './access-control';
 import { differenceInDays } from 'date-fns';
@@ -451,31 +452,43 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
     completionRate: averageCompletionRate,
   };
   
-  // 4. Manager/Team Completion Rate
+  // 4. Manager/Team Performance
   const managerRoles: UserRole[] = ['Supervisor', 'Coordenador', 'Gerente', 'Diretor'];
   const managers = allUsers.filter(u => managerRoles.includes(u.role));
   
-  const managerCompletionRate: ManagerCompletionRate[] = managers.map(manager => {
+  const calculateAverageScore = (user: User): number => {
+      const allScores = [...(user.courseScores ?? []).map(s => s.score), ...(user.trackScores ?? []).map(s => s.score)];
+      if (allScores.length === 0) return 0;
+      return Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length);
+  };
+
+  const managerPerformance: ManagerPerformance[] = managers.map(manager => {
       const teamMembers = getSubordinates(manager.name, allUsers);
       
       if (teamMembers.length === 0) {
-          return { managerName: manager.name, completionRate: 0 };
+          return { managerName: manager.name, completionRate: 0, averageScore: 0 };
       }
       
       const teamCompletionSum = teamMembers.reduce((sum, member) => {
           const memberCompletionPercentage = (member.completedCourses.length / totalCourses) * 100;
           return sum + memberCompletionPercentage;
       }, 0);
+
+      const teamScoreSum = teamMembers.reduce((sum, member) => {
+          return sum + calculateAverageScore(member);
+      }, 0);
       
-      const averageRate = Math.round(teamCompletionSum / teamMembers.length);
-      return { managerName: manager.name, completionRate: averageRate };
-  }).sort((a, b) => b.completionRate - a.completionRate); // Sort by highest completion rate
+      const averageCompletion = Math.round(teamCompletionSum / teamMembers.length);
+      const averageScore = Math.round(teamScoreSum / teamMembers.length);
+
+      return { managerName: manager.name, completionRate: averageCompletion, averageScore: averageScore };
+  }).sort((a, b) => b.completionRate - a.completionRate);
 
 
   return Promise.resolve({
     questionProficiency,
     engagementStats,
-    managerCompletionRate,
+    managerPerformance,
     totalUsers,
     totalCourses,
   });
