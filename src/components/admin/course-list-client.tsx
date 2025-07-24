@@ -1,8 +1,8 @@
 
 "use client";
 
-import type { Course } from "@/lib/types";
-import { useTransition } from "react";
+import type { Course, Quiz } from "@/lib/types";
+import { useTransition, useState } from "react";
 import {
   Table,
   TableBody,
@@ -33,16 +33,92 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Edit, Trash2, FileText, ThumbsUp, Loader2, ThumbsDown } from "lucide-react";
+import { Edit, Trash2, FileText, ThumbsUp, Loader2, ThumbsDown, Wand2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { deleteCourseAction } from "@/actions/course-actions";
 import type { Module } from "@/lib/types";
+import { QuizGenerator } from "./quiz-generator";
 
 
 interface CourseListClientProps {
     modules: Module[];
 }
+
+// Componente interno para a célula do Questionário, para manter o código limpo.
+function QuizCell({ course }: { course: Course & { trackTitle: string } }) {
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    // Se já existe um quiz, mostra um botão para visualizá-lo.
+    if (course.quiz) {
+        return (
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                        <FileText className="mr-2 h-4 w-4" />
+                        Visualizar
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[625px]">
+                    <DialogHeader>
+                        <DialogTitle>Questionário: {course.title}</DialogTitle>
+                        <DialogDescription>
+                            Perguntas e respostas cadastradas. A resposta correta está em destaque.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="max-h-[60vh] overflow-y-auto p-1 pr-4">
+                        <div className="grid gap-6 py-4">
+                            {course.quiz.questions.map((q, index) => (
+                                <div key={index} className="space-y-2">
+                                    <p className="font-semibold">
+                                        {index + 1}. {q.text}
+                                    </p>
+                                    <ul className="space-y-1 text-sm">
+                                        {q.options.map((opt, optIndex) => (
+                                            <li
+                                                key={optIndex}
+                                                className={cn(
+                                                    'p-1 rounded',
+                                                    opt === q.correctAnswer
+                                                        ? "font-bold text-green-700 dark:text-green-400"
+                                                        : "text-muted-foreground"
+                                                )}
+                                            >
+                                                - {opt}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        );
+    }
+    
+    // Se não existe um quiz, mostra um botão para gerá-lo.
+    return (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+                 <Button variant="outline" size="sm" className="text-muted-foreground">
+                    <Wand2 className="mr-2 h-4 w-4" />
+                    Gerar
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl">
+                 <QuizGenerator 
+                    courseId={course.id}
+                    title={course.title}
+                    description={course.description}
+                    hasExistingQuiz={!!course.quiz}
+                    transcript={course.transcript}
+                />
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 
 export function CourseListClient({ modules }: CourseListClientProps) {
   const { toast } = useToast();
@@ -124,52 +200,7 @@ export function CourseListClient({ modules }: CourseListClientProps) {
                   )}
                 </TableCell>
                 <TableCell>
-                    {course.quiz ? (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <FileText className="mr-2 h-4 w-4" />
-                            Visualizar
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[625px]">
-                          <DialogHeader>
-                            <DialogTitle>Questionário: {course.title}</DialogTitle>
-                            <DialogDescription>
-                              Perguntas e respostas cadastradas. A resposta correta está em destaque.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="max-h-[60vh] overflow-y-auto p-1 pr-4">
-                              <div className="grid gap-6 py-4">
-                              {course.quiz.questions.map((q, index) => (
-                                  <div key={index} className="space-y-2">
-                                  <p className="font-semibold">
-                                      {index + 1}. {q.text}
-                                  </p>
-                                  <ul className="space-y-1 text-sm">
-                                      {q.options.map((opt, optIndex) => (
-                                      <li
-                                          key={optIndex}
-                                          className={cn(
-                                              'p-1 rounded',
-                                              opt === q.correctAnswer
-                                                  ? "font-bold text-green-700 dark:text-green-400"
-                                                  : "text-muted-foreground"
-                                          )}
-                                      >
-                                          - {opt}
-                                      </li>
-                                      ))}
-                                  </ul>
-                                  </div>
-                              ))}
-                              </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    ) : (
-                      <Badge variant="outline">Não possui</Badge>
-                    )}
+                   <QuizCell course={course} />
                 </TableCell>
                 <TableCell>
                   {totalVotes > 0 ? (
