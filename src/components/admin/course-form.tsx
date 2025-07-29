@@ -184,6 +184,9 @@ export function CourseForm({ course, modules, allUsers, initialModuleId, initial
     }
   }, [isNew, initialModuleId, initialTrackId]);
 
+  // If we are creating a new course, the selection must be made.
+  // Otherwise, the fields are disabled because you can't move a course.
+  const isSelectionDisabled = !isNew;
 
   return (
     <form ref={formRef} action={dispatch} className="space-y-6">
@@ -193,10 +196,10 @@ export function CourseForm({ course, modules, allUsers, initialModuleId, initial
        {youTubeData.transcript && <input type="hidden" name="transcript" value={youTubeData.transcript} />}
 
 
-      {isNew && (
+      
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="moduleId">1. Selecione o Módulo</Label>
+            <Label htmlFor="moduleId">Módulo</Label>
             <Select
               name="moduleId"
               value={selectedModuleId}
@@ -205,6 +208,7 @@ export function CourseForm({ course, modules, allUsers, initialModuleId, initial
                 setSelectedTrackId(undefined); // Reset track when module changes
               }}
               required={isNew}
+              disabled={isSelectionDisabled}
             >
               <SelectTrigger id="moduleId">
                 <SelectValue placeholder="Selecione um módulo" />
@@ -220,7 +224,7 @@ export function CourseForm({ course, modules, allUsers, initialModuleId, initial
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="trackId">2. Selecione a Trilha</Label>
+            <Label htmlFor="trackId">Trilha</Label>
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -228,7 +232,7 @@ export function CourseForm({ course, modules, allUsers, initialModuleId, initial
                   role="combobox"
                   aria-expanded={popoverOpen}
                   className="w-full justify-between font-normal"
-                  disabled={!selectedModuleId}
+                  disabled={!selectedModuleId || isSelectionDisabled}
                 >
                   {selectedTrackId
                     ? availableTracks.find((track) => track.id === selectedTrackId)
@@ -275,7 +279,7 @@ export function CourseForm({ course, modules, allUsers, initialModuleId, initial
             )}
           </div>
         </div>
-      )}
+      
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">

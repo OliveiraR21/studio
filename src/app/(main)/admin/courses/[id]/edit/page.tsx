@@ -1,8 +1,4 @@
 
-
-'use client';
-
-import { useState, useEffect, useCallback, use } from "react";
 import { findCourseById, getLearningModules, getUsers } from "@/lib/data-access";
 import { CourseForm } from "@/components/admin/course-form";
 import { notFound } from "next/navigation";
@@ -11,87 +7,31 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { QuizGenerator } from "@/components/admin/quiz-generator";
-import type { Course, Module, User } from "@/lib/types";
 import { QuizViewer } from "@/components/admin/quiz-viewer";
-import { Skeleton } from "@/components/ui/skeleton";
+import type { Course, Module, User } from "@/lib/types";
 
-interface CourseData {
-    course: Course;
-    module: Module;
-    trackId: string;
-}
-
-export default function EditCoursePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+// This is now a Server Component, which is more robust for data fetching.
+export default async function EditCoursePage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const isNew = id === 'new';
-  const [courseData, setCourseData] = useState<CourseData | null>(null);
-  const [modules, setModules] = useState<Module[]>([]);
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // State to hold the transcript fetched from YouTube in CourseForm
-  const [liveTranscript, setLiveTranscript] = useState<string | undefined>(undefined);
 
-  const handleYouTubeDataFetched = useCallback((transcript: string) => {
-    setLiveTranscript(transcript);
-  }, []);
+  // Fetch all necessary data in parallel on the server.
+  const [modules, allUsers, courseResult] = await Promise.all([
+    getLearningModules(),
+    getUsers(),
+    isNew ? Promise.resolve(null) : findCourseById(id),
+  ]);
 
-  useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true);
-      try {
-        const [modulesData, usersData] = await Promise.all([
-          getLearningModules(),
-          getUsers()
-        ]);
-        setModules(modulesData);
-        setAllUsers(usersData);
-
-        if (!isNew) {
-          const result = await findCourseById(id);
-          if (!result) {
-            notFound();
-          }
-          setCourseData({
-              course: result.course,
-              module: result.module,
-              trackId: result.track.id
-          });
-          setLiveTranscript(result.course.transcript); // Initialize with saved transcript
-        } else {
-          setCourseData(null);
-        }
-      } catch (error) {
-        console.error("Failed to fetch data", error);
-        // Handle error state appropriately
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchData();
-  }, [id, isNew]);
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto space-y-6">
-        <div className="mb-6">
-          <Skeleton className="h-10 w-64" />
-        </div>
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-8 w-1/3" />
-            <Skeleton className="h-4 w-2/3" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-64 w-full" />
-          </CardContent>
-        </Card>
-      </div>
-    );
+  // If we are editing and the course doesn't exist, show a 404 page.
+  // This is the crucial check to prevent the 'undefined' error.
+  if (!isNew && !courseResult) {
+    notFound();
   }
   
-  const course = courseData?.course;
-
+  const course = courseResult?.course;
+  const initialModuleId = courseResult?.module?.id;
+  const initialTrackId = courseResult?.track.id;
+  
   return (
     <div className="container mx-auto space-y-6">
       <div className="mb-6">
@@ -116,9 +56,8 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
             course={course || null} 
             modules={modules} 
             allUsers={allUsers}
-            initialModuleId={courseData?.module?.id}
-            initialTrackId={courseData?.trackId}
-            onYouTubeDataFetched={handleYouTubeDataFetched}
+            initialModuleId={initialModuleId}
+            initialTrackId={initialTrackId}
           />
         </CardContent>
       </Card>
@@ -133,7 +72,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
             title={course.title}
             description={course.description}
             hasExistingQuiz={!!course.quiz}
-            transcript={liveTranscript ?? course.transcript}
+            transcript={course.transcript}
         />
       )}
     </div>
