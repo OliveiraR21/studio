@@ -1,6 +1,6 @@
 
 
-import { getLearningModules, findNextCourseForUser } from "@/lib/data-access";
+import { getLearningModules, findNextCourseForUser, filterModulesForUser } from "@/lib/data-access";
 import { 
   Tabs, 
   TabsContent, 
@@ -22,7 +22,6 @@ import { Card } from "@/components/ui/card";
 import { UserNotFound } from "@/components/layout/user-not-found";
 import { TrackFinalActions } from "@/components/course/track-final-actions";
 import { getCurrentUser } from "@/lib/auth";
-import { userHasCourseAccess } from "@/lib/access-control";
 import React from "react";
 import { cn } from "@/lib/utils";
 
@@ -172,30 +171,8 @@ export default async function MyCoursesPage({
     return <UserNotFound />
   }
 
-  // Filter modules and tracks based on user access.
-  const canSeeAllRoles: User['role'][] = ['Admin', 'Diretor'];
-  const userCanSeeAll = canSeeAllRoles.includes(currentUser.role);
-  
-  const learningModules = allModules.map(module => {
-      const filteredTracks = module.tracks
-        .map(track => {
-          const accessibleCourses = track.courses
-              .filter(course => userHasCourseAccess(currentUser, course))
-              .sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
-          
-          return {
-            ...track,
-            courses: accessibleCourses
-          };
-        })
-        .filter(track => userCanSeeAll || track.courses.length > 0)
-        .sort((a, b) => (a.order || Infinity) - (b.order || Infinity));
-
-      return {
-          ...module,
-          tracks: filteredTracks,
-      };
-    }).filter(module => module.tracks.length > 0);
+  // Use the centralized function to filter the modules
+  const learningModules = filterModulesForUser(allModules, currentUser);
 
 
   const nextCourse = await findNextCourseForUser(currentUser);

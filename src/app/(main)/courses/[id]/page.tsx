@@ -1,5 +1,6 @@
 
-import { findCourseByIdWithTrack, getUserById, getLearningModules } from "@/lib/data-access";
+
+import { findCourseByIdWithTrack, getUserById, getLearningModules, filterModulesForUser } from "@/lib/data-access";
 import { notFound } from "next/navigation";
 import { CoursePageClient } from "./course-page-client";
 import { getSimulatedUserId } from "@/lib/auth";
@@ -26,6 +27,9 @@ export default async function CoursePage({ params }: { params: { id: string } })
       notFound(); // Or show a user not found component
   }
 
+  // Filter modules for the current user to pass to the playlist
+  const learningModules = filterModulesForUser(allModules, user);
+
   const isAlreadyCompleted = user.completedCourses.includes(course.id);
 
   // Determine user's initial feedback state.
@@ -45,7 +49,7 @@ export default async function CoursePage({ params }: { params: { id: string } })
         track={track} 
         isAlreadyCompleted={isAlreadyCompleted} 
         initialFeedback={initialFeedback} 
-        allModules={allModules}
+        learningModules={learningModules}
         currentUser={user}
     />
   );

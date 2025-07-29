@@ -151,7 +151,7 @@ export async function findNextCourseForUser(user: User): Promise<(Course & {trac
   for (const module of modules) {
       const sortedTracks = [...module.tracks].sort((a,b) => (a.order || Infinity) - (b.order || Infinity));
       for (const track of sortedTracks) {
-          const sortedCourses = [...track.courses].sort((a,b) => (a.order || Infinity) - (b.order || Infinity));
+          const sortedCourses = [...track.courses].sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
           for (const course of sortedCourses) {
               if (!user.completedCourses.includes(course.id)) {
                 // Check if the user has access to this course before returning it
@@ -180,6 +180,7 @@ export async function createCourse(
         ...courseData,
         id: `course-${Date.now()}-${Math.random()}`,
         moduleId: result.module.id, // Ensure moduleId is set on creation
+        trackId: result.track.id, // Ensure trackId is set on creation
         createdAt: new Date(),
         likes: 0,
         dislikes: 0,
@@ -442,4 +443,47 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
     totalUsers,
     totalCourses,
   });
+}
+
+/**
+ * Filters a list of learning modules for a specific user.
+ * - Removes courses to which the user does not have access.
+ * - Removes tracks that become empty after filtering courses (unless the user is Admin/Director).
+ * - Removes modules that become empty after filtering tracks.
+ * @param allModules The complete list of modules.
+ * @param currentUser The logged-in user.
+ * @returns A new list of modules containing only content accessible by the user.
+ */
+export function filterModulesForUser(allModules: Module[], currentUser: User): Module[] {
+  const canSeeAllRoles: User['role'][] = ['Admin', 'Diretor'];
+  const userCanSeeAll = canSeeAllRoles.includes(currentUser.role);
+
+  // The .map() creates a new list, preserving the original.
+  return allModules.map(module => {
+    // 1. Filter the tracks within each module
+    const filteredTracks = module.tracks
+      .map(track => {
+        // 2. Filter the courses within each track
+        const accessibleCourses = track.courses
+          .filter(course => userHasCourseAccess(currentUser, course))
+          .sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+        
+        // Return the track with only the accessible courses
+        return {
+          ...track,
+          courses: accessibleCourses
+        };
+      })
+      // 3. Remove tracks that have become empty (no courses)
+      .filter(track => userCanSeeAll || track.courses.length > 0 || (track.quiz && track.quiz.questions.length > 0))
+      .sort((a, b) => (a.order || Infinity) - (b.order || Infinity));
+
+    // Return the module with only the tracks that have survived the filter
+    return {
+      ...module,
+      tracks: filteredTracks,
+    };
+  })
+  // 4. Finally, remove modules that have become empty (no tracks)
+  .filter(module => module.tracks.length > 0);
 }

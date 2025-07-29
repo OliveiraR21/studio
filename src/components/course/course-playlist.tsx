@@ -3,7 +3,6 @@
 "use client";
 
 import type { User, Module, Track, Course } from "@/lib/types";
-import { userHasCourseAccess } from "@/lib/access-control";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,73 +11,14 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 interface CoursePlaylistProps {
-    allModules: Module[];
+    learningModules: Module[]; // Renamed from allModules
     currentUser: User;
     currentCourseId: string;
     currentTrackId: string;
 }
 
-export function CoursePlaylist({ allModules, currentUser, currentCourseId, currentTrackId }: CoursePlaylistProps) {
-    
-    // Filter modules and tracks based on user access.
-    const canSeeAllRoles: User['role'][] = ['Admin', 'Diretor'];
-    const userCanSeeAll = canSeeAllRoles.includes(currentUser.role);
-    
-    const learningModules = allModules.map(module => {
-        const filteredTracks = module.tracks
-          .map(track => {
-            const accessibleCourses = track.courses
-                .filter(course => userHasCourseAccess(currentUser, course))
-                .sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
-            
-            return {
-              ...track,
-              courses: accessibleCourses
-            };
-          })
-          .filter(track => userCanSeeAll || track.courses.length > 0)
-          .sort((a, b) => (a.order || Infinity) - (b.order || Infinity));
-  
-        return {
-            ...module,
-            tracks: filteredTracks,
-        };
-      }).filter(module => module.tracks.length > 0);
-
-
+export function CoursePlaylist({ learningModules, currentUser, currentCourseId, currentTrackId }: CoursePlaylistProps) {
     const isCourseCompleted = (courseId: string) => currentUser.completedCourses.includes(courseId);
-
-    const isCourseUnlocked = (course: Course, track: Track, courseIndex: number) => {
-        let isParentTrackUnlocked = true;
-        
-        // Find current module and track index
-        const currentModule = allModules.find(m => m.tracks.some(t => t.id === track.id));
-        if (!currentModule) return false;
-
-        const trackIndex = currentModule.tracks.findIndex(t => t.id === track.id);
-        
-        if (trackIndex > 0) {
-            let prerequisiteTrack: Track | undefined;
-            for (let i = trackIndex - 1; i >= 0; i--) {
-                const pt = currentModule.tracks[i];
-                const isSkippable = pt.courses.length === 0 && (!pt.quiz || pt.quiz.questions.length === 0);
-                if (!isSkippable) {
-                    prerequisiteTrack = pt;
-                    break;
-                }
-            }
-            if (prerequisiteTrack) {
-                isParentTrackUnlocked = currentUser.completedTracks.includes(prerequisiteTrack.id);
-            }
-        }
-        
-        if (!isParentTrackUnlocked) return false;
-
-        const previousCourse = courseIndex > 0 ? track.courses[courseIndex - 1] : undefined;
-        if (!previousCourse) return true; // First course in an unlocked track is always unlocked.
-        
-        return isCourseCompleted(previousCourse.id);
-    }
 
     return (
         <Card>

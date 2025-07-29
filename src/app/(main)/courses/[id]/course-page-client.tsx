@@ -23,11 +23,11 @@ interface CoursePageClientProps {
     track: Track;
     isAlreadyCompleted: boolean;
     initialFeedback: 'like' | 'dislike' | 'none';
-    allModules: Module[];
+    learningModules: Module[];
     currentUser: User;
 }
 
-export function CoursePageClient({ course, track, isAlreadyCompleted, initialFeedback, allModules, currentUser }: CoursePageClientProps) {
+export function CoursePageClient({ course, track, isAlreadyCompleted, initialFeedback, learningModules, currentUser }: CoursePageClientProps) {
   const router = useRouter();
   const { toast } = useToast();
   
@@ -307,7 +307,7 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
         <div className="lg:col-span-1">
             <div className="sticky top-6">
                <CoursePlaylist
-                    allModules={allModules}
+                    learningModules={learningModules}
                     currentUser={currentUser}
                     currentCourseId={course.id}
                     currentTrackId={track.id}
