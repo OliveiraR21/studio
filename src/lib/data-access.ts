@@ -110,15 +110,15 @@ export const findCourseById = cache(async (courseId: string): Promise<{ course: 
 });
 
 // Find a module by its ID.
-export async function findModuleById(moduleId: string): Promise<Module | null> {
+export const findModuleById = cache(async (moduleId: string): Promise<Module | null> => {
     const modules = await getLearningModules();
     const module = modules.find(m => m.id === moduleId);
     return Promise.resolve(module || null);
-}
+});
 
 
 // Find a track by its ID, and include its parent module
-export async function findTrackById(trackId: string): Promise<{ track: Track, module: Module } | null> {
+export const findTrackById = cache(async (trackId: string): Promise<{ track: Track, module: Module } | null> => {
     const modules = await getLearningModules();
     for (const module of modules) {
         for (const track of module.tracks) {
@@ -128,22 +128,17 @@ export async function findTrackById(trackId: string): Promise<{ track: Track, mo
         }
     }
     return Promise.resolve(null);
-}
+});
 
 
 // Find a course and its parent track by the course ID
-export async function findCourseByIdWithTrack(courseId: string): Promise<{ course: Course, track: Track } | null> {
-  const modules = await getLearningModules();
-  for (const module of modules) {
-    for (const track of module.tracks) {
-      const course = track.courses.find(c => c.id === courseId);
-      if (course) {
-        return Promise.resolve({ course, track });
-      }
+export const findCourseByIdWithTrack = cache(async (courseId: string): Promise<{ course: Course, track: Track } | null> => {
+    const result = await findCourseById(courseId);
+    if (result) {
+        return { course: result.course, track: result.track };
     }
-  }
-  return Promise.resolve(null);
-}
+    return null;
+});
 
 // Finds the very first course that is not marked as completed for a given user.
 export async function findNextCourseForUser(user: User): Promise<(Course & {trackId: string}) | null> {
@@ -211,17 +206,16 @@ export async function updateCourse(
 // Deletes a course from the in-memory store.
 export async function deleteCourse(courseId: string): Promise<boolean> {
     let courseFound = false;
-    for (const mod of global.a_modules) {
-        for (const track of mod.tracks) {
+    
+    global.a_modules.forEach(mod => {
+        mod.tracks.forEach(track => {
             const courseIndex = track.courses.findIndex(c => c.id === courseId);
             if (courseIndex !== -1) {
                 track.courses.splice(courseIndex, 1);
                 courseFound = true;
-                break;
             }
-        }
-        if (courseFound) break;
-    }
+        });
+    });
 
     if (!courseFound) {
         throw new Error(`Course with ID ${courseId} not found for deletion.`);
