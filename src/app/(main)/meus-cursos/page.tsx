@@ -24,6 +24,7 @@ import { TrackFinalActions } from "@/components/course/track-final-actions";
 import { getCurrentUser } from "@/lib/auth";
 import { userHasCourseAccess } from "@/lib/access-control";
 import React from "react";
+import { cn } from "@/lib/utils";
 
 const PASSING_SCORE = 90;
 
