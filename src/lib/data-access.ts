@@ -4,6 +4,7 @@
 
 
 
+
 // In-memory data store
 import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerPerformance } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
@@ -108,7 +109,7 @@ export const findCourseById = cache(async (courseId: string): Promise<{ course: 
     for (const track of module.tracks) {
       const course = track.courses.find(c => c.id === courseId);
       if (course) {
-        return Promise.resolve({ course: {...course, moduleId: module.id}, track, module });
+        return Promise.resolve({ course, track, module });
       }
     }
   }
@@ -144,7 +145,7 @@ export async function findCourseByIdWithTrack(courseId: string): Promise<{ cours
       const course = track.courses.find(c => c.id === courseId);
       if (course) {
         // Return a deep copy to avoid mutations affecting the global store
-        return Promise.resolve({ course: {...course, moduleId: module.id}, track });
+        return Promise.resolve({ course, track });
       }
     }
   }
@@ -198,22 +199,12 @@ export async function createCourse(
     }
 
     const newCourse: Course = {
+        ...courseData,
         id: `course-${Date.now()}-${Math.random()}`,
-        moduleId: parentModule.id,
-        trackId: courseData.trackId,
-        title: courseData.title,
-        description: courseData.description,
-        videoUrl: courseData.videoUrl,
-        durationInSeconds: courseData.durationInSeconds,
-        minimumRole: courseData.minimumRole,
-        accessAreas: courseData.accessAreas,
-        thumbnailUrl: courseData.thumbnailUrl,
-        order: courseData.order,
+        moduleId: parentModule.id, // Ensure moduleId is set on creation
+        createdAt: new Date(),
         likes: 0,
         dislikes: 0,
-        createdAt: new Date(),
-        quiz: courseData.quiz,
-        transcript: courseData.transcript,
     };
 
     parentTrack.courses.push(newCourse);
