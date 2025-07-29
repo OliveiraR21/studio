@@ -44,6 +44,8 @@ interface CourseFormProps {
   course: Course | null;
   modules: Module[];
   allUsers: User[];
+  initialModuleId?: string | null;
+  initialTrackId?: string | null;
   onYouTubeDataFetched?: (transcript: string) => void;
 }
 
@@ -72,7 +74,7 @@ const formatSecondsToHHMMSS = (totalSeconds: number | undefined) => {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 };
 
-export function CourseForm({ course, modules, allUsers, onYouTubeDataFetched }: CourseFormProps) {
+export function CourseForm({ course, modules, allUsers, initialModuleId, initialTrackId, onYouTubeDataFetched }: CourseFormProps) {
   const isNew = course === null;
   const router = useRouter();
   const { toast } = useToast();
@@ -84,10 +86,10 @@ export function CourseForm({ course, modules, allUsers, onYouTubeDataFetched }: 
 
   // State for the two-step selection
   const [selectedModuleId, setSelectedModuleId] = useState<string | undefined>(
-    course?.moduleId
+    initialModuleId || undefined
   );
   const [selectedTrackId, setSelectedTrackId] = useState<string | undefined>(
-    course?.trackId
+    initialTrackId || undefined
   );
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [areaPopoverOpen, setAreaPopoverOpen] = useState(false);
@@ -173,6 +175,15 @@ export function CourseForm({ course, modules, allUsers, onYouTubeDataFetched }: 
       });
     }
   }, [state, toast, router]);
+
+  // When editing, if the initial IDs are passed, make sure to set the state.
+  useEffect(() => {
+    if (!isNew && initialModuleId && initialTrackId) {
+      setSelectedModuleId(initialModuleId);
+      setSelectedTrackId(initialTrackId);
+    }
+  }, [isNew, initialModuleId, initialTrackId]);
+
 
   return (
     <form ref={formRef} action={dispatch} className="space-y-6">

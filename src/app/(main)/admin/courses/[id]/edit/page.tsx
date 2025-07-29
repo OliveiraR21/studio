@@ -15,10 +15,16 @@ import type { Course, Module, User } from "@/lib/types";
 import { QuizViewer } from "@/components/admin/quiz-viewer";
 import { Skeleton } from "@/components/ui/skeleton";
 
+interface CourseData {
+    course: Course | null;
+    module: Module | null;
+    trackId: string | null;
+}
+
 export default function EditCoursePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const isNew = id === 'new';
-  const [course, setCourse] = useState<Course | null>(null);
+  const [courseData, setCourseData] = useState<CourseData | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,8 +52,14 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
           if (!result) {
             notFound();
           }
-          setCourse(result.course);
+          setCourseData({
+              course: result.course,
+              module: result.module,
+              trackId: result.track.id
+          });
           setLiveTranscript(result.course.transcript); // Initialize with saved transcript
+        } else {
+          setCourseData({ course: null, module: null, trackId: null });
         }
       } catch (error) {
         console.error("Failed to fetch data", error);
@@ -78,6 +90,8 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
     );
   }
 
+  const course = courseData?.course;
+
   return (
     <div className="container mx-auto space-y-6">
       <div className="mb-6">
@@ -101,7 +115,9 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
           <CourseForm 
             course={course} 
             modules={modules} 
-            allUsers={allUsers} 
+            allUsers={allUsers}
+            initialModuleId={courseData?.module?.id}
+            initialTrackId={courseData?.trackId}
             onYouTubeDataFetched={handleYouTubeDataFetched}
           />
         </CardContent>
