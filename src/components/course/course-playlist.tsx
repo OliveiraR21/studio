@@ -19,19 +19,19 @@ interface CoursePlaylistProps {
 
 export function CoursePlaylist({ allModules, currentUser, currentCourseId, currentTrackId }: CoursePlaylistProps) {
     
-    // Filter modules and tracks based on user access, unless they are Admin or Diretor
-    const learningModules = 
-        (currentUser.role === 'Admin' || currentUser.role === 'Diretor')
-        ? allModules
-        : allModules.map(module => ({
-            ...module,
-            tracks: module.tracks
-                .map(track => ({
-                ...track,
-                courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
-                }))
-                .filter(track => track.courses.length > 0) // Hide tracks with no accessible courses
-            })).filter(module => module.tracks.length > 0); // Hide modules with no accessible tracks
+    const canSeeAllRoles: User['role'][] = ['Admin', 'Diretor'];
+    const userCanSeeAll = canSeeAllRoles.includes(currentUser.role);
+
+    // Filter modules and tracks based on user access
+    const learningModules = allModules.map(module => ({
+        ...module,
+        tracks: module.tracks
+            .map(track => ({
+            ...track,
+            courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
+            }))
+            .filter(track => userCanSeeAll || track.courses.length > 0) // Hide tracks with no accessible courses for non-admins/directors
+        })).filter(module => module.tracks.length > 0); // Hide modules with no accessible tracks
 
 
     const isCourseCompleted = (courseId: string) => currentUser.completedCourses.includes(courseId);
