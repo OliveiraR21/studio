@@ -148,8 +148,7 @@ export const learningModules: Module[] = [
         title: 'Integração de Novos Colaboradores',
         description: 'Conheça a cultura e os processos comerciais da Br Supply.',
         order: 1,
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
     ]
   },
@@ -164,8 +163,7 @@ export const learningModules: Module[] = [
         title: 'Planejamento de Estoques',
         order: 1,
         description: 'Aprenda a otimizar os níveis de estoque para garantir a disponibilidade de produtos.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hs-cp',
@@ -173,8 +171,7 @@ export const learningModules: Module[] = [
         title: 'Ciclo do Pedido',
         order: 2,
         description: 'Entenda todas as etapas do ciclo de vida de um pedido, da criação à entrega.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hs-pnc',
@@ -182,8 +179,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hs',
         title: 'Pedidos Não Conformes',
         description: 'Saiba como identificar, tratar e prevenir pedidos que não seguem os padrões.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hs-co',
@@ -191,8 +187,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hs',
         title: 'Cadastros Operacionais',
         description: 'Domine os processos de cadastro que são a base para as operações da empresa.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hs-fat',
@@ -200,8 +195,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hs',
         title: 'Faturamento',
         description: 'Compreenda o processo de faturamento, desde a emissão da nota até a contabilização.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hs-inad',
@@ -209,8 +203,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hs',
         title: 'Inadimplência',
         description: 'Aprenda a gerenciar e reduzir os índices de inadimplência dos clientes.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hs-sc',
@@ -218,8 +211,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hs',
         title: 'Satisfação de Clientes',
         description: 'Desenvolva técnicas para medir e melhorar a satisfação dos nossos clientes.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hs-mb',
@@ -227,26 +219,33 @@ export const learningModules: Module[] = [
         moduleId: 'module-hs',
         title: 'Margem Bruta (MB)',
         description: 'Entenda como calcular e analisar a margem bruta para a tomada de decisões.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
-        id: 'track-hs-cv',
-        order: 10,
+        id: 'track-hs-com',
         moduleId: 'module-hs',
-        title: 'Comunicação Verbal',
-        description: 'Desenvolva suas habilidades de comunicação verbal para apresentações e interações eficazes.',
+        title: 'Comunicação',
+        description: 'Aprimore suas habilidades de comunicação para interações mais eficazes.',
+        order: 9,
         courses: [],
-        quiz: { questions: [] }
-      },
-      {
-        id: 'track-hs-ce',
-        order: 11,
-        moduleId: 'module-hs',
-        title: 'Comunicação Escrita',
-        description: 'Aprimore sua escrita para e-mails, relatórios e outros documentos profissionais.',
-        courses: [],
-        quiz: { questions: [] }
+        subTracks: [
+          {
+            id: 'track-hs-cv',
+            order: 10,
+            moduleId: 'module-hs',
+            title: 'Comunicação Verbal',
+            description: 'Desenvolva suas habilidades de comunicação verbal para apresentações e interações eficazes.',
+            courses: [],
+          },
+          {
+            id: 'track-hs-ce',
+            order: 11,
+            moduleId: 'module-hs',
+            title: 'Comunicação Escrita',
+            description: 'Aprimore sua escrita para e-mails, relatórios e outros documentos profissionais.',
+            courses: [],
+          },
+        ]
       },
        {
         id: 'track-hs-if',
@@ -254,8 +253,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hs',
         title: 'Inteligência Fiscal',
         description: 'Compreenda a legislação tributária e otimize a gestão fiscal da empresa.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
     ]
   },
@@ -270,8 +268,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-ss',
         title: 'Liderança',
         description: 'Desenvolva habilidades para inspirar, motivar e guiar equipes ao sucesso.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-ss-te',
@@ -279,8 +276,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-ss',
         title: 'Trabalho em Equipe',
         description: 'Aprenda a colaborar de forma eficaz, promovendo um ambiente produtivo e harmonioso.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-ss-ie',
@@ -288,8 +284,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-ss',
         title: 'Inteligência Emocional',
         description: 'Gerencie suas emoções e entenda as dos outros para construir relacionamentos mais fortes.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-ss-pc',
@@ -297,8 +292,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-ss',
         title: 'Pensamento Crítico',
         description: 'Desenvolva a capacidade de analisar informações e tomar decisões baseadas em lógica.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-ss-in',
@@ -306,8 +300,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-ss',
         title: 'Inovação',
         description: 'Aprenda a gerar e implementar novas ideias para resolver problemas e criar valor.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-ss-or',
@@ -315,8 +308,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-ss',
         title: 'Orientação para Resultados',
         description: 'Mantenha o foco em metas e objetivos para alcançar resultados excepcionais.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
     ]
   },
@@ -331,8 +323,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hms',
         title: 'Introdução',
         description: 'Conceitos fundamentais sobre a colaboração entre humanos e inteligência artificial.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hms-lial',
@@ -340,8 +331,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hms',
         title: 'Literacia de IA para Líderes',
         description: 'Entenda o potencial da IA para tomar decisões estratégicas na liderança.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hms-pe',
@@ -349,8 +339,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hms',
         title: 'Prompt Engineering',
         description: 'Aprenda a arte de criar instruções eficazes para obter os melhores resultados de IAs generativas.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hms-iacs',
@@ -358,8 +347,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hms',
         title: 'IA e Cybersecurity',
         description: 'Descubra como a IA está transformando a segurança digital, tanto na defesa quanto nas ameaças.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hms-ait',
@@ -367,8 +355,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hms',
         title: 'AI Tools',
         description: 'Explore uma gama de ferramentas de IA para aumentar a produtividade no dia a dia.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
       {
         id: 'track-hms-cp',
@@ -376,8 +363,7 @@ export const learningModules: Module[] = [
         moduleId: 'module-hms',
         title: 'Copilot',
         description: 'Domine o Microsoft Copilot para otimizar suas tarefas no ambiente de trabalho.',
-        courses: [],
-        quiz: { questions: [] }
+        courses: []
       },
     ]
   }

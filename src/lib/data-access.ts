@@ -5,6 +5,7 @@
 
 
 
+
 // In-memory data store
 import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerPerformance } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
@@ -101,16 +102,31 @@ export async function findUserByEmail(email: string): Promise<User | null> {
     return Promise.resolve(user || null);
 }
 
+// Recursive function to search for a course within tracks and sub-tracks
+const findCourseRecursively = (tracks: Track[], courseId: string): { course: Course, track: Track } | null => {
+    for (const track of tracks) {
+        const course = track.courses.find(c => c.id === courseId);
+        if (course) {
+            return { course, track };
+        }
+        if (track.subTracks) {
+            const foundInSub = findCourseRecursively(track.subTracks, courseId);
+            if (foundInSub) {
+                return foundInSub;
+            }
+        }
+    }
+    return null;
+};
+
 
 // Find a course by its ID, and include its parent module and track.
 export const findCourseById = cache(async (courseId: string): Promise<{ course: Course, track: Track, module: Module } | null> => {
   const modules = await getLearningModules();
   for (const module of modules) {
-    for (const track of module.tracks) {
-      const course = track.courses.find(c => c.id === courseId);
-      if (course) {
-        return Promise.resolve({ course, track, module });
-      }
+    const result = findCourseRecursively(module.tracks, courseId);
+    if (result) {
+        return Promise.resolve({ ...result, module });
     }
   }
   return Promise.resolve(null);
@@ -128,9 +144,16 @@ export async function findModuleById(moduleId: string): Promise<Module | null> {
 export async function findTrackById(trackId: string): Promise<{ track: Track, module: Module } | null> {
     const modules = await getLearningModules();
     for (const module of modules) {
-        const track = module.tracks.find(t => t.id === trackId);
-        if (track) {
-            return Promise.resolve({ track, module });
+        for (const track of module.tracks) {
+            if (track.id === trackId) {
+                return Promise.resolve({ track, module });
+            }
+             if (track.subTracks) {
+                const subTrackResult = track.subTracks.find(st => st.id === trackId);
+                if (subTrackResult) {
+                     return Promise.resolve({ track: subTrackResult, module });
+                }
+            }
         }
     }
     return Promise.resolve(null);
@@ -141,36 +164,47 @@ export async function findTrackById(trackId: string): Promise<{ track: Track, mo
 export async function findCourseByIdWithTrack(courseId: string): Promise<{ course: Course, track: Track } | null> {
   const modules = await getLearningModules();
   for (const module of modules) {
-    for (const track of module.tracks) {
-      const course = track.courses.find(c => c.id === courseId);
-      if (course) {
-        // Return a deep copy to avoid mutations affecting the global store
-        return Promise.resolve({ course, track });
-      }
+    const result = findCourseRecursively(module.tracks, courseId);
+    if (result) {
+        return Promise.resolve(result);
     }
   }
   return Promise.resolve(null);
 }
 
+// Recursive function to find the next course for a user
+const findNextCourseRecursively = (tracks: Track[], user: User): (Course & {trackId: string}) | null => {
+    const sortedTracks = [...tracks].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+    for (const track of sortedTracks) {
+        // If track has sub-tracks, search within them first
+        if (track.subTracks && track.subTracks.length > 0) {
+            const nextInSubTrack = findNextCourseRecursively(track.subTracks, user);
+            if (nextInSubTrack) {
+                return nextInSubTrack;
+            }
+        }
+        
+        // Then check courses in the current track
+        const sortedCourses = [...track.courses].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+        for (const course of sortedCourses) {
+            if (!user.completedCourses.includes(course.id)) {
+                if (userHasCourseAccess(user, course)) {
+                    return { ...course, trackId: track.id };
+                }
+            }
+        }
+    }
+    return null;
+}
+
+
 // Finds the very first course that is not marked as completed for a given user.
 export async function findNextCourseForUser(user: User): Promise<(Course & {trackId: string}) | null> {
     const modules = await getLearningModules();
     for (const module of modules) {
-        // Sort tracks by order if available
-        const sortedTracks = [...module.tracks].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
-
-        for (const track of sortedTracks) {
-            // Sort courses by order, handling undefined values
-            const sortedCourses = [...track.courses].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
-            
-            for (const course of sortedCourses) {
-                if (!user.completedCourses.includes(course.id)) {
-                    // Check for access control using the hierarchical helper
-                    if (userHasCourseAccess(user, course)) {
-                        return Promise.resolve({...course, trackId: track.id});
-                    }
-                }
-            }
+        const nextCourse = findNextCourseRecursively(module.tracks, user);
+        if (nextCourse) {
+            return Promise.resolve(nextCourse);
         }
     }
     return Promise.resolve(null); // All accessible courses completed
@@ -180,18 +214,28 @@ export async function findNextCourseForUser(user: User): Promise<(Course & {trac
 
 // Creates a course in the in-memory store.
 export async function createCourse(
-    courseData: Omit<Course, 'id' | 'moduleId' | 'trackId' | 'createdAt'> & { trackId: string }
+    courseData: Omit<Course, 'id' | 'createdAt'> & { trackId: string }
 ): Promise<Course> {
     let parentModule: Module | undefined;
     let parentTrack: Track | undefined;
 
     for (const mod of global.a_modules) {
-        const foundTrack = mod.tracks.find(t => t.id === courseData.trackId);
-        if (foundTrack) {
-            parentModule = mod;
-            parentTrack = foundTrack;
-            break;
+        for (const track of mod.tracks) {
+            if (track.id === courseData.trackId) {
+                parentModule = mod;
+                parentTrack = track;
+                break;
+            }
+            if (track.subTracks) {
+                 const foundSubTrack = track.subTracks.find(st => st.id === courseData.trackId);
+                 if (foundSubTrack) {
+                    parentModule = mod;
+                    parentTrack = foundSubTrack;
+                    break;
+                 }
+            }
         }
+        if (parentTrack) break;
     }
 
     if (!parentModule || !parentTrack) {
@@ -216,25 +260,14 @@ export async function updateCourse(
     courseId: string, 
     courseData: Partial<Omit<Course, 'id' | 'trackId' | 'moduleId'>>
 ): Promise<void> {
-    let courseToUpdate: Course | undefined;
+    const result = await findCourseById(courseId);
 
-    for (const mod of global.a_modules) {
-        for (const track of mod.tracks) {
-            const courseIndex = track.courses.findIndex(c => c.id === courseId);
-            if (courseIndex !== -1) {
-                courseToUpdate = track.courses[courseIndex];
-                break;
-            }
-        }
-        if (courseToUpdate) break;
-    }
-
-    if (!courseToUpdate) {
+    if (!result) {
         throw new Error(`Course with ID ${courseId} not found for update.`);
     }
 
     // Update base course properties
-    Object.assign(courseToUpdate, courseData);
+    Object.assign(result.course, courseData);
     
     return Promise.resolve();
 }
@@ -245,12 +278,23 @@ export async function deleteCourse(courseId: string): Promise<boolean> {
     let courseFoundAndDeleted = false;
     for (const mod of global.a_modules) {
         for (const track of mod.tracks) {
-            const courseIndex = track.courses.findIndex(c => c.id === courseId);
+            let courseIndex = track.courses.findIndex(c => c.id === courseId);
             if (courseIndex !== -1) {
                 track.courses.splice(courseIndex, 1);
                 courseFoundAndDeleted = true;
                 break;
             }
+            if (track.subTracks) {
+                for (const subTrack of track.subTracks) {
+                    courseIndex = subTrack.courses.findIndex(c => c.id === courseId);
+                    if (courseIndex !== -1) {
+                        subTrack.courses.splice(courseIndex, 1);
+                        courseFoundAndDeleted = true;
+                        break;
+                    }
+                }
+            }
+            if (courseFoundAndDeleted) break;
         }
         if (courseFoundAndDeleted) break;
     }
@@ -270,11 +314,21 @@ export async function updateTrack(
 ): Promise<void> {
   let trackToUpdate: Track | undefined;
   for (const mod of global.a_modules) {
-    const foundTrack = mod.tracks.find((t) => t.id === trackId);
+    let foundTrack = mod.tracks.find((t) => t.id === trackId);
     if (foundTrack) {
-      trackToUpdate = foundTrack;
-      break;
+        trackToUpdate = foundTrack;
+        break;
     }
+    for (const track of mod.tracks) {
+        if (track.subTracks) {
+            foundTrack = track.subTracks.find((st) => st.id === trackId);
+            if (foundTrack) {
+                trackToUpdate = foundTrack;
+                break;
+            }
+        }
+    }
+     if (trackToUpdate) break;
   }
 
   if (!trackToUpdate) {
@@ -326,23 +380,24 @@ export async function getNotificationsForUser(user: User): Promise<Notification[
     const notifications: Notification[] = [];
     const allModules = await getLearningModules();
     const today = new Date();
+    
+    const allCourses = allModules.flatMap(m => m.tracks.flatMap(t => t.subTracks ? [...t.courses, ...t.subTracks.flatMap(st => st.courses)] : t.courses));
 
-    for (const module of allModules) {
-        for (const track of module.tracks) {
-            for (const course of track.courses) {
-                // Notify about new courses added in the last 7 days that the user has access to
-                if (differenceInDays(today, course.createdAt) <= 7) {
-                    if (userHasCourseAccess(user, course)) {
-                        notifications.push({
-                            id: `notif-new-${course.id}`,
-                            title: 'Novo curso disponível!',
-                            description: `O curso "${course.title}" foi adicionado à trilha "${track.title}".`,
-                            createdAt: course.createdAt,
-                            read: false, // For this demo, notifications are always unread initially
-                            href: `/courses/${course.id}`,
-                        });
-                    }
-                }
+    for (const course of allCourses) {
+        // Notify about new courses added in the last 7 days that the user has access to
+        if (differenceInDays(today, course.createdAt) <= 7) {
+            if (userHasCourseAccess(user, course)) {
+                 const details = await findCourseByIdWithTrack(course.id);
+                 if (details) {
+                    notifications.push({
+                        id: `notif-new-${course.id}`,
+                        title: 'Novo curso disponível!',
+                        description: `O curso "${course.title}" foi adicionado à trilha "${details.track.title}".`,
+                        createdAt: course.createdAt,
+                        read: false, // For this demo, notifications are always unread initially
+                        href: `/courses/${course.id}`,
+                    });
+                 }
             }
         }
     }
@@ -396,20 +451,17 @@ const getSubordinates = (managerName: string, allUsers: User[]): User[] => {
 export async function getAnalyticsData(): Promise<AnalyticsData> {
   const allModules = await getLearningModules();
   const allUsers = await getUsers();
-  const totalCourses = allModules.flatMap(m => m.tracks.flatMap(t => t.courses)).length || 1;
+  const allCourses = allModules.flatMap(m => m.tracks.flatMap(t => t.subTracks ? [...t.courses, ...t.subTracks.flatMap(st => st.courses)] : t.courses));
+  const totalCourses = allCourses.length || 1;
 
   // 1. Calculate Question Proficiency (Simulated)
   const allQuestions: { question: Question, course: Course }[] = [];
-  allModules.forEach(module => {
-    module.tracks.forEach(track => {
-      track.courses.forEach(course => {
-        if (course.quiz && course.quiz.questions.length > 0) {
-          course.quiz.questions.forEach(question => {
-            allQuestions.push({ question, course });
-          });
-        }
+  allCourses.forEach(course => {
+    if (course.quiz && course.quiz.questions.length > 0) {
+      course.quiz.questions.forEach(question => {
+        allQuestions.push({ question, course });
       });
-    });
+    }
   });
 
   const questionProficiency: QuestionProficiency[] = allQuestions.map(({ question, course }) => {
