@@ -329,7 +329,22 @@ export const learningModules: Module[] = [
         moduleId: 'module-hs',
         title: 'Inteligência Fiscal',
         description: 'Compreenda a legislação tributária e otimize a gestão fiscal da empresa.',
-        courses: [],
+        courses: [
+          {
+            id: 'course-tax-planning',
+            moduleId: 'module-hs',
+            trackId: 'track-hs-if',
+            title: 'Planejamento Tributário para Empresas',
+            description: 'Aprenda os conceitos fundamentais do planejamento tributário e como aplicá-los para otimizar a carga de impostos da sua empresa de forma legal.',
+            videoUrl: 'https://www.youtube.com/watch?v=G9_hejSYZuk',
+            durationInSeconds: 360,
+            thumbnailUrl: '/br-supply-logo.png',
+            createdAt: today,
+            likes: 0,
+            dislikes: 0,
+            order: 1,
+          }
+        ],
         quiz: { questions: [] }
       },
     ]
