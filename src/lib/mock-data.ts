@@ -306,8 +306,17 @@ export const learningModules: Module[] = [
         quiz: { questions: [] }
       },
       {
-        id: 'track-hs-cv',
+        id: 'track-hs-if',
         order: 9,
+        moduleId: 'module-hs',
+        title: 'Inteligência Fiscal',
+        description: 'Compreenda a legislação tributária e otimize a gestão fiscal da empresa.',
+        courses: [],
+        quiz: { questions: [] }
+      },
+      {
+        id: 'track-hs-cv',
+        order: 10,
         moduleId: 'module-hs',
         title: 'Comunicação Verbal',
         description: 'Desenvolva suas habilidades de comunicação verbal para apresentações e interações eficazes.',
@@ -316,7 +325,7 @@ export const learningModules: Module[] = [
       },
       {
         id: 'track-hs-ce',
-        order: 10,
+        order: 11,
         moduleId: 'module-hs',
         title: 'Comunicação Escrita',
         description: 'Aprimore sua escrita para e-mails, relatórios e outros documentos profissionais.',
