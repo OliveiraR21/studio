@@ -187,7 +187,7 @@ export function CourseForm({ course, modules, allUsers, initialModuleId, initial
 
   return (
     <form ref={formRef} action={dispatch} className="space-y-6">
-      {!isNew && <input type="hidden" name="id" value={course.id} />}
+      {course && <input type="hidden" name="id" value={course.id} />}
       {isNew && <input type="hidden" name="trackId" value={selectedTrackId || ''} />}
       <input type="hidden" name="accessAreas" value={selectedAreas.join(',')} />
        {youTubeData.transcript && <input type="hidden" name="transcript" value={youTubeData.transcript} />}
