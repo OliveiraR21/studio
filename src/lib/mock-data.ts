@@ -331,10 +331,10 @@ export const learningModules: Module[] = [
         description: 'Compreenda a legislação tributária e otimize a gestão fiscal da empresa.',
         courses: [
           {
-            id: 'course-tax-planning',
+            id: 'course-tax-planning-1',
             moduleId: 'module-hs',
             trackId: 'track-hs-if',
-            title: 'Planejamento Tributário para Empresas',
+            title: 'Tributos na Venda I',
             description: 'Aprenda os conceitos fundamentais do planejamento tributário e como aplicá-los para otimizar a carga de impostos da sua empresa de forma legal.',
             videoUrl: 'https://www.youtube.com/watch?v=G9_hejSYZuk',
             durationInSeconds: 360,
@@ -342,7 +342,6 @@ export const learningModules: Module[] = [
             createdAt: today,
             likes: 0,
             dislikes: 0,
-            order: 1,
           }
         ],
         quiz: { questions: [] }
