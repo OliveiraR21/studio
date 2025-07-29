@@ -55,7 +55,7 @@ export default async function MyCoursesPage({
           // Filter courses within each track based on user's access rights.
           courses: track.courses
             .filter(course => userHasCourseAccess(currentUser, course))
-            .sort((a,b) => (a.order || Infinity) - (b.order || Infinity)) // Sort courses by order
+            .sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity)) // Sort courses by order
         }))
         // For non-admin/director roles, hide tracks that become empty after course filtering.
         .filter(track => (currentUser.role === 'Admin' || currentUser.role === 'Diretor') ? true : track.courses.length > 0)

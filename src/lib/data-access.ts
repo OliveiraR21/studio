@@ -2,6 +2,7 @@
 
 
 
+
 // In-memory data store
 import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerPerformance } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
@@ -154,11 +155,11 @@ export async function findNextCourseForUser(user: User): Promise<(Course & {trac
     const modules = await getLearningModules();
     for (const module of modules) {
         // Sort tracks by order if available
-        const sortedTracks = [...module.tracks].sort((a, b) => (a.order || 0) - (b.order || 0));
+        const sortedTracks = [...module.tracks].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
 
         for (const track of sortedTracks) {
-            // Sort courses by order
-            const sortedCourses = [...track.courses].sort((a, b) => (a.order || 0) - (b.order || 0));
+            // Sort courses by order, handling undefined values
+            const sortedCourses = [...track.courses].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
             
             for (const course of sortedCourses) {
                 if (!user.completedCourses.includes(course.id)) {

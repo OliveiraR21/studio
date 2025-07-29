@@ -199,7 +199,7 @@ export function CourseListClient({ modules }: CourseListClientProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {allCourses.sort((a,b) => (a.order || Infinity) - (b.order || Infinity)).map((course) => {
+          {allCourses.sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity)).map((course) => {
             const totalVotes = (course.likes || 0) + (course.dislikes || 0);
 
             return (
