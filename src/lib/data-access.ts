@@ -3,6 +3,7 @@
 
 
 
+
 // In-memory data store
 import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerPerformance } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
@@ -107,7 +108,7 @@ export const findCourseById = cache(async (courseId: string): Promise<{ course: 
     for (const track of module.tracks) {
       const course = track.courses.find(c => c.id === courseId);
       if (course) {
-        return Promise.resolve({ course, track, module });
+        return Promise.resolve({ course: {...course, moduleId: module.id}, track, module });
       }
     }
   }
@@ -143,7 +144,7 @@ export async function findCourseByIdWithTrack(courseId: string): Promise<{ cours
       const course = track.courses.find(c => c.id === courseId);
       if (course) {
         // Return a deep copy to avoid mutations affecting the global store
-        return Promise.resolve({ course, track });
+        return Promise.resolve({ course: {...course, moduleId: module.id}, track });
       }
     }
   }

@@ -16,9 +16,9 @@ import { QuizViewer } from "@/components/admin/quiz-viewer";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface CourseData {
-    course: Course | null;
-    module: Module | null;
-    trackId: string | null;
+    course: Course;
+    module: Module;
+    trackId: string;
 }
 
 export default function EditCoursePage({ params }: { params: Promise<{ id: string }> }) {
@@ -59,7 +59,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
           });
           setLiveTranscript(result.course.transcript); // Initialize with saved transcript
         } else {
-          setCourseData({ course: null, module: null, trackId: null });
+          setCourseData(null);
         }
       } catch (error) {
         console.error("Failed to fetch data", error);
@@ -89,7 +89,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
       </div>
     );
   }
-
+  
   const course = courseData?.course;
 
   return (
@@ -113,7 +113,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
         </CardHeader>
         <CardContent>
           <CourseForm 
-            course={course} 
+            course={course || null} 
             modules={modules} 
             allUsers={allUsers}
             initialModuleId={courseData?.module?.id}
