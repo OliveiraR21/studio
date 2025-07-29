@@ -35,44 +35,24 @@ const moduleIcons: Record<string, React.ElementType> = {
     'module-hms': Bot,
 };
 
-const flattenTracks = (tracks: Track[]): Track[] => {
-    let allTracks: Track[] = [];
-    for (const track of tracks) {
-        allTracks.push(track);
-        if (track.subTracks) {
-            allTracks = allTracks.concat(flattenTracks(track.subTracks));
-        }
-    }
-    return allTracks;
-};
-
-// Recursive component to render tracks and sub-tracks
 const TrackAccordion = ({ 
     tracks, 
     currentUser, 
-    level = 0, 
-    defaultOpenTrackId, 
-    parentTrackUnlocked = true 
+    defaultOpenTrackId 
 }: { 
     tracks: Track[], 
     currentUser: User, 
-    level?: number, 
-    defaultOpenTrackId?: string, 
-    parentTrackUnlocked?: boolean 
+    defaultOpenTrackId?: string 
 }) => {
     const isCourseCompleted = (courseId: string) => currentUser.completedCourses.includes(courseId);
 
     const getTrackProgress = (track: Track): number | null => {
-        const courses = track.subTracks ? flattenTracks(track.subTracks).flatMap(t => t.courses) : track.courses;
-        if (courses.length === 0) return null;
-        const completedCount = courses.filter(c => isCourseCompleted(c.id)).length;
-        return (completedCount / courses.length) * 100;
+        if (track.courses.length === 0) return null;
+        const completedCount = track.courses.filter(c => isCourseCompleted(c.id)).length;
+        return (completedCount / track.courses.length) * 100;
     };
     
     const isTrackCompleted = (track: Track): boolean => {
-        if (track.subTracks && track.subTracks.length > 0) {
-            return track.subTracks.every(st => isTrackCompleted(st));
-        }
         if (track.courses.length > 0) {
             return track.courses.every(c => isCourseCompleted(c.id));
         }
@@ -83,25 +63,17 @@ const TrackAccordion = ({
         return true;
     }
 
-    const isCourseUnlocked = (course: Course, track: Track, courseIndex: number) => {
-        const isParentUnlocked = currentUser.completedTracks.includes(track.id) || parentTrackUnlocked;
-        if (!isParentUnlocked) return false;
-        
-        if (courseIndex === 0) return true;
-        
-        const previousCourse = track.courses[courseIndex - 1];
-        return isCourseCompleted(previousCourse.id);
-    };
-
     return (
         <Accordion type="single" collapsible className="w-full space-y-4" defaultValue={defaultOpenTrackId ? `track-${defaultOpenTrackId}` : undefined}>
-            {tracks.sort((a,b) => (a.order || Infinity) - (b.order || Infinity)).map((track, trackIndex) => {
-                let isUnlocked = parentTrackUnlocked;
+            {tracks.map((track, trackIndex) => {
+                let isUnlocked = true;
                 if (trackIndex > 0) {
                     let prerequisiteTrack: Track | undefined;
                     for (let i = trackIndex - 1; i >= 0; i--) {
                         const pt = tracks[i];
-                        if (!prerequisiteTrack) {
+                        // A track is a prerequisite if it has courses or a quiz. Empty tracks are skipped.
+                        const isSkippable = pt.courses.length === 0 && (!pt.quiz || pt.quiz.questions.length === 0);
+                        if (!isSkippable) {
                              prerequisiteTrack = pt;
                              break;
                         }
@@ -114,11 +86,11 @@ const TrackAccordion = ({
 
                 const progress = getTrackProgress(track);
                 const allCoursesInTrackCompleted = progress === 100;
-                const trackCompleted = currentUser.completedTracks.includes(track.id) || isTrackCompleted(track);
+                const trackCompleted = currentUser.completedTracks.includes(track.id) || (allCoursesInTrackCompleted && track.courses.length > 0);
                 const hasQuiz = track.quiz && track.quiz.questions.length > 0;
                 
                 return (
-                    <Card key={track.id} className={cn(!unlocked ? 'bg-muted/50' : '', level > 0 && 'ml-6')}>
+                    <Card key={track.id} className={!unlocked ? 'bg-muted/50' : ''}>
                         <AccordionItem value={`track-${track.id}`} className="border-b-0">
                             <AccordionTrigger className={`p-6 hover:no-underline ${!unlocked ? 'cursor-not-allowed' : ''}`} disabled={!unlocked}>
                                 <div className="flex items-center gap-4 w-full">
@@ -145,16 +117,13 @@ const TrackAccordion = ({
                             </AccordionTrigger>
                             <AccordionContent className="px-6 pb-6">
                                 <div className="border-t pt-6">
-                                    {track.subTracks && track.subTracks.length > 0 && (
-                                        <TrackAccordion tracks={track.subTracks} currentUser={currentUser} level={level + 1} defaultOpenTrackId={defaultOpenTrackId} parentTrackUnlocked={unlocked && trackCompleted}/>
-                                    )}
-
                                     {track.courses.length > 0 && (
                                         <>
                                             <h4 className="text-md font-semibold mb-4">Cursos da Trilha</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                                                 {track.courses.map((course, courseIndex) => {
-                                                    const courseUnlocked = isCourseUnlocked(course, track, courseIndex);
+                                                    const previousCourse = courseIndex > 0 ? track.courses[courseIndex - 1] : undefined;
+                                                    const courseUnlocked = unlocked && (!previousCourse || isCourseCompleted(previousCourse.id));
                                                     const completed = isCourseCompleted(course.id);
                                                     return (
                                                         <CourseCard 
@@ -207,24 +176,11 @@ export default async function MyCoursesPage({
   const learningModules = allModules.map(module => ({
       ...module,
       tracks: module.tracks
-        .map(track => {
-            const filterCourses = (courses: Course[]) => courses.filter(course => userHasCourseAccess(currentUser, course)).sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
-            
-            const filterSubTracks = (tracks: Track[]): Track[] => {
-                return tracks.map(st => ({
-                    ...st,
-                    courses: filterCourses(st.courses),
-                    subTracks: st.subTracks ? filterSubTracks(st.subTracks) : []
-                })).filter(st => st.courses.length > 0 || (st.subTracks && st.subTracks.length > 0));
-            };
-
-            return {
-                ...track,
-                courses: filterCourses(track.courses),
-                subTracks: track.subTracks ? filterSubTracks(track.subTracks) : []
-            };
-        })
-        .filter(track => (currentUser.role === 'Admin' || currentUser.role === 'Diretor') ? true : (track.courses.length > 0 || (track.subTracks && track.subTracks.length > 0)))
+        .map(track => ({
+          ...track,
+          courses: track.courses.filter(course => userHasCourseAccess(currentUser, course)).sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity))
+        }))
+        .filter(track => (currentUser.role === 'Admin' || currentUser.role === 'Diretor') ? true : track.courses.length > 0)
         .sort((a, b) => (a.order || Infinity) - (b.order || Infinity)) 
     })).filter(module => module.tracks.length > 0);
 
@@ -233,8 +189,8 @@ export default async function MyCoursesPage({
   
   const findTrackInModules = (modules: Module[], trackId: string): Track | undefined => {
     for (const module of modules) {
-        const found = flattenTracks(module.tracks).find(t => t.id === trackId);
-        if (found) return found;
+        const track = module.tracks.find(t => t.id === trackId);
+        if (track) return track;
     }
     return undefined;
   };

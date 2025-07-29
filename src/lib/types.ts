@@ -16,8 +16,6 @@ export interface Track {
   courses: Course[];
   // Every track can have a final quiz.
   quiz?: Quiz;
-  // NEW: A track can now contain sub-tracks
-  subTracks?: Track[]; 
 }
 
 export interface Course {

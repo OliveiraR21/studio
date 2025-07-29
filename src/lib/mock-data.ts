@@ -228,26 +228,24 @@ export const learningModules: Module[] = [
         description: 'Aprimore suas habilidades de comunicação para interações mais eficazes.',
         order: 9,
         courses: [],
-        subTracks: [
-          {
-            id: 'track-hs-cv',
-            order: 10,
-            moduleId: 'module-hs',
-            title: 'Comunicação Verbal',
-            description: 'Desenvolva suas habilidades de comunicação verbal para apresentações e interações eficazes.',
-            courses: [],
-          },
-          {
-            id: 'track-hs-ce',
-            order: 11,
-            moduleId: 'module-hs',
-            title: 'Comunicação Escrita',
-            description: 'Aprimore sua escrita para e-mails, relatórios e outros documentos profissionais.',
-            courses: [],
-          },
-        ]
       },
-       {
+      {
+        id: 'track-hs-cv',
+        order: 10,
+        moduleId: 'module-hs',
+        title: 'Comunicação Verbal',
+        description: 'Desenvolva suas habilidades de comunicação verbal para apresentações e interações eficazes.',
+        courses: [],
+      },
+      {
+        id: 'track-hs-ce',
+        order: 11,
+        moduleId: 'module-hs',
+        title: 'Comunicação Escrita',
+        description: 'Aprimore sua escrita para e-mails, relatórios e outros documentos profissionais.',
+        courses: [],
+      },
+      {
         id: 'track-hs-if',
         order: 12,
         moduleId: 'module-hs',

@@ -85,8 +85,10 @@ export function CoursePlaylist({ allModules, currentUser, currentCourseId, curre
                                     <div className="flex flex-col gap-1">
                                         {track.courses
                                             .filter(course => userHasCourseAccess(currentUser, course))
-                                            .map((course, index) => {
-                                                const unlocked = isCourseUnlocked(course, track, index);
+                                            .sort((a,b) => (a.order || Infinity) - (b.order || Infinity))
+                                            .map((course, index, sortedCourses) => {
+                                                const previousCourse = index > 0 ? sortedCourses[index - 1] : undefined;
+                                                const unlocked = !previousCourse || isCourseCompleted(previousCourse.id);
                                                 const completed = isCourseCompleted(course.id);
                                                 const isCurrent = course.id === currentCourseId;
 
