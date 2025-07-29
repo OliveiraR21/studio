@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import type { User, Module, Track, Course } from "@/lib/types";
@@ -19,19 +20,30 @@ interface CoursePlaylistProps {
 
 export function CoursePlaylist({ allModules, currentUser, currentCourseId, currentTrackId }: CoursePlaylistProps) {
     
+    // Filter modules and tracks based on user access.
     const canSeeAllRoles: User['role'][] = ['Admin', 'Diretor'];
     const userCanSeeAll = canSeeAllRoles.includes(currentUser.role);
-
-    // Filter modules and tracks based on user access
-    const learningModules = allModules.map(module => ({
-        ...module,
-        tracks: module.tracks
-            .map(track => ({
-            ...track,
-            courses: track.courses.filter(course => userHasCourseAccess(currentUser, course))
-            }))
-            .filter(track => userCanSeeAll || track.courses.length > 0) // Hide tracks with no accessible courses for non-admins/directors
-        })).filter(module => module.tracks.length > 0); // Hide modules with no accessible tracks
+    
+    const learningModules = allModules.map(module => {
+        const filteredTracks = module.tracks
+          .map(track => {
+            const accessibleCourses = track.courses
+                .filter(course => userHasCourseAccess(currentUser, course))
+                .sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+            
+            return {
+              ...track,
+              courses: accessibleCourses
+            };
+          })
+          .filter(track => userCanSeeAll || track.courses.length > 0)
+          .sort((a, b) => (a.order || Infinity) - (b.order || Infinity));
+  
+        return {
+            ...module,
+            tracks: filteredTracks,
+        };
+      }).filter(module => module.tracks.length > 0);
 
 
     const isCourseCompleted = (courseId: string) => currentUser.completedCourses.includes(courseId);
@@ -84,7 +96,6 @@ export function CoursePlaylist({ allModules, currentUser, currentCourseId, curre
                                 <AccordionContent>
                                     <div className="flex flex-col gap-1">
                                         {track.courses
-                                            .filter(course => userHasCourseAccess(currentUser, course))
                                             .sort((a,b) => (a.order || Infinity) - (b.order || Infinity))
                                             .map((course, index, sortedCourses) => {
                                                 const previousCourse = index > 0 ? sortedCourses[index - 1] : undefined;

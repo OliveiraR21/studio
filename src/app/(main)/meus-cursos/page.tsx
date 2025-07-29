@@ -172,25 +172,30 @@ export default async function MyCoursesPage({
     return <UserNotFound />
   }
 
-  // Define a list of roles that should see all content, including empty tracks.
+  // Filter modules and tracks based on user access.
   const canSeeAllRoles: User['role'][] = ['Admin', 'Diretor'];
   const userCanSeeAll = canSeeAllRoles.includes(currentUser.role);
-
-  // Filter modules and tracks based on user access.
-  const learningModules = allModules.map(module => ({
-      ...module,
-      tracks: module.tracks
-        .map(track => ({
-          ...track,
-          // First, filter the courses within the track based on user access.
-          courses: track.courses.filter(course => userHasCourseAccess(currentUser, course)).sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity))
-        }))
-        // Then, filter the tracks themselves. A track is kept if the user has a role that can see everything,
-        // OR if the track has at least one accessible course left in it.
+  
+  const learningModules = allModules.map(module => {
+      const filteredTracks = module.tracks
+        .map(track => {
+          const accessibleCourses = track.courses
+              .filter(course => userHasCourseAccess(currentUser, course))
+              .sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+          
+          return {
+            ...track,
+            courses: accessibleCourses
+          };
+        })
         .filter(track => userCanSeeAll || track.courses.length > 0)
-        .sort((a, b) => (a.order || Infinity) - (b.order || Infinity)) 
-    // Finally, filter the modules. A module is kept if it has at least one visible track left.
-    })).filter(module => module.tracks.length > 0);
+        .sort((a, b) => (a.order || Infinity) - (b.order || Infinity));
+
+      return {
+          ...module,
+          tracks: filteredTracks,
+      };
+    }).filter(module => module.tracks.length > 0);
 
 
   const nextCourse = await findNextCourseForUser(currentUser);
