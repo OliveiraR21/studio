@@ -84,10 +84,10 @@ export function CourseForm({ course, modules, allUsers, onYouTubeDataFetched }: 
 
   // State for the two-step selection
   const [selectedModuleId, setSelectedModuleId] = useState<string | undefined>(
-    isNew ? undefined : course.moduleId
+    course?.moduleId
   );
   const [selectedTrackId, setSelectedTrackId] = useState<string | undefined>(
-    isNew ? undefined : course.trackId
+    course?.trackId
   );
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [areaPopoverOpen, setAreaPopoverOpen] = useState(false);
