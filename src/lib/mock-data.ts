@@ -148,32 +148,7 @@ export const learningModules: Module[] = [
         title: 'Integração de Novos Colaboradores',
         description: 'Conheça a cultura e os processos comerciais da Br Supply.',
         order: 1,
-        courses: [
-          {
-            id: 'course-integ-1',
-            moduleId: 'module-integration',
-            trackId: 'track-integration-main',
-            order: 1,
-            title: 'Boas-vindas e Cultura Organizacional',
-            description: 'Uma introdução à nossa missão, visão e valores. Conheça a história da Br Supply e entenda como sua função se encaixa em nossos objetivos estratégicos.',
-            videoUrl: 'https://youtu.be/dQw4w9WgXcQ',
-            durationInSeconds: 300,
-            createdAt: oneYearAgo,
-            minimumRole: 'Analista'
-          },
-          {
-            id: 'course-integ-2',
-            moduleId: 'module-integration',
-            trackId: 'track-integration-main',
-            order: 2,
-            title: 'Políticas Internas e Compliance',
-            description: 'Um guia essencial sobre as principais políticas da empresa, código de conduta, segurança da informação e LGPD (Lei Geral de Proteção de Dados).',
-            videoUrl: 'https://youtu.be/dQw4w9WgXcQ',
-            durationInSeconds: 450,
-            createdAt: oneYearAgo,
-            accessAreas: ['Comercial', 'Logística']
-          }
-        ]
+        courses: [],
       },
     ]
   },
@@ -188,28 +163,7 @@ export const learningModules: Module[] = [
         title: 'Planejamento de Estoques',
         order: 1,
         description: 'Aprenda a otimizar os níveis de estoque para garantir a disponibilidade de produtos.',
-        courses: [
-          {
-            id: 'course-pe-1',
-            moduleId: 'module-hs',
-            trackId: 'track-hs-pe',
-            order: 1,
-            title: 'Tributos na Venda I',
-            description: 'Entenda os conceitos básicos de tributação aplicáveis às nossas operações de venda.',
-            videoUrl: 'https://www.youtube.com/watch?v=videoseries?list=PLx0sYbCqOb8TBPRdmBHs5Iftvv9TPboYG',
-            durationInSeconds: 600,
-            createdAt: today,
-            likes: 120,
-            dislikes: 5,
-            minimumRole: 'Supervisor',
-            quiz: {
-                questions: [
-                    { text: 'Qual o principal imposto sobre vendas?', options: ['ICMS', 'IPI', 'PIS', 'COFINS'], correctAnswer: 'ICMS', difficulty: 'Fácil' },
-                    { text: 'O que significa a sigla IPI?', options: ['Imposto sobre Produtos Industrializados', 'Imposto Predial e Territorial Urbano', 'Imposto sobre Importação', 'Índice de Preços ao Consumidor'], correctAnswer: 'Imposto sobre Produtos Industrializados', difficulty: 'Fácil' },
-                ]
-            }
-          },
-        ]
+        courses: [],
       },
       {
         id: 'track-hs-cp',
@@ -273,22 +227,7 @@ export const learningModules: Module[] = [
         title: 'Comunicação',
         description: 'Aprimore suas habilidades de comunicação para interações mais eficazes.',
         order: 9,
-        courses: [
-            {
-                id: 'course-com-1',
-                moduleId: 'module-hs',
-                trackId: 'track-hs-com',
-                order: 1,
-                title: 'Comunicação Efetiva no Ambiente de Trabalho',
-                description: 'Aprenda técnicas de comunicação para melhorar a colaboração e a produtividade.',
-                videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                durationInSeconds: 720,
-                createdAt: fiveDaysAgo,
-                likes: 85,
-                dislikes: 2,
-                accessAreas: ['Comercial']
-            }
-        ]
+        courses: []
       },
       {
         id: 'track-hs-cv',
