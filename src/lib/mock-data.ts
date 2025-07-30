@@ -168,9 +168,9 @@ export const learningModules: Module[] = [
             moduleId: 'module-integration',
             trackId: 'track-integration-main',
             title: 'Integração Comercial',
-            description: 'Um tour pelas principais ferramentas e recursos da nossa plataforma de e-learning.',
+            description: 'Conheça mais sobre a nossa área comercial com o nosso diretor Eliandro Arena.',
             order: 2,
-            videoUrl: 'https://app.heygen.com/embeds/f508152b4abc46f2b5f135fba44b31cb',
+            videoUrl: 'https://youtu.be/x5KXVAeDpkU',
             durationInSeconds: 120,
             thumbnailUrl: '/BrSupply.png',
             createdAt: new Date(),
@@ -256,7 +256,7 @@ export const learningModules: Module[] = [
         title: 'Comunicação',
         description: 'Aprimore suas habilidades de comunicação para interações mais eficazes.',
         order: 9,
-        courses: []
+        courses: [],
       },
       {
         id: 'track-hs-cv',
