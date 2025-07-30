@@ -167,7 +167,7 @@ export const learningModules: Module[] = [
             id: 'course-integ-2',
             moduleId: 'module-integration',
             trackId: 'track-integration-main',
-            title: 'Conhecendo a Plataforma',
+            title: 'Integração Comercial',
             description: 'Um tour pelas principais ferramentas e recursos da nossa plataforma de e-learning.',
             order: 2,
             videoUrl: 'https://app.heygen.com/embeds/f508152b4abc46f2b5f135fba44b31cb',
