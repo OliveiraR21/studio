@@ -148,7 +148,22 @@ export const learningModules: Module[] = [
         title: 'Integração de Novos Colaboradores',
         description: 'Conheça a cultura e os processos comerciais da Br Supply.',
         order: 1,
-        courses: [],
+        courses: [
+          {
+            id: 'course-integ-1',
+            moduleId: 'module-integration',
+            trackId: 'track-integration-main',
+            title: 'Boas-vindas à Br Supply',
+            description: 'Uma mensagem de boas-vindas do nosso CEO e uma introdução à nossa cultura e valores.',
+            order: 1,
+            videoUrl: 'https://app.heygen.com/embeds/603bafc3779141ec87c7eb529ce6452d',
+            durationInSeconds: 90,
+            thumbnailUrl: '/BrSupply.png',
+            createdAt: new Date(),
+            likes: 0,
+            dislikes: 0,
+          }
+        ],
       },
     ]
   },
