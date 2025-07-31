@@ -24,6 +24,7 @@ import { TrackFinalActions } from "@/components/course/track-final-actions";
 import React, { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { ModuleFinalActions } from "@/components/course/module-final-actions";
 
 const moduleIcons: Record<string, React.ElementType> = {
     'module-integration': ClipboardList,
@@ -55,6 +56,15 @@ export function MyCoursesPageContent({ learningModules, currentUser, nextCourse 
   const defaultTrack = defaultOpenTrackId ? findTrackInModules(learningModules, defaultOpenTrackId) : undefined;
   const defaultOpenModuleId = defaultTrack?.moduleId || learningModules[0]?.id;
 
+  const isTrackCompleted = (track: Track): boolean => {
+      if (track.courses.length > 0) {
+          return track.courses.every(c => currentUser.completedCourses.includes(c.id));
+      }
+      if (track.quiz && track.quiz.questions.length > 0) {
+            return currentUser.completedTracks.includes(track.id);
+      }
+      return true;
+  }
   
   return (
     <div className="container mx-auto py-2 space-y-8">
@@ -80,11 +90,19 @@ export function MyCoursesPageContent({ learningModules, currentUser, nextCourse 
           })}
         </TabsList>
 
-        {learningModules.map(module => (
-          <TabsContent key={module.id} value={module.id}>
-             <TrackAccordion tracks={module.tracks} currentUser={currentUser} defaultOpenTrackId={defaultOpenTrackId} />
-          </TabsContent>
-        ))}
+        {learningModules.map(module => {
+          const allTracksInModuleCompleted = module.tracks.length > 0 && module.tracks.every(isTrackCompleted);
+          return (
+            <TabsContent key={module.id} value={module.id} className="space-y-6">
+              <TrackAccordion tracks={module.tracks} currentUser={currentUser} defaultOpenTrackId={defaultOpenTrackId} />
+              <ModuleFinalActions
+                module={module}
+                currentUser={currentUser}
+                isModuleCompleted={allTracksInModuleCompleted}
+              />
+            </TabsContent>
+          )
+        })}
       </Tabs>
     </div>
   );

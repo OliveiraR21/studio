@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import { PDFDocument, rgb, StandardFonts, PDFFont } from 'pdf-lib';
@@ -9,8 +10,8 @@ import { ptBR } from 'date-fns/locale';
 
 interface CertificateData {
     userName: string;
-    trackName: string;
-    trackDurationInSeconds?: number;
+    moduleName: string;
+    moduleDurationInSeconds?: number;
 }
 
 // Helper function to wrap text
@@ -56,10 +57,10 @@ function formatDuration(totalSeconds: number): string {
 }
 
 
-export async function generateCertificatePdf({ userName, trackName, trackDurationInSeconds = 0 }: CertificateData): Promise<string> {
+export async function generateCertificatePdf({ userName, moduleName, moduleDurationInSeconds = 0 }: CertificateData): Promise<string> {
     try {
         const pdfDoc = await PDFDocument.create();
-        pdfDoc.setTitle(`Certificado de Conclusão - ${trackName}`);
+        pdfDoc.setTitle(`Certificado de Conclusão - ${moduleName}`);
         pdfDoc.setAuthor('Br Supply Academy Stream');
         pdfDoc.setCreator('Br Supply Academy Stream');
 
@@ -153,7 +154,7 @@ export async function generateCertificatePdf({ userName, trackName, trackDuratio
         currentY -= (userNameSize + 35);
 
         // 4. "for successfully completing" Text
-        const reasonText = 'POR CONCLUIR COM SUCESSO A TRILHA:';
+        const reasonText = 'POR CONCLUIR COM SUCESSO O MÓDULO:';
         const reasonSize = 14;
         const reasonWidth = font.widthOfTextAtSize(reasonText, reasonSize);
         page.drawText(reasonText, {
@@ -166,19 +167,19 @@ export async function generateCertificatePdf({ userName, trackName, trackDuratio
         });
         currentY -= (reasonSize + 20);
 
-        // 5. Track Name (with wrapping)
-        const trackNameSize = 24;
+        // 5. Module Name (with wrapping)
+        const moduleNameSize = 24;
         const maxTextWidth = width - 240; // Leave some padding
-        const trackNameLines = wrapText(trackName.toUpperCase(), boldFont, trackNameSize, maxTextWidth);
+        const moduleNameLines = wrapText(moduleName.toUpperCase(), boldFont, moduleNameSize, maxTextWidth);
         const lineHeight = 30;
 
-        for (const line of trackNameLines) {
-            const trackNameWidth = boldFont.widthOfTextAtSize(line, trackNameSize);
+        for (const line of moduleNameLines) {
+            const moduleNameWidth = boldFont.widthOfTextAtSize(line, moduleNameSize);
             page.drawText(line, {
-                x: width / 2 - trackNameWidth / 2,
+                x: width / 2 - moduleNameWidth / 2,
                 y: currentY,
                 font: boldFont,
-                size: trackNameSize,
+                size: moduleNameSize,
                 color: primaryOrange,
             });
             currentY -= lineHeight;
@@ -187,8 +188,8 @@ export async function generateCertificatePdf({ userName, trackName, trackDuratio
         // 6. Add some space after the title
         currentY -= 15;
 
-        // 7. Track Duration
-        const durationString = formatDuration(trackDurationInSeconds);
+        // 7. Module Duration
+        const durationString = formatDuration(moduleDurationInSeconds);
         if (durationString) {
             const durationText = `CARGA HORÁRIA: ${durationString.toUpperCase()}`;
             const durationSize = 12;

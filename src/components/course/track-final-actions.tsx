@@ -2,14 +2,13 @@
 
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Star, ThumbsUp, ThumbsDown, CheckCircle, Loader2, Award } from "lucide-react";
+import { Star, ThumbsUp, ThumbsDown, CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { completeTrackForUser } from "@/actions/track-actions";
-import { generateCertificatePdf } from "@/actions/certificate-actions";
 import type { User, Course } from "@/lib/types";
 
 
@@ -24,16 +23,11 @@ interface TrackFinalActionsProps {
     currentUser: User;
 }
 
-export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted, trackCompleted, trackTitle, courseCount, courses, currentUser }: TrackFinalActionsProps) {
+export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted, trackCompleted, trackTitle, courseCount }: TrackFinalActionsProps) {
     const { toast } = useToast();
     const router = useRouter();
     const [isCompleting, setIsCompleting] = useState(false);
-    const [isDownloading, setIsDownloading] = useState(false);
     const [feedbackState, setFeedbackState] = useState<'pending' | 'sent'>('pending');
-
-    const trackDurationInSeconds = useMemo(() => {
-        return courses.reduce((total, course) => total + (course.durationInSeconds || 0), 0);
-    }, [courses]);
 
     const handleCompleteTrack = useCallback(async () => {
         setIsCompleting(true);
@@ -69,35 +63,7 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
         toast({ title: "Obrigado pelo seu feedback!", description: `Sua avaliação para a trilha "${trackTitle}" foi registrada.` });
     };
     
-    const handleDownloadCertificate = async () => {
-        setIsDownloading(true);
-        toast({ title: 'Gerando seu certificado...', description: 'Isso pode levar alguns segundos.' });
-        try {
-            const pdfDataUri = await generateCertificatePdf({
-                userName: currentUser.name,
-                trackName: trackTitle,
-                trackDurationInSeconds: trackDurationInSeconds,
-            });
-
-            const link = document.createElement('a');
-            link.href = pdfDataUri;
-            link.download = `Certificado-${trackTitle.replace(/ /g, '_')}.pdf`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } catch (error) {
-            console.error(error);
-            toast({
-                variant: 'destructive',
-                title: 'Erro ao gerar certificado',
-                description: error instanceof Error ? error.message : 'Tente novamente.',
-            });
-        } finally {
-            setIsDownloading(false);
-        }
-    };
-    
-    // If track is already completed, show certificate and feedback options.
+    // If track is already completed, show feedback options.
     if (trackCompleted) {
         if (courseCount === 0 && !hasQuiz) {
             return null; // Don't show anything for an empty, completed track.
@@ -110,22 +76,14 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
                     <CardTitle>Parabéns, trilha concluída!</CardTitle>
                     <CardDescription>Você finalizou a trilha "{trackTitle}".</CardDescription>
                 </CardHeader>
-                <CardContent className="flex flex-col sm:flex-row justify-center items-center gap-4 flex-wrap">
-                    <Button 
-                        onClick={handleDownloadCertificate} 
-                        disabled={isDownloading}
-                        size="lg"
-                    >
-                        {isDownloading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <Award className="mr-2 h-5 w-5" />}
-                        {isDownloading ? 'Gerando...' : 'Baixar Certificado'}
-                    </Button>
-                    {feedbackState === 'pending' && (
+                {feedbackState === 'pending' && (
+                     <CardContent className="flex flex-col sm:flex-row justify-center items-center gap-4 flex-wrap">
                         <div className="flex gap-2">
                             <Button variant="outline" size="lg" onClick={handleFeedback}><ThumbsUp className="mr-2 h-5 w-5" /> Gostei</Button>
                             <Button variant="outline" size="lg" onClick={handleFeedback}><ThumbsDown className="mr-2 h-5 w-5" /> Não Gostei</Button>
                         </div>
-                    )}
-                </CardContent>
+                    </CardContent>
+                )}
             </Card>
         );
     }
