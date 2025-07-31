@@ -187,19 +187,17 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
       {/* Engagement Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-baseline justify-between space-y-0 pb-2">
-            <div className="flex items-baseline gap-2">
-                <CardTitle className="text-sm font-medium">Usuários Ativos</CardTitle>
-                <Tooltip>
-                    <TooltipTrigger>
-                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Representa o número total de contas de usuários cadastradas na plataforma.</p>
-                    </TooltipContent>
-                </Tooltip>
-            </div>
+          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Usuários Ativos</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
+             <Tooltip>
+                <TooltipTrigger className="absolute bottom-2 right-2">
+                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Representa o número total de contas de usuários cadastradas na plataforma.</p>
+                </TooltipContent>
+            </Tooltip>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalUsers}</div>
@@ -207,19 +205,17 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-baseline justify-between space-y-0 pb-2">
-             <div className="flex items-baseline gap-2">
-                <CardTitle className="text-sm font-medium">Taxa de Conclusão Média</CardTitle>
-                 <Tooltip>
-                    <TooltipTrigger>
-                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs">
-                        <p>Calcula a média do percentual de cursos concluídos por todos os usuários.</p>
-                    </TooltipContent>
-                </Tooltip>
-            </div>
+          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Taxa de Conclusão Média</CardTitle>
             <AreaChart className="h-4 w-4 text-muted-foreground" />
+            <Tooltip>
+                <TooltipTrigger className="absolute bottom-2 right-2">
+                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                    <p>Calcula a média do percentual de cursos concluídos por todos os usuários.</p>
+                </TooltipContent>
+            </Tooltip>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{engagementStats.completionRate}%</div>
@@ -227,19 +223,17 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-baseline justify-between space-y-0 pb-2">
-             <div className="flex items-baseline gap-2">
-                <CardTitle className="text-sm font-medium">Tempo Médio de Sessão</CardTitle>
-                <Tooltip>
-                    <TooltipTrigger>
-                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>Indica o tempo médio que um usuário permanece ativo na plataforma a cada visita.</p>
-                    </TooltipContent>
-                </Tooltip>
-            </div>
+          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Tempo Médio de Sessão</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
+            <Tooltip>
+                <TooltipTrigger className="absolute bottom-2 right-2">
+                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>Indica o tempo médio que um usuário permanece ativo na plataforma a cada visita.</p>
+                </TooltipContent>
+            </Tooltip>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{engagementStats.avgSessionTime}</div>
@@ -247,19 +241,17 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-baseline justify-between space-y-0 pb-2">
-             <div className="flex items-baseline gap-2">
-                <CardTitle className="text-sm font-medium">Horário de Pico</CardTitle>
-                <Tooltip>
-                    <TooltipTrigger>
-                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>O intervalo de tempo em que a plataforma registra o maior número de usuários ativos.</p>
-                    </TooltipContent>
-                </Tooltip>
-            </div>
+          <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Horário de Pico</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
+            <Tooltip>
+                <TooltipTrigger className="absolute bottom-2 right-2">
+                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>O intervalo de tempo em que a plataforma registra o maior número de usuários ativos.</p>
+                </TooltipContent>
+            </Tooltip>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{engagementStats.peakTime}</div>
