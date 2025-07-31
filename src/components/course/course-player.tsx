@@ -14,13 +14,16 @@ export function CoursePlayer({ videoUrl, title }: CoursePlayerProps) {
     if (url.includes("youtube.com/watch") || url.includes("youtu.be/")) {
       const videoIdMatch = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})(?:\?|&|$)/);
       if (videoIdMatch && videoIdMatch[1]) {
-        // Add parameters to clean up the player UI
+        const videoId = videoIdMatch[1];
+        // Using `playlist` and `loop` is the modern way to prevent related videos from showing.
         const params = new URLSearchParams({
-          rel: '0', // Do not show related videos from other channels
-          showinfo: '0', // Hide video title and uploader
-          modestbranding: '1', // Remove YouTube logo
+          rel: '0',             // Do not show related videos.
+          modestbranding: '1',  // Remove YouTube logo.
+          iv_load_policy: '3',  // Do not show video annotations.
+          loop: '1',            // Loop the video (works with playlist).
+          playlist: videoId,    // Required for the loop parameter to work.
         });
-        return `https://www.youtube.com/embed/${videoIdMatch[1]}?${params.toString()}`;
+        return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
       }
     }
 
