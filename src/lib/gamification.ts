@@ -1,34 +1,32 @@
 
+
 import type { User, LevelInfo, Module } from './types';
 
 // --- Configuration ---
 
-// Base XP is calculated as number of completed courses * 10.
-const XP_PER_COURSE = 10;
-// Bonus XP is calculated as average_score * 5. (e.g., 90% average score = 450 bonus XP)
-const XP_PERFORMANCE_MULTIPLIER = 5;
-
-// Define the XP required to reach each level.
-const LEVEL_THRESHOLDS: Record<number, number> = {
-  1: 0,      // Bronze
-  2: 60,     // Prata (e.g., ~5 courses + good grades)
-  3: 200,    // Ouro (e.g., ~15 courses + good grades)
-  4: 500,    // Diamante (Special Case: 100% completion + >95% score)
+// Define the percentage thresholds for each level.
+const LEVEL_THRESHOLDS = {
+    NO_LEVEL: 33,
+    BRONZE: 66,
+    PRATA: 99,
+    OURO: 100,
 };
 
-// Define names for each level
+// Define names for each level number.
 const LEVEL_NAMES: Record<number, string> = {
+    0: 'Sem Nível',
     1: 'Bronze',
     2: 'Prata',
     3: 'Ouro',
     4: 'Diamante',
 };
 
-const MAX_LEVEL = Object.keys(LEVEL_THRESHOLDS).length;
+const DIAMOND_MINIMUM_SCORE = 95;
+const MAX_LEVEL = Object.keys(LEVEL_NAMES).length -1;
+
 
 /**
- * Calculates a user's current level, XP, and progress towards the next level
- * based on course completion percentage and quiz performance.
+ * Calculates a user's current level and progress based on the percentage of completed courses.
  * @param user The user object.
  * @param allModules All available modules in the platform.
  * @returns An object with the user's level information.
@@ -37,57 +35,50 @@ export async function calculateUserLevel(user: User, allModules: Module[]): Prom
     
   // 1. Get the TOTAL number of courses on the platform, regardless of access.
   const allPlatformCourses = allModules.flatMap(m => m.tracks.flatMap(t => t.courses));
+  const totalCourses = allPlatformCourses.length > 0 ? allPlatformCourses.length : 1; // Avoid division by zero
   const completedCoursesCount = user.completedCourses.length;
 
-  // 2. Calculate average score
+  // 2. Calculate completion percentage. This is the primary driver for levels.
+  const completionPercentage = Math.round((completedCoursesCount / totalCourses) * 100);
+
+  // 3. Calculate average score for the Diamond level condition.
   const allScores = [...(user.courseScores ?? []).map(s => s.score), ...(user.trackScores ?? []).map(s => s.score)];
   const averageScore = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
+  
+  // 4. Determine Level based on new percentage rules.
+  let level: number;
+  let levelName: string;
 
-  // 3. Calculate XP based on the number of completed courses, not percentage.
-  const baseXp = completedCoursesCount * XP_PER_COURSE; 
-  const performanceXp = Math.round(averageScore * XP_PERFORMANCE_MULTIPLIER);
-  const currentXp = baseXp + performanceXp;
-  
-  let level = 1;
-  
-  // 4. Determine Level, with special case for Diamond
-  // Check if the user has completed ALL courses on the platform.
-  const allPlatformCourseIds = allPlatformCourses.map(c => c.id);
-  const hasCompletedAllCourses = allPlatformCourseIds.every(id => user.completedCourses.includes(id));
-  
-  const isDiamondCandidate = hasCompletedAllCourses && averageScore > 95;
+  const isDiamondCandidate = (completionPercentage === 100 && averageScore > DIAMOND_MINIMUM_SCORE);
 
   if (isDiamondCandidate) {
-      level = 4; // Diamante
+      level = 4;
+      levelName = LEVEL_NAMES[4];
+  } else if (completionPercentage === LEVEL_THRESHOLDS.OURO) {
+      level = 3;
+      levelName = LEVEL_NAMES[3];
+  } else if (completionPercentage > LEVEL_THRESHOLDS.BRONZE) {
+      level = 2;
+      levelName = LEVEL_NAMES[2];
+  } else if (completionPercentage > LEVEL_THRESHOLDS.NO_LEVEL) {
+      level = 1;
+      levelName = LEVEL_NAMES[1];
   } else {
-      // Find the current level by checking which threshold the user's XP has surpassed.
-      // We iterate backwards to find the highest level achieved.
-      for (let i = MAX_LEVEL; i > 0; i--) {
-        if (i === MAX_LEVEL && !isDiamondCandidate) continue; // Skip diamond if not candidate
-
-        if (currentXp >= LEVEL_THRESHOLDS[i]) {
-          level = i;
-          break;
-        }
-      }
+      level = 0;
+      levelName = LEVEL_NAMES[0];
   }
 
-  const xpForCurrentLevel = LEVEL_THRESHOLDS[level];
-  const xpForNextLevel = level < MAX_LEVEL ? LEVEL_THRESHOLDS[level + 1] : xpForCurrentLevel;
-
-  const xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
-  const xpEarnedInCurrentLevel = currentXp - xpForCurrentLevel;
-
-  // Calculate progress percentage, handling the max level case.
-  const progressPercentage = (level < MAX_LEVEL && xpNeededForNextLevel > 0)
-    ? Math.min(100, Math.round((xpEarnedInCurrentLevel / xpNeededForNextLevel) * 100))
-    : 100; // At max level, progress is 100%
+  // The progress bar will now directly reflect the course completion percentage.
+  // The concept of "XP" is abstracted away in favor of this direct metric.
+  const progressPercentageForBar = level === MAX_LEVEL ? 100 : completionPercentage;
 
   return {
     level,
-    currentXp,
-    xpForNextLevel: xpForNextLevel,
-    progressPercentage,
-    levelName: LEVEL_NAMES[level] || 'Desconhecido',
+    progressPercentage: progressPercentageForBar,
+    levelName,
+    // The 'xp' fields are now less central, but can be used for display if needed.
+    // We'll map the percentage directly to these fields for simplicity.
+    currentXp: completionPercentage,
+    xpForNextLevel: 100,
   };
 }

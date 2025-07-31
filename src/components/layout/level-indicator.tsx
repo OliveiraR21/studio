@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import type { LevelInfo } from "@/lib/types";
@@ -11,16 +12,17 @@ interface LevelIndicatorProps {
 }
 
 const levelColors = [
-    '#a16207', // Nível 1 (Bronze)
-    '#d4d4d8', // Nível 2 (Prata)
-    '#facc15', // Nível 3 (Ouro)
-    '#2dd4bf', // Nível 4 (Diamante)
+    '#a1a1aa', // Level 0 (Sem Nível - a light gray)
+    '#a16207', // Level 1 (Bronze)
+    '#d4d4d8', // Level 2 (Prata)
+    '#facc15', // Level 3 (Ouro)
+    '#2dd4bf', // Level 4 (Diamante)
 ];
 
 export function LevelIndicator({ levelInfo }: LevelIndicatorProps) {
   const { level, progressPercentage, currentXp, xpForNextLevel, levelName } = levelInfo;
-  const trophyColor = levelColors[level - 1] || levelColors[0];
-  const isMaxLevel = level === Object.keys(levelColors).length;
+  const trophyColor = levelColors[level] || levelColors[0];
+  const isMaxLevel = level === 4;
 
   return (
     <Popover>
@@ -43,10 +45,8 @@ export function LevelIndicator({ levelInfo }: LevelIndicatorProps) {
             </div>
             <Progress value={progressPercentage} className="h-2" />
             <div className="flex justify-between text-xs text-muted-foreground">
-                <span>XP Atual: {currentXp}</span>
-                 {!isMaxLevel && (
-                    <span>Próximo Nível: {xpForNextLevel}</span>
-                )}
+                <span>Progresso</span>
+                 <span>{currentXp}% Concluído</span>
             </div>
             {isMaxLevel && (
                 <p className="text-xs text-center text-primary font-semibold pt-1">Você atingiu o nível máximo!</p>
