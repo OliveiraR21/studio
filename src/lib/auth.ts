@@ -15,7 +15,7 @@ const DEFAULT_USER_ID = '1';
  * This function is cached to prevent multiple lookups in a single request.
  * @returns The user ID string, or a default ID if not logged in.
  */
-export const getSimulatedUserId = cache((): string => {
+export const getSimulatedUserId = cache(async (): Promise<string> => {
   const cookieStore = cookies();
   return cookieStore.get('simulated_user_id')?.value || DEFAULT_USER_ID;
 });
@@ -26,7 +26,7 @@ export const getSimulatedUserId = cache((): string => {
  * @returns The user object, or null if not found.
  */
 export const getCurrentUser = cache(async (): Promise<User | null> => {
-    const userId = getSimulatedUserId();
+    const userId = await getSimulatedUserId();
     const user = await getUserById(userId);
     return user;
 });
