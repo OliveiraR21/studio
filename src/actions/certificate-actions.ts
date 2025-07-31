@@ -63,8 +63,8 @@ export async function generateCertificatePdf({ userName, itemName, durationInSec
         const pdfDoc = await PDFDocument.create();
         const pdfTitle = type === 'general' ? 'Certificado de Conclusão Geral' : `Certificado de Conclusão - ${itemName}`;
         pdfDoc.setTitle(pdfTitle);
-        pdfDoc.setAuthor('Br Supply Academy Stream');
-        pdfDoc.setCreator('Br Supply Academy Stream');
+        pdfDoc.setAuthor('Academia Br Supply');
+        pdfDoc.setCreator('Academia Br Supply');
 
         const page = pdfDoc.addPage([841.89, 595.28]); // A4 landscape
         const { width, height } = page.getSize();
@@ -173,14 +173,28 @@ export async function generateCertificatePdf({ userName, itemName, durationInSec
 
         // Add platform name for general certificate
         if (type === 'general') {
-            const platformText = 'BR SUPPLY ACADEMY STREAM';
-            const platformTextWidth = boldFont.widthOfTextAtSize(platformText, reasonSize + 2);
-             page.drawText(platformText, {
-                x: width / 2 - platformTextWidth / 2,
+            const platformTextPart1 = 'BR ';
+            const platformTextPart2 = 'ACADEMIA SUPPLY';
+            const platformTextSize = reasonSize + 2;
+
+            const part1Width = boldFont.widthOfTextAtSize(platformTextPart1, platformTextSize);
+            const part2Width = boldFont.widthOfTextAtSize(platformTextPart2, platformTextSize);
+            const totalWidth = part1Width + part2Width;
+            const startX = width / 2 - totalWidth / 2;
+
+            page.drawText(platformTextPart1, {
+                x: startX,
                 y: currentY - 15,
                 font: boldFont,
-                size: reasonSize + 2,
+                size: platformTextSize,
                 color: primaryOrange,
+            });
+            page.drawText(platformTextPart2, {
+                x: startX + part1Width,
+                y: currentY - 15,
+                font: boldFont,
+                size: platformTextSize,
+                color: white,
             });
             currentY -= 35;
         } else {
