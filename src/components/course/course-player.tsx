@@ -9,31 +9,34 @@ interface CoursePlayerProps {
 export function CoursePlayer({ videoUrl, title }: CoursePlayerProps) {
   const getEmbedUrl = (url: string): string => {
     if (!url) return '';
-    
-    // Handle YouTube URLs
-    if (url.includes("youtube.com/watch") || url.includes("youtu.be/")) {
-      const videoIdMatch = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})(?:\?|&|$)/);
+
+    // Verifica se a URL é do YouTube
+    if (url.includes("youtube.com") || url.includes("youtu.be")) {
+      // Expressão regular para extrair o ID do vídeo de diferentes formatos de URL
+      const videoIdMatch = url.match(/(?:v=|vi\/|embed\/|youtu.be\/)([a-zA-Z0-9_-]{11})/);
+
       if (videoIdMatch && videoIdMatch[1]) {
         const videoId = videoIdMatch[1];
-        // Using `playlist` and `loop` is the modern way to prevent related videos from showing.
+
+        // Parâmetros para personalizar o player do YouTube
         const params = new URLSearchParams({
-          rel: '0',             // Do not show related videos.
-          modestbranding: '1',  // Remove YouTube logo.
-          iv_load_policy: '3',  // Do not show video annotations.
-          loop: '1',            // Loop the video (works with playlist).
-          playlist: videoId,    // Required for the loop parameter to work.
+          rel: '0',             // Não mostra vídeos relacionados no final.
+          modestbranding: '1',  // Remove o logo do YouTube da barra de controle.
+          iv_load_policy: '3',  // Desativa anotações no vídeo.
+          controls: '1',        // Garante que os controles do player (play, volume, etc.) sejam exibidos.
         });
+
+        // Retorna a URL de incorporação (embed) padrão e mais limpa
         return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
       }
     }
 
-    // Handle HeyGen URLs
+    // Mantém a lógica para URLs do HeyGen
     if (url.includes("heygen.com/")) {
-      // Handles /videos/, /video/, and /guest/videos/ formats, converting them to the correct /embeds/ format.
       return url.replace(/(\/guest)?\/videos?\//, "/embeds/");
     }
-    
-    // Return the URL as is if it's not a recognized format that needs conversion
+
+    // Retorna a URL original se não for um formato reconhecido para conversão
     return url;
   };
 
@@ -48,6 +51,8 @@ export function CoursePlayer({ videoUrl, title }: CoursePlayerProps) {
         allow="autoplay; fullscreen; picture-in-picture"
         allowFullScreen
         className="border-0"
+        // É uma boa prática adicionar o título ao iframe para acessibilidade
+        title={title}
       ></iframe>
     </div>
   );
