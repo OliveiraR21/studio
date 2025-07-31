@@ -1,5 +1,7 @@
 
 
+'use client';
+
 import { getLearningModules, findNextCourseForUser, filterModulesForUser } from "@/lib/data-access";
 import { 
   Tabs, 
@@ -22,8 +24,10 @@ import { Card } from "@/components/ui/card";
 import { UserNotFound } from "@/components/layout/user-not-found";
 import { TrackFinalActions } from "@/components/course/track-final-actions";
 import { getCurrentUser } from "@/lib/auth";
-import React from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import confetti from 'canvas-confetti';
 
 const PASSING_SCORE = 90;
 
@@ -33,6 +37,103 @@ const moduleIcons: Record<string, React.ElementType> = {
     'module-ss': HeartHandshake,
     'module-hms': Bot,
 };
+
+const triggerConfetti = () => {
+    const duration = 2 * 1000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+    function randomInRange(min: number, max: number) {
+        return Math.random() * (max - min) + min;
+    }
+
+    const interval = window.setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+            return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+    }, 250);
+};
+
+
+interface MyCoursesPageContentProps {
+    learningModules: Module[];
+    currentUser: User;
+    nextCourse: (Course & { trackId: string; }) | null
+}
+
+
+function MyCoursesPageContent({ learningModules, currentUser, nextCourse }: MyCoursesPageContentProps) {
+  const searchParams = useSearchParams();
+  const prevCompletedTracksRef = useRef<string[]>(currentUser.completedTracks);
+
+  const findTrackInModules = (modules: Module[], trackId: string): Track | undefined => {
+    for (const module of modules) {
+        const track = module.tracks.find(t => t.id === trackId);
+        if (track) return track;
+    }
+    return undefined;
+  };
+  
+  const openTrackId = searchParams.get('openTrack');
+  const defaultOpenTrackId = openTrackId || nextCourse?.trackId;
+  const defaultTrack = defaultOpenTrackId ? findTrackInModules(learningModules, defaultOpenTrackId) : undefined;
+  const defaultOpenModuleId = defaultTrack?.moduleId || learningModules[0]?.id;
+
+  useEffect(() => {
+    const prevCompleted = prevCompletedTracksRef.current;
+    const currentCompleted = currentUser.completedTracks;
+
+    if (currentCompleted.length > prevCompleted.length) {
+      const newCompletedTrackId = currentCompleted.find(id => !prevCompleted.includes(id));
+      if (newCompletedTrackId && newCompletedTrackId === defaultOpenTrackId) {
+        triggerConfetti();
+      }
+    }
+    
+    prevCompletedTracksRef.current = currentCompleted;
+  }, [currentUser.completedTracks, defaultOpenTrackId]);
+  
+  return (
+    <div className="container mx-auto py-2 space-y-8">
+      <div className="mb-6">
+          <h1 className="text-3xl font-bold">Meus Cursos</h1>
+          <p className="text-muted-foreground">
+              Explore suas trilhas de conhecimento e continue sua jornada de aprendizado.
+          </p>
+      </div>
+      <Tabs defaultValue={defaultOpenModuleId}>
+        <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-4 h-auto">
+          {learningModules.map(module => {
+            const Icon = moduleIcons[module.id] || ClipboardList; // Fallback icon
+            return (
+                <TabsTrigger key={module.id} value={module.id} className="h-full flex flex-col items-start p-4 text-left">
+                <div className="flex items-center gap-3">
+                    <Icon className="h-5 w-5" />
+                    <p className="font-bold text-lg">{module.title}</p>
+                </div>
+                <p className="text-xs text-muted-foreground whitespace-normal mt-2">{module.description}</p>
+                </TabsTrigger>
+            );
+          })}
+        </TabsList>
+
+        {learningModules.map(module => (
+          <TabsContent key={module.id} value={module.id}>
+             <TrackAccordion tracks={module.tracks} currentUser={currentUser} defaultOpenTrackId={defaultOpenTrackId} />
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  );
+}
+
+
 
 const TrackAccordion = ({ 
     tracks, 
@@ -159,11 +260,7 @@ const TrackAccordion = ({
 };
 
 
-export default async function MyCoursesPage({
-  searchParams,
-}: {
-  searchParams?: { openTrack?: string };
-}) {
+export default async function MyCoursesPageWrapper() {
   const currentUser = await getCurrentUser();
   const allModules = await getLearningModules();
 
@@ -171,54 +268,14 @@ export default async function MyCoursesPage({
     return <UserNotFound />
   }
 
-  // Use the centralized function to filter the modules
   const learningModules = filterModulesForUser(allModules, currentUser);
-
-
   const nextCourse = await findNextCourseForUser(currentUser);
   
-  const findTrackInModules = (modules: Module[], trackId: string): Track | undefined => {
-    for (const module of modules) {
-        const track = module.tracks.find(t => t.id === trackId);
-        if (track) return track;
-    }
-    return undefined;
-  };
-
-  const defaultOpenTrackId = searchParams?.openTrack || nextCourse?.trackId;
-  const defaultTrack = defaultOpenTrackId ? findTrackInModules(learningModules, defaultOpenTrackId) : undefined;
-  const defaultOpenModuleId = defaultTrack?.moduleId || learningModules[0]?.id;
-  
   return (
-    <div className="container mx-auto py-2 space-y-8">
-      <div className="mb-6">
-          <h1 className="text-3xl font-bold">Meus Cursos</h1>
-          <p className="text-muted-foreground">
-              Explore suas trilhas de conhecimento e continue sua jornada de aprendizado.
-          </p>
-      </div>
-      <Tabs defaultValue={defaultOpenModuleId}>
-        <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-4 h-auto">
-          {learningModules.map(module => {
-            const Icon = moduleIcons[module.id] || ClipboardList; // Fallback icon
-            return (
-                <TabsTrigger key={module.id} value={module.id} className="h-full flex flex-col items-start p-4 text-left">
-                <div className="flex items-center gap-3">
-                    <Icon className="h-5 w-5" />
-                    <p className="font-bold text-lg">{module.title}</p>
-                </div>
-                <p className="text-xs text-muted-foreground whitespace-normal mt-2">{module.description}</p>
-                </TabsTrigger>
-            );
-          })}
-        </TabsList>
-
-        {learningModules.map(module => (
-          <TabsContent key={module.id} value={module.id}>
-             <TrackAccordion tracks={module.tracks} currentUser={currentUser} defaultOpenTrackId={defaultOpenTrackId} />
-          </TabsContent>
-        ))}
-      </Tabs>
-    </div>
+    <MyCoursesPageContent 
+        learningModules={learningModules}
+        currentUser={currentUser}
+        nextCourse={nextCourse}
+    />
   );
 }
