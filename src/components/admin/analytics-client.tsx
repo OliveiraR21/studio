@@ -14,12 +14,12 @@ import {
   Bar,
   XAxis,
   YAxis,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   ResponsiveContainer,
   CartesianGrid,
   Legend
 } from "recharts";
-import { Clock, Users, AreaChart, AlertCircle, Download, Users2 } from "lucide-react";
+import { Clock, Users, AreaChart, AlertCircle, Download, Users2, Info } from "lucide-react";
 import Link from 'next/link';
 import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +31,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 
 interface AnalyticsClientProps {
   data: AnalyticsData;
@@ -150,6 +152,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
   };
 
   return (
+    <TooltipProvider>
     <div className="container mx-auto space-y-6">
         <div className="flex items-center justify-between">
             <div>
@@ -185,7 +188,17 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Usuários Ativos</CardTitle>
+            <div className="flex items-center gap-2">
+                <CardTitle className="text-sm font-medium">Usuários Ativos</CardTitle>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Representa o número total de contas de usuários cadastradas na plataforma.</p>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -195,7 +208,17 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Taxa de Conclusão Média</CardTitle>
+             <div className="flex items-center gap-2">
+                <CardTitle className="text-sm font-medium">Taxa de Conclusão Média</CardTitle>
+                 <Tooltip>
+                    <TooltipTrigger>
+                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                        <p>Calcula a média do percentual de cursos concluídos por todos os usuários.</p>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
             <AreaChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -205,7 +228,17 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tempo Médio de Sessão</CardTitle>
+             <div className="flex items-center gap-2">
+                <CardTitle className="text-sm font-medium">Tempo Médio de Sessão</CardTitle>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Indica o tempo médio que um usuário permanece ativo na plataforma a cada visita.</p>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -215,7 +248,17 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Horário de Pico</CardTitle>
+             <div className="flex items-center gap-2">
+                <CardTitle className="text-sm font-medium">Horário de Pico</CardTitle>
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>O intervalo de tempo em que a plataforma registra o maior número de usuários ativos.</p>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -246,7 +289,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="managerName" tick={{ fontSize: 12 }} />
                             <YAxis type="number" domain={[0, 100]} unit="%" />
-                            <Tooltip
+                            <RechartsTooltip
                                 cursor={{ fill: 'hsl(var(--muted))' }}
                                 content={<CustomTooltip />}
                             />
@@ -296,7 +339,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                         axisLine={false}
                         tick={{ fontSize: 12 }}
                         />
-                        <Tooltip
+                        <RechartsTooltip
                         cursor={{ fill: 'hsl(var(--muted))' }}
                         content={<CustomTooltip />}
                         />
@@ -315,5 +358,6 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
             </Card>
        </div>
     </div>
+    </TooltipProvider>
   );
 }
