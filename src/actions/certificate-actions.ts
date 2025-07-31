@@ -10,6 +10,7 @@ import { ptBR } from 'date-fns/locale';
 interface CertificateData {
     userName: string;
     trackName: string;
+    trackDurationInSeconds?: number;
 }
 
 // Helper function to wrap text
@@ -35,8 +36,27 @@ function wrapText(text: string, font: PDFFont, fontSize: number, maxWidth: numbe
     return lines;
 }
 
+function formatDuration(totalSeconds: number): string {
+    if (!totalSeconds || totalSeconds < 60) {
+        return ''; // Don't show duration if it's less than a minute
+    }
 
-export async function generateCertificatePdf({ userName, trackName }: CertificateData): Promise<string> {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.round((totalSeconds % 3600) / 60);
+
+    const parts: string[] = [];
+    if (hours > 0) {
+        parts.push(`${hours} hora${hours > 1 ? 's' : ''}`);
+    }
+    if (minutes > 0) {
+        parts.push(`${minutes} minuto${minutes > 1 ? 's' : ''}`);
+    }
+
+    return parts.join(' e ');
+}
+
+
+export async function generateCertificatePdf({ userName, trackName, trackDurationInSeconds = 0 }: CertificateData): Promise<string> {
     try {
         const pdfDoc = await PDFDocument.create();
         pdfDoc.setTitle(`Certificado de Conclusão - ${trackName}`);
@@ -164,27 +184,36 @@ export async function generateCertificatePdf({ userName, trackName }: Certificat
             currentY -= lineHeight;
         }
 
-        // 6. Date and Location (at the bottom)
+        // 6. Add some space after the title
+        currentY -= 15;
+
+        // 7. Track Duration
+        const durationString = formatDuration(trackDurationInSeconds);
+        if (durationString) {
+            const durationText = `CARGA HORÁRIA: ${durationString.toUpperCase()}`;
+            const durationSize = 12;
+            const durationWidth = font.widthOfTextAtSize(durationText, durationSize);
+            page.drawText(durationText, {
+                x: width / 2 - durationWidth / 2,
+                y: currentY,
+                font: font,
+                size: durationSize,
+                color: lightGray,
+                characterSpacing: 0.5,
+            });
+        }
+
+
+        // 8. Date (at the bottom)
         const now = new Date();
         const timeZone = 'America/Sao_Paulo';
         const completionDate = formatInTimeZone(now, timeZone, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
         
-        const locationText = 'Rio Grande do Sul, Brasil';
         const dateText = `Concluído em ${completionDate}`;
-
-        const locationWidth = font.widthOfTextAtSize(locationText, 10);
-        page.drawText(locationText, {
-            x: width / 2 - locationWidth / 2,
-            y: 85,
-            font: font,
-            size: 10,
-            color: lightGray,
-        });
-
         const dateWidth = font.widthOfTextAtSize(dateText, 12);
         page.drawText(dateText, {
             x: width / 2 - dateWidth / 2,
-            y: 65,
+            y: 75, // Adjusted Y position
             font: font,
             size: 12,
             color: lightGray,

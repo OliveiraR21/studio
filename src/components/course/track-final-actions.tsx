@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Star, ThumbsUp, ThumbsDown, CheckCircle, Loader2, Award } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { useRouter } from "next/navigation";
 import { completeTrackForUser } from "@/actions/track-actions";
 import { generateCertificatePdf } from "@/actions/certificate-actions";
-import type { User } from "@/lib/types";
+import type { User, Course } from "@/lib/types";
 
 
 interface TrackFinalActionsProps {
@@ -20,15 +20,20 @@ interface TrackFinalActionsProps {
     trackCompleted: boolean;
     trackTitle: string;
     courseCount: number;
+    courses: Course[];
     currentUser: User;
 }
 
-export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted, trackCompleted, trackTitle, courseCount, currentUser }: TrackFinalActionsProps) {
+export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted, trackCompleted, trackTitle, courseCount, courses, currentUser }: TrackFinalActionsProps) {
     const { toast } = useToast();
     const router = useRouter();
     const [isCompleting, setIsCompleting] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
     const [feedbackState, setFeedbackState] = useState<'pending' | 'sent'>('pending');
+
+    const trackDurationInSeconds = useMemo(() => {
+        return courses.reduce((total, course) => total + (course.durationInSeconds || 0), 0);
+    }, [courses]);
 
     const handleCompleteTrack = useCallback(async () => {
         setIsCompleting(true);
@@ -71,6 +76,7 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
             const pdfDataUri = await generateCertificatePdf({
                 userName: currentUser.name,
                 trackName: trackTitle,
+                trackDurationInSeconds: trackDurationInSeconds,
             });
 
             const link = document.createElement('a');

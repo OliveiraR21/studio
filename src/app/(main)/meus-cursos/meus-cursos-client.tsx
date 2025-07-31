@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import type { Track, Course, User, Module } from "@/lib/types";
@@ -203,6 +204,7 @@ const TrackAccordion = ({
                                         trackCompleted={trackCompleted}
                                         hasQuiz={hasQuiz}
                                         courseCount={track.courses.length}
+                                        courses={track.courses}
                                         currentUser={currentUser}
                                     />
                                 </div>
