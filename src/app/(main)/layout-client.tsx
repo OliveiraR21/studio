@@ -30,11 +30,12 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import type { User } from '@/lib/types';
+import type { User, LevelInfo } from '@/lib/types';
 import { NotificationBell } from '@/components/layout/notification-bell';
 import { OnboardingTour } from '@/components/layout/onboarding-tour';
 import { TourProvider } from '@/hooks/use-tour';
 import { GlobalSearch } from '@/components/layout/global-search';
+import { LevelIndicator } from '@/components/layout/level-indicator';
 
 // Helper to create a slug for data attributes
 const toSlug = (str: string) => str.toLowerCase().replace(/\s+/g, '-');
@@ -62,9 +63,11 @@ const NavItem = ({ href, icon: Icon, label, pathname }: { href: string; icon: Re
 
 export function MainLayoutClient({
   user,
+  levelInfo,
   children,
 }: {
   user: User;
+  levelInfo: LevelInfo,
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -143,6 +146,7 @@ export function MainLayoutClient({
             <div className="w-full flex-1">
               {/* Future elements can go here */}
             </div>
+            <LevelIndicator levelInfo={levelInfo} />
             <NotificationBell />
             <ThemeToggle />
             <UserNav user={user} />

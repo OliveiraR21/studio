@@ -1,5 +1,6 @@
 
 
+
 export interface Module {
   id: string;
   title: string;
@@ -116,4 +117,13 @@ export interface AnalyticsData {
   managerPerformance: ManagerPerformance[];
   totalUsers: number;
   totalCourses: number;
+}
+
+// Gamification Types
+export interface LevelInfo {
+  level: number;
+  currentXp: number;
+  xpForNextLevel: number;
+  progressPercentage: number;
+  levelName: string;
 }
