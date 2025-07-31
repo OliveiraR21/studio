@@ -173,28 +173,16 @@ export async function generateCertificatePdf({ userName, itemName, durationInSec
 
         // Add platform name for general certificate
         if (type === 'general') {
-            const platformTextPart1 = 'BR ';
-            const platformTextPart2 = 'ACADEMIA SUPPLY';
+            const platformText = 'ACADEMIA BR SUPPLY';
             const platformTextSize = reasonSize + 2;
+            const platformTextWidth = boldFont.widthOfTextAtSize(platformText, platformTextSize);
 
-            const part1Width = boldFont.widthOfTextAtSize(platformTextPart1, platformTextSize);
-            const part2Width = boldFont.widthOfTextAtSize(platformTextPart2, platformTextSize);
-            const totalWidth = part1Width + part2Width;
-            const startX = width / 2 - totalWidth / 2;
-
-            page.drawText(platformTextPart1, {
-                x: startX,
+            page.drawText(platformText, {
+                x: width / 2 - platformTextWidth / 2,
                 y: currentY - 15,
                 font: boldFont,
                 size: platformTextSize,
                 color: primaryOrange,
-            });
-            page.drawText(platformTextPart2, {
-                x: startX + part1Width,
-                y: currentY - 15,
-                font: boldFont,
-                size: platformTextSize,
-                color: white,
             });
             currentY -= 35;
         } else {
