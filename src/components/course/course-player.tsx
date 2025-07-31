@@ -1,3 +1,4 @@
+
 "use client";
 
 interface CoursePlayerProps {
@@ -13,7 +14,13 @@ export function CoursePlayer({ videoUrl, title }: CoursePlayerProps) {
     if (url.includes("youtube.com/watch") || url.includes("youtu.be/")) {
       const videoIdMatch = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})(?:\?|&|$)/);
       if (videoIdMatch && videoIdMatch[1]) {
-        return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
+        // Add parameters to clean up the player UI
+        const params = new URLSearchParams({
+          rel: '0', // Do not show related videos from other channels
+          showinfo: '0', // Hide video title and uploader
+          modestbranding: '1', // Remove YouTube logo
+        });
+        return `https://www.youtube.com/embed/${videoIdMatch[1]}?${params.toString()}`;
       }
     }
 
