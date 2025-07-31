@@ -187,8 +187,8 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
       {/* Engagement Stats */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div className="flex items-center gap-2">
+          <CardHeader className="flex flex-row items-baseline justify-between space-y-0 pb-2">
+            <div className="flex items-baseline gap-2">
                 <CardTitle className="text-sm font-medium">Usuários Ativos</CardTitle>
                 <Tooltip>
                     <TooltipTrigger>
@@ -207,8 +207,8 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-             <div className="flex items-center gap-2">
+          <CardHeader className="flex flex-row items-baseline justify-between space-y-0 pb-2">
+             <div className="flex items-baseline gap-2">
                 <CardTitle className="text-sm font-medium">Taxa de Conclusão Média</CardTitle>
                  <Tooltip>
                     <TooltipTrigger>
@@ -227,8 +227,8 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-             <div className="flex items-center gap-2">
+          <CardHeader className="flex flex-row items-baseline justify-between space-y-0 pb-2">
+             <div className="flex items-baseline gap-2">
                 <CardTitle className="text-sm font-medium">Tempo Médio de Sessão</CardTitle>
                 <Tooltip>
                     <TooltipTrigger>
@@ -247,8 +247,8 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-             <div className="flex items-center gap-2">
+          <CardHeader className="flex flex-row items-baseline justify-between space-y-0 pb-2">
+             <div className="flex items-baseline gap-2">
                 <CardTitle className="text-sm font-medium">Horário de Pico</CardTitle>
                 <Tooltip>
                     <TooltipTrigger>
