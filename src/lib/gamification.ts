@@ -1,6 +1,5 @@
 
 import type { User, LevelInfo, Module } from './types';
-import { getLearningModules, filterModulesForUser } from './data-access';
 
 // --- Configuration ---
 
@@ -36,19 +35,16 @@ const MAX_LEVEL = Object.keys(LEVEL_THRESHOLDS).length;
  */
 export async function calculateUserLevel(user: User, allModules: Module[]): Promise<LevelInfo> {
     
-  // 1. Determine total accessible courses for the user
-  const accessibleCourses = filterModulesForUser(allModules, user)
-    .flatMap(m => m.tracks.flatMap(t => t.courses));
-  const totalCoursesCount = accessibleCourses.length > 0 ? accessibleCourses.length : 1;
-  const completedCoursesCount = user.completedCourses.filter(id => accessibleCourses.some(c => c.id === id)).length;
+  // 1. Get the TOTAL number of courses on the platform, regardless of access.
+  const allPlatformCourses = allModules.flatMap(m => m.tracks.flatMap(t => t.courses));
+  const totalCoursesCount = allPlatformCourses.length > 0 ? allPlatformCourses.length : 1;
+  const completedCoursesCount = user.completedCourses.length;
 
   // 2. Calculate average score
   const allScores = [...(user.courseScores ?? []).map(s => s.score), ...(user.trackScores ?? []).map(s => s.score)];
   const averageScore = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
 
-  // 3. Calculate XP
-  const completionPercentage = Math.round((completedCoursesCount / totalCoursesCount) * 100);
-  // --- BUG FIX: Calculate base XP from course count, not percentage ---
+  // 3. Calculate XP based on the number of completed courses, not percentage.
   const baseXp = completedCoursesCount * XP_PER_COURSE; 
   const performanceXp = Math.round(averageScore * XP_PERFORMANCE_MULTIPLIER);
   const currentXp = baseXp + performanceXp;
@@ -56,25 +52,26 @@ export async function calculateUserLevel(user: User, allModules: Module[]): Prom
   let level = 1;
   
   // 4. Determine Level, with special case for Diamond
-  const isDiamondCandidate = completionPercentage >= 100 && averageScore > 95;
+  // Check if the user has completed ALL courses on the platform.
+  const allPlatformCourseIds = allPlatformCourses.map(c => c.id);
+  const hasCompletedAllCourses = allPlatformCourseIds.every(id => user.completedCourses.includes(id));
+  
+  const isDiamondCandidate = hasCompletedAllCourses && averageScore > 95;
 
   if (isDiamondCandidate) {
       level = 4; // Diamante
   } else {
       // Find the current level by checking which threshold the user's XP has surpassed.
-      for (const levelKey in LEVEL_THRESHOLDS) {
-        const thresholdLevel = parseInt(levelKey, 10);
-        // Don't allow reaching diamond level via XP alone
-        if (thresholdLevel === MAX_LEVEL) continue;
-        
-        if (currentXp >= LEVEL_THRESHOLDS[thresholdLevel]) {
-          level = thresholdLevel;
-        } else {
-          break; // Stop when we find a threshold the user hasn't reached yet
+      // We iterate backwards to find the highest level achieved.
+      for (let i = MAX_LEVEL; i > 0; i--) {
+        if (i === MAX_LEVEL && !isDiamondCandidate) continue; // Skip diamond if not candidate
+
+        if (currentXp >= LEVEL_THRESHOLDS[i]) {
+          level = i;
+          break;
         }
       }
   }
-
 
   const xpForCurrentLevel = LEVEL_THRESHOLDS[level];
   const xpForNextLevel = level < MAX_LEVEL ? LEVEL_THRESHOLDS[level + 1] : xpForCurrentLevel;
@@ -84,7 +81,7 @@ export async function calculateUserLevel(user: User, allModules: Module[]): Prom
 
   // Calculate progress percentage, handling the max level case.
   const progressPercentage = (level < MAX_LEVEL && xpNeededForNextLevel > 0)
-    ? Math.round((xpEarnedInCurrentLevel / xpNeededForNextLevel) * 100)
+    ? Math.min(100, Math.round((xpEarnedInCurrentLevel / xpNeededForNextLevel) * 100))
     : 100; // At max level, progress is 100%
 
   return {
