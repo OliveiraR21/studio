@@ -75,7 +75,7 @@ export async function saveUser(
 
 
 export async function updateUserAvatar(avatarDataUrl: string): Promise<{ success: boolean; message: string }> {
-  const userId = getSimulatedUserId();
+  const userId = await getSimulatedUserId();
   if (!userId) {
     return { success: false, message: 'Usuário não autenticado.' };
   }
@@ -96,7 +96,7 @@ export async function updateUserAvatar(avatarDataUrl: string): Promise<{ success
 }
 
 export async function removeUserAvatar(): Promise<{ success: boolean; message: string }> {
-  const userId = getSimulatedUserId();
+  const userId = await getSimulatedUserId();
   if (!userId) {
     return { success: false, message: 'Usuário não autenticado.' };
   }
@@ -119,7 +119,7 @@ const userProfileSchema = z.object({
 export async function updateUserProfile(
     formData: FormData
 ): Promise<{ success: boolean; message: string }> {
-    const userId = getSimulatedUserId();
+    const userId = await getSimulatedUserId();
     if (!userId) {
         return { success: false, message: 'Usuário não autenticado.' };
     }
@@ -144,7 +144,7 @@ export async function updateUserProfile(
 }
 
 export async function completeOnboardingForUser(): Promise<{ success: boolean }> {
-  const userId = getSimulatedUserId();
+  const userId = await getSimulatedUserId();
   if (!userId) {
     return { success: false };
   }

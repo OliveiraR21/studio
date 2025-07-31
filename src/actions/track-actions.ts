@@ -87,7 +87,7 @@ export async function saveTrack(
 
 
 export async function completeTrackForUser(trackId: string): Promise<{ success: boolean; message: string }> {
-  const userId = getSimulatedUserId();
+  const userId = await getSimulatedUserId();
   
   try {
     const user = await getUserById(userId);

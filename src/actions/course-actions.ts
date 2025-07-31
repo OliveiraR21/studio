@@ -268,7 +268,7 @@ export async function recordCourseFeedback(
 export async function completeCourseForUser(
   courseId: string
 ): Promise<{ success: boolean; message: string; nextCourseId?: string | null }> {
-  const userId = getSimulatedUserId(); 
+  const userId = await getSimulatedUserId(); 
   
   try {
     const user = await getUserById(userId);
