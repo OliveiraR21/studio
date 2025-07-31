@@ -20,7 +20,7 @@ export default async function CoursePage({ params }: { params: { id: string } })
   const allModules = await getLearningModules();
 
   // Check if the current user has already completed this course
-  const userId = getSimulatedUserId();
+  const userId = await getSimulatedUserId();
   const user = await getUserById(userId);
   
   if (!user) {
