@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Star, ThumbsUp, ThumbsDown, CheckCircle, Loader2, Award } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -51,12 +51,12 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
     const [isCompleting, setIsCompleting] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
     const [feedbackState, setFeedbackState] = useState<'pending' | 'sent'>('pending');
+    const prevTrackCompleted = useRef(trackCompleted);
 
     const handleCompleteTrack = useCallback(async () => {
         setIsCompleting(true);
         const result = await completeTrackForUser(trackId);
         if (result.success) {
-            triggerConfetti();
             toast({
                 title: "Trilha Concluída!",
                 description: "Seu progresso foi salvo com sucesso.",
@@ -78,6 +78,13 @@ export function TrackFinalActions({ trackId, hasQuiz, allCoursesInTrackCompleted
         }
     }, [allCoursesInTrackCompleted, trackCompleted, hasQuiz, isCompleting, handleCompleteTrack]);
 
+    // Effect to trigger confetti when the track is newly completed.
+    useEffect(() => {
+        if (trackCompleted && !prevTrackCompleted.current) {
+            triggerConfetti();
+        }
+        prevTrackCompleted.current = trackCompleted;
+    }, [trackCompleted]);
 
     const handleStartQuiz = () => {
         toast({ title: "Funcionalidade em desenvolvimento", description: "A prova final da trilha ainda não foi implementada." });
