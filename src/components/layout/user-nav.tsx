@@ -40,7 +40,7 @@ export function UserNav({ user }: { user: UserType | null }) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-9 w-9 rounded-full" data-tour-id="user-nav">
           <Avatar className="h-9 w-9">
-            <AvatarImage src={user.avatarUrl} alt={displayName} data-ai-hint="user avatar" />
+            {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={displayName} data-ai-hint="user avatar" />}
             <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
           </Avatar>
         </Button>

@@ -25,6 +25,7 @@ import React, { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ModuleFinalActions } from "@/components/course/module-final-actions";
+import { GeneralCertificateCard } from "@/components/course/general-certificate-card";
 
 const moduleIcons: Record<string, React.ElementType> = {
     'module-integration': ClipboardList,
@@ -90,8 +91,10 @@ export function MyCoursesPageContent({ learningModules, currentUser, nextCourse 
           })}
         </TabsList>
 
-        {learningModules.map(module => {
+        {learningModules.map((module, moduleIndex) => {
           const allTracksInModuleCompleted = module.tracks.length > 0 && module.tracks.every(isTrackCompleted);
+          const isLastModule = moduleIndex === learningModules.length - 1;
+
           return (
             <TabsContent key={module.id} value={module.id} className="space-y-6">
               <TrackAccordion tracks={module.tracks} currentUser={currentUser} defaultOpenTrackId={defaultOpenTrackId} />
@@ -100,6 +103,12 @@ export function MyCoursesPageContent({ learningModules, currentUser, nextCourse 
                 currentUser={currentUser}
                 isModuleCompleted={allTracksInModuleCompleted}
               />
+              {isLastModule && (
+                <GeneralCertificateCard
+                  allModules={learningModules}
+                  currentUser={currentUser}
+                />
+              )}
             </TabsContent>
           )
         })}

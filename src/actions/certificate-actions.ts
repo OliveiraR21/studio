@@ -10,8 +10,9 @@ import { ptBR } from 'date-fns/locale';
 
 interface CertificateData {
     userName: string;
-    moduleName: string;
-    moduleDurationInSeconds?: number;
+    itemName: string; // Can be Module name or "Geral"
+    durationInSeconds?: number;
+    type: 'module' | 'general';
 }
 
 // Helper function to wrap text
@@ -57,10 +58,11 @@ function formatDuration(totalSeconds: number): string {
 }
 
 
-export async function generateCertificatePdf({ userName, moduleName, moduleDurationInSeconds = 0 }: CertificateData): Promise<string> {
+export async function generateCertificatePdf({ userName, itemName, durationInSeconds = 0, type }: CertificateData): Promise<string> {
     try {
         const pdfDoc = await PDFDocument.create();
-        pdfDoc.setTitle(`Certificado de Conclusão - ${moduleName}`);
+        const pdfTitle = type === 'general' ? 'Certificado de Conclusão Geral' : `Certificado de Conclusão - ${itemName}`;
+        pdfDoc.setTitle(pdfTitle);
         pdfDoc.setAuthor('Br Supply Academy Stream');
         pdfDoc.setCreator('Br Supply Academy Stream');
 
@@ -154,7 +156,9 @@ export async function generateCertificatePdf({ userName, moduleName, moduleDurat
         currentY -= (userNameSize + 35);
 
         // 4. "for successfully completing" Text
-        const reasonText = 'POR CONCLUIR COM SUCESSO O MÓDULO:';
+        const reasonText = type === 'general' 
+            ? 'POR CONCLUIR COM SUCESSO TODOS OS MÓDULOS DE APRENDIZAGEM DA'
+            : 'POR CONCLUIR COM SUCESSO O MÓDULO:';
         const reasonSize = 14;
         const reasonWidth = font.widthOfTextAtSize(reasonText, reasonSize);
         page.drawText(reasonText, {
@@ -165,33 +169,52 @@ export async function generateCertificatePdf({ userName, moduleName, moduleDurat
             color: lightGray,
             characterSpacing: 1,
         });
-        currentY -= (reasonSize + 20);
+        currentY -= (reasonSize + 5);
 
-        // 5. Module Name (with wrapping)
-        const moduleNameSize = 24;
-        const maxTextWidth = width - 240; // Leave some padding
-        const moduleNameLines = wrapText(moduleName.toUpperCase(), boldFont, moduleNameSize, maxTextWidth);
-        const lineHeight = 30;
-
-        for (const line of moduleNameLines) {
-            const moduleNameWidth = boldFont.widthOfTextAtSize(line, moduleNameSize);
-            page.drawText(line, {
-                x: width / 2 - moduleNameWidth / 2,
-                y: currentY,
+        // Add platform name for general certificate
+        if (type === 'general') {
+            const platformText = 'BR SUPPLY ACADEMY STREAM';
+            const platformTextWidth = boldFont.widthOfTextAtSize(platformText, reasonSize + 2);
+             page.drawText(platformText, {
+                x: width / 2 - platformTextWidth / 2,
+                y: currentY - 15,
                 font: boldFont,
-                size: moduleNameSize,
+                size: reasonSize + 2,
                 color: primaryOrange,
             });
-            currentY -= lineHeight;
+            currentY -= 35;
+        } else {
+             currentY -= 15;
+        }
+
+        // 5. Item Name (Module or nothing)
+        if (type === 'module') {
+            const itemNameSize = 24;
+            const maxTextWidth = width - 240; // Leave some padding
+            const itemNameLines = wrapText(itemName.toUpperCase(), boldFont, itemNameSize, maxTextWidth);
+            const lineHeight = 30;
+
+            for (const line of itemNameLines) {
+                const itemNameWidth = boldFont.widthOfTextAtSize(line, itemNameSize);
+                page.drawText(line, {
+                    x: width / 2 - itemNameWidth / 2,
+                    y: currentY,
+                    font: boldFont,
+                    size: itemNameSize,
+                    color: primaryOrange,
+                });
+                currentY -= lineHeight;
+            }
+            currentY += 15; // remove extra space from last line
         }
 
         // 6. Add some space after the title
         currentY -= 15;
 
         // 7. Module Duration
-        const durationString = formatDuration(moduleDurationInSeconds);
+        const durationString = formatDuration(durationInSeconds);
         if (durationString) {
-            const durationText = `CARGA HORÁRIA: ${durationString.toUpperCase()}`;
+            const durationText = `CARGA HORÁRIA TOTAL: ${durationString.toUpperCase()}`;
             const durationSize = 12;
             const durationWidth = font.widthOfTextAtSize(durationText, durationSize);
             page.drawText(durationText, {
