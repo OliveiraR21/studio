@@ -1,51 +1,79 @@
-import type { User, LevelInfo } from './types';
+
+import type { User, LevelInfo, Module } from './types';
+import { getLearningModules, filterModulesForUser } from './data-access';
 
 // --- Configuration ---
 
-// XP awarded for each completed course
-const XP_PER_COURSE = 10;
+// Base XP is calculated as % of courses completed * 10. (e.g., 80% completion = 800 XP)
+const XP_BASE_MULTIPLIER = 10;
+// Bonus XP is calculated as average_score * 5. (e.g., 90% average score = 450 bonus XP)
+const XP_PERFORMANCE_MULTIPLIER = 5;
 
-// Define the XP required to reach each level. The key is the level number.
+// Define the XP required to reach each level.
 const LEVEL_THRESHOLDS: Record<number, number> = {
-  1: 0,
-  2: 50,    // 5 courses to reach level 2
-  3: 120,   // 7 more courses (12 total)
-  4: 250,   // 13 more courses (25 total)
-  5: 500,   // 25 more courses (50 total)
-  6: 1000,  // 50 more courses (100 total)
+  1: 0,      // Bronze
+  2: 600,    // Prata
+  3: 1100,   // Ouro
+  4: 1500,   // Diamante (Special Case)
 };
 
 // Define names for each level
 const LEVEL_NAMES: Record<number, string> = {
-    1: 'Iniciante',
-    2: 'Aprendiz',
-    3: 'Explorador',
-    4: 'Especialista',
-    5: 'Mestre',
-    6: 'Lenda',
+    1: 'Bronze',
+    2: 'Prata',
+    3: 'Ouro',
+    4: 'Diamante',
 };
 
 const MAX_LEVEL = Object.keys(LEVEL_THRESHOLDS).length;
 
 /**
- * Calculates a user's current level, XP, and progress towards the next level.
- * @param user The user object, which must contain `completedCourses`.
+ * Calculates a user's current level, XP, and progress towards the next level
+ * based on course completion percentage and quiz performance.
+ * @param user The user object.
+ * @param allModules All available modules in the platform.
  * @returns An object with the user's level information.
  */
-export function calculateUserLevel(user: User): LevelInfo {
-  const completedCoursesCount = user.completedCourses.length;
-  const currentXp = completedCoursesCount * XP_PER_COURSE;
+export async function calculateUserLevel(user: User, allModules: Module[]): Promise<LevelInfo> {
+    
+  // 1. Determine total accessible courses for the user
+  const accessibleCourses = filterModulesForUser(allModules, user)
+    .flatMap(m => m.tracks.flatMap(t => t.courses));
+  const totalCoursesCount = accessibleCourses.length > 0 ? accessibleCourses.length : 1;
+  const completedCoursesCount = user.completedCourses.filter(id => accessibleCourses.some(c => c.id === id)).length;
 
+  // 2. Calculate average score
+  const allScores = [...(user.courseScores ?? []).map(s => s.score), ...(user.trackScores ?? []).map(s => s.score)];
+  const averageScore = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
+
+  // 3. Calculate XP
+  const completionPercentage = Math.round((completedCoursesCount / totalCoursesCount) * 100);
+  const baseXp = completionPercentage * XP_BASE_MULTIPLIER;
+  const performanceXp = Math.round(averageScore * XP_PERFORMANCE_MULTIPLIER);
+  const currentXp = baseXp + performanceXp;
+  
   let level = 1;
-  // Find the current level by checking which threshold the user's XP has surpassed.
-  for (const levelKey in LEVEL_THRESHOLDS) {
-    const thresholdLevel = parseInt(levelKey, 10);
-    if (currentXp >= LEVEL_THRESHOLDS[thresholdLevel]) {
-      level = thresholdLevel;
-    } else {
-      break; // Stop when we find a threshold the user hasn't reached yet
-    }
+  
+  // 4. Determine Level, with special case for Diamond
+  const isDiamondCandidate = completionPercentage >= 100 && averageScore > 95;
+
+  if (isDiamondCandidate) {
+      level = 4; // Diamante
+  } else {
+      // Find the current level by checking which threshold the user's XP has surpassed.
+      for (const levelKey in LEVEL_THRESHOLDS) {
+        const thresholdLevel = parseInt(levelKey, 10);
+        // Don't allow reaching diamond level via XP alone
+        if (thresholdLevel === MAX_LEVEL) continue;
+        
+        if (currentXp >= LEVEL_THRESHOLDS[thresholdLevel]) {
+          level = thresholdLevel;
+        } else {
+          break; // Stop when we find a threshold the user hasn't reached yet
+        }
+      }
   }
+
 
   const xpForCurrentLevel = LEVEL_THRESHOLDS[level];
   const xpForNextLevel = level < MAX_LEVEL ? LEVEL_THRESHOLDS[level + 1] : xpForCurrentLevel;

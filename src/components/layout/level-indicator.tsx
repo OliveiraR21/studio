@@ -11,12 +11,10 @@ interface LevelIndicatorProps {
 }
 
 const levelColors = [
-    '#a1a1aa', // Nível 1 (cinza)
-    '#a16207', // Nível 2 (bronze)
-    '#d4d4d8', // Nível 3 (prata)
-    '#facc15', // Nível 4 (ouro)
-    '#2dd4bf', // Nível 5 (diamante)
-    '#f472b6', // Nível 6 (mestre/lenda)
+    '#a16207', // Nível 1 (Bronze)
+    '#d4d4d8', // Nível 2 (Prata)
+    '#facc15', // Nível 3 (Ouro)
+    '#2dd4bf', // Nível 4 (Diamante)
 ];
 
 export function LevelIndicator({ levelInfo }: LevelIndicatorProps) {
