@@ -61,7 +61,6 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
   };
   
   const handleFinishCourse = async () => {
-    // This function should only be callable if the course isn't already completed.
     if (isAlreadyCompleted) return;
 
     const completionResult = await completeCourseForUser(course.id);
@@ -69,9 +68,16 @@ export function CoursePageClient({ course, track, isAlreadyCompleted, initialFee
         setCompletionStep('completed');
         toast({
             title: "Curso Concluído!",
-            description: "Seu progresso foi registrado com sucesso. Dê seu feedback!",
+            description: "Seu progresso foi registrado com sucesso.",
         });
-        router.refresh();
+
+        // Navigate to the next course if available, otherwise go to the track page.
+        if (completionResult.nextCourseId) {
+            router.push(`/courses/${completionResult.nextCourseId}`);
+        } else {
+            router.push(`/meus-cursos?openTrack=${track.id}`);
+        }
+
     } else {
          toast({
             variant: "destructive",

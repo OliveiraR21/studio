@@ -2,7 +2,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createCourse, updateCourse, findCourseById, getUserById, updateUser, deleteCourse, findTrackById } from '@/lib/data-access';
+import { createCourse, updateCourse, findCourseById, getUserById, updateUser, deleteCourse, findTrackById, findNextCourseForUser } from '@/lib/data-access';
 import { revalidatePath } from 'next/cache';
 import type { Course, Quiz, UserRole } from '@/lib/types';
 import { getSimulatedUserId } from '@/lib/auth';
@@ -267,8 +267,7 @@ export async function recordCourseFeedback(
 
 export async function completeCourseForUser(
   courseId: string
-): Promise<{ success: boolean; message: string }> {
-  // Use the simulated user ID for the prototype.
+): Promise<{ success: boolean; message: string; nextCourseId?: string | null }> {
   const userId = getSimulatedUserId(); 
   
   try {
@@ -277,13 +276,11 @@ export async function completeCourseForUser(
       throw new Error(`Usuário com ID ${userId} não encontrado.`);
     }
 
-    // This part is for the initial completion. Feedback is handled separately now.
     if (!user.completedCourses.includes(courseId)) {
         const updatedCompletedCourses = [...user.completedCourses, courseId];
         await updateUser(userId, { completedCourses: updatedCompletedCourses });
     }
 
-    // Add user to course voters if not already there, for simulation purposes.
     const course = await findCourseById(courseId);
     if (course) {
         let voters = course.course.voters || [];
@@ -293,13 +290,21 @@ export async function completeCourseForUser(
         }
     }
 
+    // After completing, find the next course for the user.
+    // Important: We need the user object with the *updated* completedCourses list.
+    const updatedUser = await getUserById(userId);
+    const nextCourse = await findNextCourseForUser(updatedUser!);
 
     // Revalidate all paths where progress is shown
     revalidatePath('/dashboard');
     revalidatePath('/meus-cursos');
     revalidatePath(`/courses/${courseId}`);
 
-    return { success: true, message: "Progresso salvo com sucesso!" };
+    return { 
+        success: true, 
+        message: "Progresso salvo com sucesso!",
+        nextCourseId: nextCourse?.id || null, // Return the ID of the next course, or null if none
+    };
 
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.';
