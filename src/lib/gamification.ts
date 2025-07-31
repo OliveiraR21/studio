@@ -4,17 +4,17 @@ import { getLearningModules, filterModulesForUser } from './data-access';
 
 // --- Configuration ---
 
-// Base XP is calculated as % of courses completed * 10. (e.g., 80% completion = 800 XP)
-const XP_BASE_MULTIPLIER = 10;
+// Base XP is calculated as number of completed courses * 10.
+const XP_PER_COURSE = 10;
 // Bonus XP is calculated as average_score * 5. (e.g., 90% average score = 450 bonus XP)
 const XP_PERFORMANCE_MULTIPLIER = 5;
 
 // Define the XP required to reach each level.
 const LEVEL_THRESHOLDS: Record<number, number> = {
   1: 0,      // Bronze
-  2: 600,    // Prata
-  3: 1100,   // Ouro
-  4: 1500,   // Diamante (Special Case)
+  2: 60,     // Prata (e.g., ~5 courses + good grades)
+  3: 200,    // Ouro (e.g., ~15 courses + good grades)
+  4: 500,    // Diamante (Special Case: 100% completion + >95% score)
 };
 
 // Define names for each level
@@ -48,7 +48,8 @@ export async function calculateUserLevel(user: User, allModules: Module[]): Prom
 
   // 3. Calculate XP
   const completionPercentage = Math.round((completedCoursesCount / totalCoursesCount) * 100);
-  const baseXp = completionPercentage * XP_BASE_MULTIPLIER;
+  // --- BUG FIX: Calculate base XP from course count, not percentage ---
+  const baseXp = completedCoursesCount * XP_PER_COURSE; 
   const performanceXp = Math.round(averageScore * XP_PERFORMANCE_MULTIPLIER);
   const currentXp = baseXp + performanceXp;
   
