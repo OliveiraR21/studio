@@ -20,10 +20,9 @@ import { CourseCard } from "@/components/dashboard/course-card";
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
 import { TrackFinalActions } from "@/components/course/track-final-actions";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import confetti from 'canvas-confetti';
 
 const moduleIcons: Record<string, React.ElementType> = {
     'module-integration': ClipboardList,
@@ -31,29 +30,6 @@ const moduleIcons: Record<string, React.ElementType> = {
     'module-ss': HeartHandshake,
     'module-hms': Bot,
 };
-
-const triggerConfetti = () => {
-    const duration = 2 * 1000;
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
-
-    function randomInRange(min: number, max: number) {
-        return Math.random() * (max - min) + min;
-    }
-
-    const interval = window.setInterval(function() {
-        const timeLeft = animationEnd - Date.now();
-
-        if (timeLeft <= 0) {
-            return clearInterval(interval);
-        }
-
-        const particleCount = 50 * (timeLeft / duration);
-        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
-    }, 250);
-};
-
 
 interface MyCoursesPageContentProps {
     learningModules: Module[];
@@ -64,7 +40,6 @@ interface MyCoursesPageContentProps {
 
 export function MyCoursesPageContent({ learningModules, currentUser, nextCourse }: MyCoursesPageContentProps) {
   const searchParams = useSearchParams();
-  const prevCompletedTracksRef = useRef<string[]>(currentUser.completedTracks);
 
   const findTrackInModules = (modules: Module[], trackId: string): Track | undefined => {
     for (const module of modules) {
@@ -79,22 +54,6 @@ export function MyCoursesPageContent({ learningModules, currentUser, nextCourse 
   const defaultTrack = defaultOpenTrackId ? findTrackInModules(learningModules, defaultOpenTrackId) : undefined;
   const defaultOpenModuleId = defaultTrack?.moduleId || learningModules[0]?.id;
 
-  useEffect(() => {
-    const prevCompleted = prevCompletedTracksRef.current;
-    const currentCompleted = currentUser.completedTracks;
-
-    // Check if a new track has been completed
-    if (currentCompleted.length > prevCompleted.length) {
-      const newCompletedTrackId = currentCompleted.find(id => !prevCompleted.includes(id));
-      // Trigger confetti if the newly completed track is the one being displayed
-      if (newCompletedTrackId && newCompletedTrackId === defaultOpenTrackId) {
-        triggerConfetti();
-      }
-    }
-    
-    // Update the ref for the next render
-    prevCompletedTracksRef.current = currentCompleted;
-  }, [currentUser.completedTracks, defaultOpenTrackId]);
   
   return (
     <div className="container mx-auto py-2 space-y-8">
