@@ -37,7 +37,6 @@ export async function calculateUserLevel(user: User, allModules: Module[]): Prom
     
   // 1. Get the TOTAL number of courses on the platform, regardless of access.
   const allPlatformCourses = allModules.flatMap(m => m.tracks.flatMap(t => t.courses));
-  const totalCoursesCount = allPlatformCourses.length > 0 ? allPlatformCourses.length : 1;
   const completedCoursesCount = user.completedCourses.length;
 
   // 2. Calculate average score
