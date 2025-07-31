@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   LogOut,
   Network,
+  Trophy,
   UserCog,
   Users,
 } from 'lucide-react';
@@ -76,6 +77,7 @@ export function MainLayoutClient({
   const baseNavItems = [
     { href: '/dashboard', icon: Home, label: 'Meu Painel' },
     { href: '/meus-cursos', icon: LayoutGrid, label: 'Meus Cursos' },
+    { href: '/gamification', icon: Trophy, label: 'Gamificação' },
   ];
 
   const helpNavItem = {
