@@ -3,10 +3,18 @@ import type { User, LevelInfo, Module } from './types';
 
 // --- Configuration ---
 
-const XP_PER_COURSE = 10;
-const XP_PER_TRACK = 50;
-const XP_PER_MODULE = 100;
-const XP_PERFORMANCE_MULTIPLIER = 0.5; // 50% of average score is added as bonus XP
+const XP_CONFIG = {
+    INITIAL_TOUR: 30,
+    COMPLETE_COURSE: 10,
+    COMPLETE_TRACK: 50,
+    COMPLETE_MODULE: 500, // Major bonus
+    QUIZ_FIRST_ATTEMPT: 25,
+    QUIZ_PASS: 30, // For score >= 90%
+    QUIZ_IMPROVEMENT_BONUS: 40, // Retaking a passed quiz and scoring higher
+    QUIZ_EXCELLENCE_BONUS: 75, // For score 95-99%
+    QUIZ_PERFECTION_BONUS: 150, // For score 100%
+};
+
 
 // Define the XP thresholds for each level.
 const LEVEL_THRESHOLDS: Record<number, number> = {
@@ -40,20 +48,23 @@ const MAX_LEVEL = Object.keys(LEVEL_NAMES).length - 1;
 
 
 /**
- * Calculates a user's current level and progress based on XP earned from various activities.
+ * Calculates a user's current level and progress based on a detailed XP system.
  * @param user The user object.
  * @param allModules All available modules in the platform.
  * @returns An object with the user's level information.
  */
 export async function calculateUserLevel(user: User, allModules: Module[]): Promise<LevelInfo> {
-    
-    // 1. Calculate XP from completed courses
-    const xpFromCourses = user.completedCourses.length * XP_PER_COURSE;
-    
-    // 2. Calculate XP from completed tracks
-    const xpFromTracks = user.completedTracks.length * XP_PER_TRACK;
+    let totalXp = 0;
 
-    // 3. Calculate XP from completed modules
+    // 1. Onboarding Tour XP
+    if (user.hasCompletedOnboarding) {
+        totalXp += XP_CONFIG.INITIAL_TOUR;
+    }
+
+    // 2. Content Completion XP
+    totalXp += user.completedCourses.length * XP_CONFIG.COMPLETE_COURSE;
+    totalXp += user.completedTracks.length * XP_CONFIG.COMPLETE_TRACK;
+
     const allTracksByModule = allModules.reduce((acc, module) => {
         acc[module.id] = module.tracks.map(t => t.id);
         return acc;
@@ -66,17 +77,48 @@ export async function calculateUserLevel(user: User, allModules: Module[]): Prom
             completedModulesCount++;
         }
     }
-    const xpFromModules = completedModulesCount * XP_PER_MODULE;
+    totalXp += completedModulesCount * XP_CONFIG.COMPLETE_MODULE;
 
-    // 4. Calculate bonus XP from performance
-    const allScores = [...(user.courseScores ?? []).map(s => s.score), ...(user.trackScores ?? []).map(s => s.score)];
-    const averageScore = allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
-    const xpFromPerformance = Math.round(averageScore * XP_PERFORMANCE_MULTIPLIER);
+    // 3. Quiz Performance XP
+    const allScores = [...(user.courseScores || []), ...(user.trackScores || [])];
+    
+    allScores.forEach(scoreInfo => {
+        // XP for the first attempt
+        if (scoreInfo.attempts === 1) {
+            totalXp += XP_CONFIG.QUIZ_FIRST_ATTEMPT;
+        }
 
-    // 5. Calculate Total XP
-    const currentXp = xpFromCourses + xpFromTracks + xpFromModules + xpFromPerformance;
+        // XP for passing
+        if (scoreInfo.score >= 90) {
+            totalXp += XP_CONFIG.QUIZ_PASS;
+        }
+        
+        // XP for improvement
+        if (scoreInfo.attempts > 1) {
+            // This assumes we would store previous scores to check for actual improvement.
+            // For this simulation, we grant it on any attempt after the first if the user passed.
+            if(scoreInfo.score >= 90) {
+                 totalXp += XP_CONFIG.QUIZ_IMPROVEMENT_BONUS;
+            }
+        }
+        
+        // XP for excellence
+        if (scoreInfo.score >= 95 && scoreInfo.score < 100) {
+            totalXp += XP_CONFIG.QUIZ_EXCELLENCE_BONUS;
+        }
+        
+        // XP for perfection
+        if (scoreInfo.score === 100) {
+            totalXp += XP_CONFIG.QUIZ_PERFECTION_BONUS;
+        }
+    });
 
-    // 6. Determine Level
+    // NOTE: Daily login and streak XP would require a persistent database with login tracking.
+    // This part is omitted from the calculation as it's not feasible with the current mock data structure.
+
+    const currentXp = totalXp;
+
+    // Determine Level based on XP
     let level = 0;
     for (let i = MAX_LEVEL; i >= 0; i--) {
         if (currentXp >= LEVEL_THRESHOLDS[i]) {
@@ -86,8 +128,6 @@ export async function calculateUserLevel(user: User, allModules: Module[]): Prom
     }
 
     const levelName = LEVEL_NAMES[level];
-
-    // 7. Calculate progress towards next level
     const xpForCurrentLevel = LEVEL_THRESHOLDS[level];
     const xpForNextLevel = level < MAX_LEVEL ? LEVEL_THRESHOLDS[level + 1] : currentXp;
     
