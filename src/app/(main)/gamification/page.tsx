@@ -15,12 +15,17 @@ import { Trophy, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
-const levelInfoMap = {
-  0: { name: 'Sem Nível', color: 'text-gray-500', bgColor: 'bg-gray-500/10' },
-  1: { name: 'Bronze', color: 'text-yellow-600', bgColor: 'bg-yellow-600/10' },
-  2: { name: 'Prata', color: 'text-gray-400', bgColor: 'bg-gray-400/10' },
-  3: { name: 'Ouro', color: 'text-yellow-400', bgColor: 'bg-yellow-400/10' },
-  4: { name: 'Diamante', color: 'text-teal-400', bgColor: 'bg-teal-400/10' },
+const levelInfoMap: Record<number, { name: string; color: string; bgColor: string; description: string, xp: string }> = {
+  0: { name: 'Ferro', color: 'text-gray-500', bgColor: 'bg-gray-500/10', description: 'Nível inicial.', xp: '0 XP' },
+  1: { name: 'Bronze', color: 'text-yellow-600', bgColor: 'bg-yellow-600/10', description: 'Concluiu as primeiras aulas e a trilha do Módulo Integração.', xp: '150 XP' },
+  2: { name: 'Prata', color: 'text-gray-400', bgColor: 'bg-gray-400/10', description: 'Conquistou o Módulo Integração! Um grande marco inicial.', xp: '800 XP' },
+  3: { name: 'Ouro', color: 'text-yellow-400', bgColor: 'bg-yellow-400/10', description: 'Avançou significativamente no Módulo Soft Skills ou Human-Machine.', xp: '1.500 XP' },
+  4: { name: 'Platina', color: 'text-cyan-400', bgColor: 'bg-cyan-400/10', description: 'Concluiu os 3 módulos menores (Integração, Soft, Human-Machine).', xp: '2.500 XP' },
+  5: { name: 'Esmeralda', color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', description: 'Está na metade da jornada do Módulo Hard Skills (o maior desafio).', xp: '3.500 XP' },
+  6: { name: 'Diamante', color: 'text-teal-400', bgColor: 'bg-teal-400/10', description: 'Quase um mestre! Concluiu quase todo o Módulo Hard Skills.', xp: '4.200 XP' },
+  7: { name: 'Mestre', color: 'text-purple-400', bgColor: 'bg-purple-400/10', description: 'Domínio do Conteúdo! Concluiu 100% de todos os Módulos e Trilhas.', xp: '4.900 XP' },
+  8: { name: 'Grão-Mestre', color: 'text-fuchsia-500', bgColor: 'bg-fuchsia-500/10', description: 'Status de Elite. Além de concluir tudo, continuou engajado com logins e melhoria de notas.', xp: '6.000 XP' },
+  9: { name: 'Desafiante', color: 'text-red-500', bgColor: 'bg-red-500/10', description: 'Lenda da Plataforma. Um reconhecimento para os mais dedicados a longo prazo.', xp: '8.000+ XP' },
 };
 
 export default async function GamificationPage() {
@@ -33,7 +38,7 @@ export default async function GamificationPage() {
   const levelInfo = await calculateUserLevel(currentUser, allModules);
 
   const currentLevelStyle = levelInfoMap[levelInfo.level as keyof typeof levelInfoMap] || levelInfoMap[0];
-  const isMaxLevel = levelInfo.level === 4;
+  const isMaxLevel = levelInfo.level === 9;
 
   return (
     <div className="container mx-auto space-y-8">
@@ -66,22 +71,22 @@ export default async function GamificationPage() {
           <div className="text-center">
             <Trophy className={cn("h-24 w-24 mx-auto mb-4", currentLevelStyle.color)} />
             <h3 className="text-4xl font-bold tracking-tighter">
-              {levelInfo.currentXp}%
+              {levelInfo.currentXp.toLocaleString()} XP
             </h3>
             <p className="text-muted-foreground">
-              de todos os cursos da plataforma concluídos
+              Pontos de Experiência totais acumulados.
             </p>
           </div>
           <div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Progresso de Conclusão</span>
-              <span className="text-sm font-bold">{levelInfo.progressPercentage}%</span>
+              <span className="text-sm font-medium">Progresso para o próximo nível</span>
+              <span className="text-sm font-bold">{isMaxLevel ? 'Nível Máximo!' : `${levelInfo.currentXp.toLocaleString()} / ${levelInfo.xpForNextLevel.toLocaleString()} XP`}</span>
             </div>
-            <Progress value={levelInfo.progressPercentage} className="h-3" />
+            <Progress value={isMaxLevel ? 100 : levelInfo.progressPercentage} className="h-3" />
           </div>
           {isMaxLevel && (
             <div className="text-center pt-4">
-                 <p className="font-semibold text-teal-400">Parabéns! Você alcançou o nível máximo de maestria!</p>
+                 <p className="font-semibold text-red-500">Parabéns! Você alcançou o nível máximo da plataforma!</p>
             </div>
           )}
         </CardContent>
@@ -92,71 +97,27 @@ export default async function GamificationPage() {
         <CardHeader>
           <CardTitle>Como Funcionam os Níveis?</CardTitle>
           <CardDescription>
-            Seu nível é calculado com base no percentual de cursos concluídos.
+            Seu nível é calculado com base nos Pontos de Experiência (XP) que você acumula.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-start gap-4 p-3 rounded-lg bg-muted/50">
-              <div className="pt-1">
-                <Trophy className="h-6 w-6 text-gray-500" />
-              </div>
-              <div>
-                <h4 className="font-semibold">Sem Nível</h4>
-                <p className="text-sm text-muted-foreground">
-                  Complete até 33% de todos os cursos disponíveis.
-                </p>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.values(levelInfoMap).map((levelStyle, index) => (
+                     <div key={index} className={cn("flex items-start gap-4 p-3 rounded-lg bg-muted/50", levelStyle.color.replace('text-', 'border-')/30 )}>
+                        <div className="pt-1">
+                            <Trophy className={cn("h-6 w-6", levelStyle.color)} />
+                        </div>
+                        <div>
+                            <h4 className={cn("font-semibold", levelStyle.color)}>{levelStyle.name} <span className="text-xs font-normal text-muted-foreground">({levelStyle.xp})</span></h4>
+                            <p className="text-sm text-muted-foreground">
+                            {levelStyle.description}
+                            </p>
+                        </div>
+                    </div>
+                ))}
             </div>
-            <div className="flex items-start gap-4 p-3 rounded-lg bg-muted/50">
-               <div className="pt-1">
-                <Trophy className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div>
-                <h4 className="font-semibold">Bronze</h4>
-                <p className="text-sm text-muted-foreground">
-                  Complete entre 34% e 66% de todos os cursos.
-                </p>
-              </div>
-            </div>
-             <div className="flex items-start gap-4 p-3 rounded-lg bg-muted/50">
-               <div className="pt-1">
-                <Trophy className="h-6 w-6 text-gray-400" />
-              </div>
-              <div>
-                <h4 className="font-semibold">Prata</h4>
-                <p className="text-sm text-muted-foreground">
-                  Complete entre 67% e 99% de todos os cursos.
-                </p>
-              </div>
-            </div>
-             <div className="flex items-start gap-4 p-3 rounded-lg bg-muted/50">
-               <div className="pt-1">
-                <Trophy className="h-6 w-6 text-yellow-400" />
-              </div>
-              <div>
-                <h4 className="font-semibold">Ouro</h4>
-                <p className="text-sm text-muted-foreground">
-                  Complete 100% de todos os cursos.
-                </p>
-              </div>
-            </div>
-             <div className="flex items-start gap-4 p-3 rounded-lg bg-muted/50 border border-teal-400/30">
-               <div className="pt-1">
-                 <Star className="h-6 w-6 text-teal-400" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-teal-400">Diamante (Nível Mestre)</h4>
-                <p className="text-sm text-muted-foreground">
-                  Requisito especial: Complete 100% dos cursos E tenha uma média
-                  de notas em todas as provas superior a 95%.
-                </p>
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
   );
 }
-
