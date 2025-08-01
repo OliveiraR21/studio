@@ -132,10 +132,10 @@ export async function calculateUserLevel(user: User, allModules: Module[]): Prom
     const xpForNextLevel = level < MAX_LEVEL ? LEVEL_THRESHOLDS[level + 1] : currentXp;
     
     const xpInCurrentLevel = currentXp - xpForCurrentLevel;
-    const xpNeededForNextLevel = xpForNextLevel - xpForCurrentLevel;
+    const xpRangeForLevel = xpForNextLevel - xpForCurrentLevel;
 
-    const progressPercentage = (xpNeededForNextLevel > 0) 
-        ? Math.round((xpInCurrentLevel / xpNeededForNextLevel) * 100) 
+    const progressPercentage = (xpRangeForLevel > 0) 
+        ? Math.round((xpInCurrentLevel / xpRangeForLevel) * 100) 
         : 100;
 
     return {

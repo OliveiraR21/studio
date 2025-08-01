@@ -34,6 +34,7 @@ export default async function GamificationPage() {
     return <UserNotFound />;
   }
 
+  // A mesma lógica do layout é usada aqui para garantir consistência.
   const allModules = await getLearningModules();
   const levelInfo = await calculateUserLevel(currentUser, allModules);
 
