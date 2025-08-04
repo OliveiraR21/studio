@@ -1,6 +1,6 @@
 
 // In-memory data store
-import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerPerformance } from './types';
+import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerPerformance, InactiveUsersReport } from './types';
 import { learningModules as mockModules, users as mockUsers } from './mock-data';
 import { userHasCourseAccess } from './access-control';
 import { differenceInDays } from 'date-fns';
@@ -429,6 +429,26 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
       return { managerName: manager.name, completionRate: averageCompletion, averageScore: averageScore };
   }).sort((a, b) => b.completionRate - a.completionRate);
 
+  // 5. Inactive Users Report
+  const inactiveUsers = allUsers.filter(user => 
+    (!user.hasCompletedOnboarding && user.completedCourses.length === 0) && user.role !== 'Admin'
+  );
+
+  const inactiveUsersByManager = inactiveUsers.reduce((acc, user) => {
+    const managerName = user.diretor || user.gerente || user.coordenador || user.supervisor || 'Sem Gestor Definido';
+    if (!acc[managerName]) {
+      acc[managerName] = [];
+    }
+    acc[managerName].push({ id: user.id, name: user.name });
+    return acc;
+  }, {} as Record<string, { id: string; name: string }[]>);
+
+  const inactiveUsersReport: InactiveUsersReport = {
+    count: inactiveUsers.length,
+    percentage: totalUsers > 0 ? Math.round((inactiveUsers.length / totalUsers) * 100) : 0,
+    usersByManager: inactiveUsersByManager,
+  };
+
 
   return Promise.resolve({
     questionProficiency,
@@ -436,6 +456,7 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
     managerPerformance,
     totalUsers,
     totalCourses,
+    inactiveUsersReport,
   });
 }
 

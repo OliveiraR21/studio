@@ -19,7 +19,7 @@ import {
   CartesianGrid,
   Legend
 } from "recharts";
-import { Clock, Users, AreaChart, AlertCircle, Download, Users2, Info } from "lucide-react";
+import { Clock, Users, AreaChart, AlertCircle, Download, Users2, Info, UserX } from "lucide-react";
 import Link from 'next/link';
 import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +32,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { ScrollArea } from "../ui/scroll-area";
 
 
 interface AnalyticsClientProps {
@@ -105,7 +112,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export function AnalyticsClient({ data }: AnalyticsClientProps) {
   const { toast } = useToast();
-  const { engagementStats, questionProficiency, managerPerformance, totalUsers } = data;
+  const { engagementStats, questionProficiency, managerPerformance, totalUsers, inactiveUsersReport } = data;
 
   const proficiencyChartData = questionProficiency.map(q => ({
     name: q.questionText.length > 50 ? `${q.questionText.substring(0, 50)}...` : q.questionText,
@@ -272,9 +279,56 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
         </Card>
       </div>
 
-       <div className="grid gap-6 lg:grid-cols-1">
+       <div className="grid gap-6 lg:grid-cols-2">
+            {/* Inactive Users Report */}
+            <Card className="lg:col-span-1">
+                 <CardHeader>
+                    <div className="flex items-center gap-3">
+                        <UserX className="h-6 w-6 text-destructive" />
+                        <div>
+                            <CardTitle>Engajamento Inicial</CardTitle>
+                            <CardDescription>
+                                Colaboradores que ainda não acessaram a plataforma ou iniciaram os treinamentos.
+                            </CardDescription>
+                        </div>
+                    </div>
+                </CardHeader>
+                 <CardContent>
+                    {inactiveUsersReport.count > 0 ? (
+                        <>
+                            <div className="flex items-baseline justify-center text-center gap-2 mb-4">
+                                <span className="text-4xl font-bold text-destructive">{inactiveUsersReport.count}</span>
+                                <span className="text-lg text-muted-foreground">({inactiveUsersReport.percentage}%)</span>
+                            </div>
+                            <ScrollArea className="h-[250px] w-full">
+                                <Accordion type="single" collapsible className="w-full">
+                                    {Object.entries(inactiveUsersReport.usersByManager).sort(([managerA], [managerB]) => managerA.localeCompare(managerB)).map(([manager, users]) => (
+                                        <AccordionItem value={manager} key={manager}>
+                                            <AccordionTrigger className="text-sm font-semibold">{manager} ({users.length})</AccordionTrigger>
+                                            <AccordionContent>
+                                                <ul className="space-y-1 pl-4 text-sm text-muted-foreground">
+                                                    {users.map(user => (
+                                                        <li key={user.id}>{user.name}</li>
+                                                    ))}
+                                                </ul>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    ))}
+                                </Accordion>
+                            </ScrollArea>
+                        </>
+                    ) : (
+                         <div className="flex flex-col items-center justify-center text-center p-6 gap-3 text-muted-foreground h-[320px]">
+                            <Users className="h-10 w-10 text-green-500" />
+                            <p className="font-semibold">Parabéns!</p>
+                            <p className="text-sm">Todos os colaboradores já iniciaram sua jornada de aprendizado.</p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
             {/* Manager Performance Report */}
-            <Card>
+            <Card className="lg:col-span-1">
                 <CardHeader>
                 <div className="flex items-center gap-3">
                     <Users2 className="h-6 w-6" />
@@ -288,7 +342,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                 </CardHeader>
                 <CardContent>
                 {managerChartData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height={350}>
+                    <ResponsiveContainer width="100%" height={320}>
                         <BarChart data={managerChartData} margin={{ left: 30 }}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="managerName" tick={{ fontSize: 12 }} />
@@ -303,7 +357,7 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                         </BarChart>
                     </ResponsiveContainer>
                 ) : (
-                    <div className="flex flex-col items-center justify-center text-center p-6 gap-3 text-muted-foreground">
+                    <div className="flex flex-col items-center justify-center text-center p-6 gap-3 text-muted-foreground h-[320px]">
                         <AlertCircle className="h-10 w-10" />
                         <p className="font-semibold">Nenhum dado de gestor encontrado</p>
                         <p className="text-sm">Cadastre gestores e equipes para ver este relatório.</p>
@@ -311,7 +365,9 @@ export function AnalyticsClient({ data }: AnalyticsClientProps) {
                 )}
                 </CardContent>
             </Card>
-
+       </div>
+       
+       <div className="grid gap-6 lg:grid-cols-1">
             {/* Question Proficiency Report */}
             <Card>
                 <CardHeader>

@@ -111,10 +111,17 @@ export interface ManagerPerformance {
     averageScore: number;
 }
 
+export interface InactiveUsersReport {
+  count: number;
+  percentage: number;
+  usersByManager: Record<string, { id: string; name: string }[]>;
+}
+
 export interface AnalyticsData {
   questionProficiency: QuestionProficiency[];
   engagementStats: EngagementStats;
   managerPerformance: ManagerPerformance[];
+  inactiveUsersReport: InactiveUsersReport;
   totalUsers: number;
   totalCourses: number;
 }
