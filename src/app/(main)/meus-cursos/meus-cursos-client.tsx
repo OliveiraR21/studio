@@ -76,16 +76,18 @@ export function MyCoursesPageContent({ learningModules, currentUser, nextCourse 
           </p>
       </div>
       <Tabs defaultValue={defaultOpenModuleId}>
-        <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-4 h-auto">
+        <TabsList className="flex flex-col md:flex-row h-auto w-full gap-2 mb-4">
           {learningModules.map(module => {
             const Icon = moduleIcons[module.id] || ClipboardList; // Fallback icon
             return (
-                <TabsTrigger key={module.id} value={module.id} className="h-full flex flex-col items-start p-4 text-left">
-                <div className="flex items-center gap-3">
-                    <Icon className="h-5 w-5" />
-                    <p className="font-bold text-lg">{module.title}</p>
-                </div>
-                <p className="text-xs text-muted-foreground whitespace-normal mt-2">{module.description}</p>
+                <TabsTrigger key={module.id} value={module.id} className="flex-1 text-left p-4 h-full">
+                  <div className="flex items-start gap-3 w-full">
+                    <Icon className="h-5 w-5 mt-1 flex-shrink-0" />
+                    <div className="flex-grow">
+                      <p className="font-bold text-lg leading-tight">{module.title}</p>
+                      <p className="text-xs text-muted-foreground whitespace-normal mt-2">{module.description}</p>
+                    </div>
+                  </div>
                 </TabsTrigger>
             );
           })}
