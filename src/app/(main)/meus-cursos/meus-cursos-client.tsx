@@ -80,7 +80,7 @@ export function MyCoursesPageContent({ learningModules, currentUser, nextCourse 
           {learningModules.map(module => {
             const Icon = moduleIcons[module.id] || ClipboardList; // Fallback icon
             return (
-                <TabsTrigger key={module.id} value={module.id} className="flex-1 text-left p-4 h-full">
+                <TabsTrigger key={module.id} value={module.id} className="flex-1 text-left p-4 h-full !justify-start">
                   <div className="flex items-start gap-3 w-full">
                     <Icon className="h-5 w-5 mt-1 flex-shrink-0" />
                     <div className="flex-grow">
