@@ -28,7 +28,7 @@ export async function AnimatedSupply() {
         errorOccurred = true;
     }
 
-    if (videoDataUri) {
+    if (videoDataUri && !errorOccurred) {
         return (
             <video
                 src={videoDataUri}
@@ -43,7 +43,7 @@ export async function AnimatedSupply() {
         );
     }
     
-    // Fallback to static image if video generation failed
+    // Fallback to static image if video generation failed or resulted in an error
     return (
         <Avatar className="h-full w-full">
             <AvatarImage src="/supply-avatar.png" alt="Avatar Supply" data-ai-hint="mascot avatar" />
