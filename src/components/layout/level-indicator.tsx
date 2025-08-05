@@ -18,16 +18,16 @@ const levelColors: Record<number, string> = {
     4: '#22d3ee', // Platina (cyan)
     5: '#34d399', // Esmeralda
     6: '#2dd4bf', // Diamante (teal)
-    7: '#a78bfa', // Mestre (purple)
-    8: '#f472b6', // Grão-Mestre (pink)
-    9: '#ef4444', // Desafiante (red)
+    7: '#a78bfa', // Grão-Mestre (purple)
+    8: '#f472b6', // Mestre (pink)
+    9: '#ef4444', // Extra Classe (red)
 };
 
 
 export function LevelIndicator({ levelInfo }: LevelIndicatorProps) {
   const { level, progressPercentage, currentXp, xpForNextLevel, levelName } = levelInfo;
   const trophyColor = levelColors[level] || levelColors[0];
-  const isMaxLevel = level === 9;
+  const isMaxLevel = level >= 9;
 
   return (
     <Popover>

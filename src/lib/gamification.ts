@@ -24,10 +24,10 @@ const LEVEL_THRESHOLDS: Record<number, number> = {
     3: 1500,    // Ouro
     4: 2500,    // Platina
     5: 3500,    // Esmeralda
-    6: 4200,    // Diamante
-    7: 4900,    // Mestre
-    8: 6000,    // Grão-Mestre
-    9: 8000,    // Desafiante
+    6: 4900,    // Diamante
+    7: 6000,    // Grão-Mestre
+    8: 8000,    // Mestre
+    9: 10000,    // Extra Classe
 };
 
 // Define names for each level number.
@@ -39,9 +39,9 @@ const LEVEL_NAMES: Record<number, string> = {
     4: 'Platina',
     5: 'Esmeralda',
     6: 'Diamante',
-    7: 'Mestre',
-    8: 'Grão-Mestre',
-    9: 'Desafiante',
+    7: 'Grão-Mestre',
+    8: 'Mestre',
+    9: 'Extra Classe',
 };
 
 const MAX_LEVEL = Object.keys(LEVEL_NAMES).length - 1;
@@ -134,9 +134,7 @@ export async function calculateUserLevel(user: User, allModules: Module[]): Prom
     const xpInCurrentLevel = currentXp - xpForCurrentLevel;
     const xpRangeForLevel = xpForNextLevel - xpForCurrentLevel;
 
-    const progressPercentage = (xpRangeForLevel > 0) 
-        ? Math.round((xpInCurrentLevel / xpRangeForLevel) * 100) 
-        : 100;
+    const progressPercentage = level < MAX_LEVEL ? (xpRangeForLevel > 0 ? Math.round((xpInCurrentLevel / xpRangeForLevel) * 100) : 0) : 100;
 
     return {
         level,
