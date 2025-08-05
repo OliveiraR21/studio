@@ -7,6 +7,7 @@ import { calculateUserLevel } from '@/lib/gamification';
 import { getLearningModules } from '@/lib/data-access';
 
 export const dynamic = 'force-dynamic';
+export const maxDuration = 120; // 2 minutes
 
 export default async function MainLayout({
   children,

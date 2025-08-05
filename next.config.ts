@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '4.5mb',
+    },
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
