@@ -6,6 +6,7 @@ import Joyride, { type Step, type CallBackProps, EVENTS } from 'react-joyride';
 import type { User } from '@/lib/types';
 import { useTour } from '@/hooks/use-tour';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface OnboardingTourProps {
   user: User;
@@ -27,7 +28,7 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
   let steps: Step[] = [
     {
       content:
-        'Boas-vindas à Academia Br Supply! Vamos fazer um tour rápido pela plataforma.',
+        'Boas-vindas à BRS Academy! Eu sou o Supply, seu guia. Vamos fazer um tour rápido pela plataforma.',
       placement: 'center',
       target: 'body',
     },
@@ -73,7 +74,7 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
     {
       target: '[data-tour-id="preciso-de-ajuda"]',
       content:
-        'Precisa de ajuda? Clique aqui para rever o guia ou refazer este tour.',
+        'Precisa de ajuda? Clique aqui para rever o guia ou refazer este tour a qualquer momento.',
     }
   );
 
@@ -121,7 +122,7 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
         back: 'Voltar',
         close: 'Fechar',
         last: 'Finalizar',
-        next: 'Next',
+        next: 'Avançar',
         skip: 'Pular',
       }}
       styles={{
@@ -145,20 +146,28 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
         primaryProps,
         tooltipProps,
       }) => (
-        <div {...tooltipProps} className="p-4 rounded-lg bg-card text-card-foreground shadow-lg max-w-xs">
-          {step.content}
-          <div className="flex justify-between items-center mt-4">
-              <span className="text-xs text-muted-foreground">{index + 1} de {steps.length}</span>
-              <div className="flex items-center gap-2">
-                {index > 0 && (
-                  <Button {...backProps} variant="ghost" size="sm">
-                    Voltar
+        <div {...tooltipProps} className="p-4 rounded-lg bg-card text-card-foreground shadow-lg max-w-xs flex gap-4">
+          <div className="flex-shrink-0">
+             <Avatar className="h-20 w-20">
+                <AvatarImage src="/supply-avatar.png" alt="Avatar Supply" data-ai-hint="mascot avatar" />
+                <AvatarFallback>S</AvatarFallback>
+             </Avatar>
+          </div>
+          <div className="flex-grow">
+            <div className="text-sm">{step.content}</div>
+            <div className="flex justify-between items-center mt-4">
+                <span className="text-xs text-muted-foreground">{index + 1} de {steps.length}</span>
+                <div className="flex items-center gap-2">
+                  {index > 0 && (
+                    <Button {...backProps} variant="ghost" size="sm">
+                      Voltar
+                    </Button>
+                  )}
+                  <Button {...primaryProps} size="sm" className="joyride-next-button">
+                      {continuous ? 'Avançar' : 'Finalizar'}
                   </Button>
-                )}
-                <Button {...primaryProps} size="sm" className="joyride-next-button">
-                    {continuous ? 'Next' : 'Finalizar'}
-                </Button>
-              </div>
+                </div>
+            </div>
           </div>
         </div>
       )}
