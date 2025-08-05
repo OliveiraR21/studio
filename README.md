@@ -1,6 +1,6 @@
-# Br Supply Academy Stream
+# BRS Academy
 
-Esta é uma aplicação Next.js para a plataforma de e-learning Br Supply Academy Stream, desenvolvida com o auxílio do Firebase Studio.
+Esta é uma aplicação Next.js para a plataforma de e-learning BRS Academy, desenvolvida com o auxílio do Firebase Studio.
 
 ## Visão Geral da Tecnologia
 

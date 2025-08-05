@@ -63,8 +63,8 @@ export async function generateCertificatePdf({ userName, itemName, durationInSec
         const pdfDoc = await PDFDocument.create();
         const pdfTitle = type === 'general' ? 'Certificado de Conclusão Geral' : `Certificado de Conclusão - ${itemName}`;
         pdfDoc.setTitle(pdfTitle);
-        pdfDoc.setAuthor('Academia Br Supply');
-        pdfDoc.setCreator('Academia Br Supply');
+        pdfDoc.setAuthor('BRS Academy');
+        pdfDoc.setCreator('BRS Academy');
 
         const page = pdfDoc.addPage([841.89, 595.28]); // A4 landscape
         const { width, height } = page.getSize();
@@ -173,7 +173,7 @@ export async function generateCertificatePdf({ userName, itemName, durationInSec
 
         // Add platform name for general certificate
         if (type === 'general') {
-            const platformText = 'ACADEMIA BR SUPPLY';
+            const platformText = 'BRS ACADEMY';
             const platformTextSize = reasonSize + 2;
             const platformTextWidth = boldFont.widthOfTextAtSize(platformText, platformTextSize);
 

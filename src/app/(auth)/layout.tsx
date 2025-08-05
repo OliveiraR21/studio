@@ -42,7 +42,7 @@ export default function AuthLayout({
       <header className="w-full z-10 flex justify-center py-4">
           <img
               src="/br-supply-logo.png"
-              alt="Br Supply Logo"
+              alt="BRS Academy Logo"
               className="h-28"
               data-ai-hint="logo"
           />

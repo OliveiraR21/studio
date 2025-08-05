@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'Br Supply Academy Stream',
+  title: 'BRS Academy',
   description: 'Gerado pelo Firebase Studio',
 };
 
