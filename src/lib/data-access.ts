@@ -508,9 +508,9 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
     questionProficiency,
     engagementStats,
     managerPerformance,
+    inactiveUsersReport,
     totalUsers,
     totalCourses,
-    inactiveUsersReport,
   });
 }
 
@@ -601,7 +601,7 @@ export async function updateProjectSubmissionStatus(
     return Promise.resolve(global.a_project_submissions[submissionIndex]);
 }
 
-export async function findProjectSubmissionByUserId(userId: string): Promise<ProjectSubmission | null> {
-    const submission = global.a_project_submissions.find(sub => sub.userId === userId);
-    return Promise.resolve(submission || null);
+export async function findProjectSubmissionsByUserId(userId: string): Promise<ProjectSubmission[]> {
+    const submissions = global.a_project_submissions.filter(sub => sub.userId === userId);
+    return Promise.resolve(submissions || []);
 }

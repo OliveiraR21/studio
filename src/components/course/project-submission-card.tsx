@@ -7,7 +7,7 @@ import { Loader2, Presentation, CheckCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { submitProjectProposal } from "@/actions/project-actions";
-import { findProjectSubmissionByUserId } from "@/lib/data-access";
+import { findProjectSubmissionsByUserId } from "@/lib/data-access";
 import type { User, Module, ProjectSubmission } from "@/lib/types";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -19,7 +19,7 @@ interface ProjectSubmissionCardProps {
 
 export function ProjectSubmissionCard({ allModules, currentUser }: ProjectSubmissionCardProps) {
     const { toast } = useToast();
-    const [submission, setSubmission] = useState<ProjectSubmission | null>(null);
+    const [submissions, setSubmissions] = useState<ProjectSubmission[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const { allCoursesCompleted } = useMemo(() => {
@@ -33,8 +33,8 @@ export function ProjectSubmissionCard({ allModules, currentUser }: ProjectSubmis
         const checkExistingSubmission = async () => {
             if (allCoursesCompleted) {
                 try {
-                    const existing = await findProjectSubmissionByUserId(currentUser.id);
-                    setSubmission(existing);
+                    const existing = await findProjectSubmissionsByUserId(currentUser.id);
+                    setSubmissions(existing);
                 } catch (error) {
                     console.error("Failed to check for existing submission:", error);
                 } finally {
@@ -59,7 +59,7 @@ export function ProjectSubmissionCard({ allModules, currentUser }: ProjectSubmis
             });
             if (state.success) {
                 // Optimistically update the UI to show the pending state
-                setSubmission({
+                const newSubmission: ProjectSubmission = {
                     id: '', // Temp ID
                     userId: currentUser.id,
                     userName: currentUser.name,
@@ -67,7 +67,8 @@ export function ProjectSubmissionCard({ allModules, currentUser }: ProjectSubmis
                     projectName: 'Seu projeto',
                     submissionDate: new Date(),
                     status: 'Pendente'
-                });
+                };
+                setSubmissions(prev => [...prev, newSubmission]);
             }
         }
     }, [state, toast, currentUser]);
@@ -87,8 +88,12 @@ export function ProjectSubmissionCard({ allModules, currentUser }: ProjectSubmis
         );
     }
     
-    if (submission) {
-        if (submission.status === 'Aprovado') {
+    // Check if there's at least one submission that is approved or pending
+    const hasActiveSubmission = submissions.some(s => s.status === 'Aprovado' || s.status === 'Pendente');
+
+    if (hasActiveSubmission) {
+        const approvedSubmission = submissions.find(s => s.status === 'Aprovado');
+        if (approvedSubmission) {
              return (
                 <Card className="bg-gradient-to-br from-green-500/10 to-primary/10 border-green-500/20 mt-8">
                     <CardHeader className="text-center">
@@ -99,16 +104,21 @@ export function ProjectSubmissionCard({ allModules, currentUser }: ProjectSubmis
                 </Card>
             );
         }
-        return (
-            <Card className="bg-gradient-to-br from-blue-500/10 to-primary/10 border-blue-500/20 mt-8">
-                <CardHeader className="text-center">
-                    <Clock className="h-12 w-12 text-blue-500 mx-auto mb-2" />
-                    <CardTitle className="text-2xl">Candidatura em Análise</CardTitle>
-                    <CardDescription>Sua candidatura para o projeto "{submission.projectName}" foi enviada e está aguardando avaliação da banca.</CardDescription>
-                </CardHeader>
-            </Card>
-        );
+        
+        const pendingSubmission = submissions.find(s => s.status === 'Pendente');
+        if (pendingSubmission) {
+            return (
+                <Card className="bg-gradient-to-br from-blue-500/10 to-primary/10 border-blue-500/20 mt-8">
+                    <CardHeader className="text-center">
+                        <Clock className="h-12 w-12 text-blue-500 mx-auto mb-2" />
+                        <CardTitle className="text-2xl">Candidatura em Análise</CardTitle>
+                        <CardDescription>Sua candidatura para o projeto "{pendingSubmission.projectName}" foi enviada e está aguardando avaliação da banca.</CardDescription>
+                    </CardHeader>
+                </Card>
+            );
+        }
     }
+
 
     return (
         <Card className="bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-primary/10 border-primary/20 mt-8">

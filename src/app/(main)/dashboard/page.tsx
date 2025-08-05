@@ -1,6 +1,6 @@
 
 
-import { getLearningModules, findCourseById, findNextCourseForUser, getUsers, findProjectSubmissionByUserId } from "@/lib/data-access";
+import { getLearningModules, findCourseById, findNextCourseForUser, getUsers, findProjectSubmissionsByUserId } from "@/lib/data-access";
 import { 
   Card, 
   CardContent, 
@@ -19,6 +19,10 @@ import { UserNotFound } from "@/components/layout/user-not-found";
 import { getCurrentUser } from "@/lib/auth";
 import { userHasCourseAccess } from "@/lib/access-control";
 import { cn } from "@/lib/utils";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Badge } from "@/components/ui/badge";
 
 const PASSING_SCORE = 90;
 
@@ -34,48 +38,10 @@ const formatDuration = (totalSeconds: number) => {
     return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 };
 
-const ProjectStatusCard = ({ submission }: { submission: ProjectSubmission }) => {
-    const statusConfig = {
-        Pendente: {
-            icon: Clock,
-            title: "Candidatura em Análise",
-            description: `Sua candidatura para o projeto "${submission.projectName}" foi enviada e está aguardando avaliação da banca.`,
-            color: "text-blue-500",
-            bgColor: "bg-blue-500/10",
-            borderColor: "border-blue-500/20",
-        },
-        Aprovado: {
-            icon: CheckCircle,
-            title: "Projeto Aprovado!",
-            description: `Parabéns! Seu projeto "${submission.projectName}" foi aprovado. Você ganhou 2.000 XP!`,
-            color: "text-green-500",
-            bgColor: "bg-green-500/10",
-            borderColor: "border-green-500/20",
-        },
-        Reprovado: {
-            icon: XCircle,
-            title: "Projeto Reprovado",
-            description: `Seu projeto "${submission.projectName}" foi reprovado. Entre em contato com seu gestor para mais detalhes.`,
-            color: "text-destructive",
-            bgColor: "bg-destructive/10",
-            borderColor: "border-destructive/20",
-        },
-    };
-
-    const config = statusConfig[submission.status];
-    const Icon = config.icon;
-
-    return (
-        <Card className={cn(config.bgColor, config.borderColor)}>
-            <CardHeader className="flex flex-row items-center gap-4 space-y-0">
-                <Icon className={cn("h-8 w-8", config.color)} />
-                <div>
-                    <CardTitle>{config.title}</CardTitle>
-                    <CardDescription className={cn("pt-1", config.color)}>{config.description}</CardDescription>
-                </div>
-            </CardHeader>
-        </Card>
-    );
+const statusColors: Record<ProjectSubmission['status'], string> = {
+  Pendente: 'bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30',
+  Aprovado: 'bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30',
+  Reprovado: 'bg-destructive/20 text-destructive dark:text-destructive border-destructive/30',
 };
 
 
@@ -92,7 +58,7 @@ export default async function DashboardPage() {
     coursesToRetakeResult, 
     trackPerformanceResult, 
     nextCourse, 
-    projectSubmission
+    projectSubmissions
   ] = await Promise.all([
     getLearningModules(),
     Promise.all(
@@ -124,7 +90,7 @@ export default async function DashboardPage() {
         })
     ),
     findNextCourseForUser(currentUser),
-    findProjectSubmissionByUserId(currentUser.id)
+    findProjectSubmissionsByUserId(currentUser.id)
   ]);
   
   // Filter out null results after Promise.all resolves
@@ -177,10 +143,6 @@ export default async function DashboardPage() {
                 Um resumo do seu progresso e desempenho na plataforma.
             </p>
         </div>
-
-        {projectSubmission && (
-          <ProjectStatusCard submission={projectSubmission} />
-        )}
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <ProgressChart completed={completedCoursesCount} total={totalCourses} />
@@ -283,20 +245,20 @@ export default async function DashboardPage() {
             </Card>
         </div>
         
-        <Card className="border-amber-500/50 bg-amber-500/5">
-            <CardHeader>
-                <div className="flex items-center gap-3">
-                    <AlertTriangle className="h-6 w-6 text-amber-600" />
-                    <div>
-                        <CardTitle>Pendências de Estudo</CardTitle>
-                        <CardDescription>
-                            Cursos com nota abaixo do esperado que precisam ser refeitos para progredir.
-                        </CardDescription>
+        {coursesToRetake.length > 0 && (
+            <Card className="border-amber-500/50 bg-amber-500/5">
+                <CardHeader>
+                    <div className="flex items-center gap-3">
+                        <AlertTriangle className="h-6 w-6 text-amber-600" />
+                        <div>
+                            <CardTitle>Pendências de Estudo</CardTitle>
+                            <CardDescription>
+                                Cursos com nota abaixo do esperado que precisam ser refeitos para progredir.
+                            </CardDescription>
+                        </div>
                     </div>
-                </div>
-            </CardHeader>
-            <CardContent>
-                {coursesToRetake.length > 0 ? (
+                </CardHeader>
+                <CardContent>
                     <ul className="space-y-3">
                         {coursesToRetake.map(course => (
                             <li key={course.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
@@ -310,15 +272,49 @@ export default async function DashboardPage() {
                             </li>
                         ))}
                     </ul>
-                ) : (
-                    <div className="flex flex-col items-center justify-center text-center p-6 gap-3">
-                        <BookCheck className="h-10 w-10 text-green-500" />
-                        <p className="font-semibold">Você está em dia com todas as suas provas!</p>
-                        <p className="text-sm text-muted-foreground">Nenhuma pendência encontrada. Ótimo trabalho!</p>
-                    </div>
-                )}
+                </CardContent>
+            </Card>
+        )}
+        
+        {projectSubmissions.length > 0 && (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Presentation className="h-6 w-6 text-primary" />
+                <div>
+                  <CardTitle>Status dos Projetos</CardTitle>
+                  <CardDescription>
+                    Acompanhe o andamento das suas candidaturas para o nível Extra Classe.
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome do Projeto</TableHead>
+                    <TableHead>Data da Inscrição</TableHead>
+                    <TableHead className="text-center">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {projectSubmissions.map((submission) => (
+                    <TableRow key={submission.id}>
+                      <TableCell className="font-medium">{submission.projectName}</TableCell>
+                      <TableCell>{format(submission.submissionDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className={cn("font-semibold", statusColors[submission.status])}>
+                          {submission.status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
-        </Card>
+          </Card>
+        )}
     </div>
   );
 }
