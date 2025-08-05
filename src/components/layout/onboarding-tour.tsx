@@ -1,27 +1,17 @@
 
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Joyride, { type Step, type CallBackProps, EVENTS } from 'react-joyride';
 import type { User } from '@/lib/types';
 import { useTour } from '@/hooks/use-tour';
 import { Button } from '@/components/ui/button';
-import { AnimatedSupply } from './animated-supply';
-import { Skeleton } from '../ui/skeleton';
+import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
+
 
 interface OnboardingTourProps {
   user: User;
 }
-
-// Create a separate component to isolate the Suspense boundary
-function TourAvatar() {
-  return (
-    <Suspense fallback={<Skeleton className="w-28 h-28 rounded-full" />}>
-      <AnimatedSupply />
-    </Suspense>
-  );
-}
-
 
 export function OnboardingTour({ user }: OnboardingTourProps) {
   const [isMounted, setIsMounted] = useState(false);
@@ -159,7 +149,10 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
       }) => (
         <div {...tooltipProps} className="p-4 rounded-lg bg-card text-card-foreground shadow-lg max-w-xs flex gap-4">
           <div className="flex-shrink-0 w-28 h-28">
-            <TourAvatar />
+             <Avatar className="h-full w-full">
+                <AvatarImage src="/supply-avatar.png" alt="Avatar Supply" data-ai-hint="mascot avatar" />
+                <AvatarFallback>S</AvatarFallback>
+            </Avatar>
           </div>
           <div className="flex-grow">
             <div className="text-sm">{step.content}</div>
