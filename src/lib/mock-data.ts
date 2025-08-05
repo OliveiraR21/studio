@@ -1,5 +1,5 @@
 
-import type { User, Module } from './types';
+import type { User, Module, ProjectSubmission } from './types';
 
 const today = new Date();
 const fiveDaysAgo = new Date();
@@ -395,3 +395,5 @@ export const learningModules: Module[] = [
     ]
   }
 ];
+
+export const projectSubmissions: ProjectSubmission[] = [];

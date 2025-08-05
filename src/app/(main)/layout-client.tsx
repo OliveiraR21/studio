@@ -12,6 +12,7 @@ import {
   Trophy,
   UserCog,
   Users,
+  Presentation,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -97,6 +98,7 @@ export function MainLayoutClient({
       icon: BookMarked,
       label: 'Gerenciamento de Cursos',
     },
+    { href: '/admin/projects', icon: Presentation, label: 'Gestão de Projetos' },
     { href: '/admin/reports', icon: BarChart, label: 'Relatórios' },
   ];
 

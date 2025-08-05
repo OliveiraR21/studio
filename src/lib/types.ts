@@ -1,6 +1,5 @@
 
 
-
 export interface Module {
   id: string;
   title: string;
@@ -133,4 +132,17 @@ export interface LevelInfo {
   xpForNextLevel: number;
   progressPercentage: number;
   levelName: string;
+}
+
+// Project Submission Types
+export type SubmissionStatus = 'Pendente' | 'Aprovado' | 'Reprovado';
+
+export interface ProjectSubmission {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  projectName: string;
+  submissionDate: Date;
+  status: SubmissionStatus;
 }

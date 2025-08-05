@@ -1,7 +1,7 @@
 
 // In-memory data store
-import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerPerformance, InactiveUsersReport } from './types';
-import { learningModules as mockModules, users as mockUsers } from './mock-data';
+import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerPerformance, InactiveUsersReport, ProjectSubmission, SubmissionStatus } from './types';
+import { learningModules as mockModules, users as mockUsers, projectSubmissions as mockProjectSubmissions } from './mock-data';
 import { userHasCourseAccess } from './access-control';
 import { differenceInDays } from 'date-fns';
 import { cache } from 'react';
@@ -24,6 +24,8 @@ declare global {
   var a_users: User[];
   // eslint-disable-next-line no-var
   var a_modules: Module[];
+  // eslint-disable-next-line no-var
+  var a_project_submissions: ProjectSubmission[];
 }
 
 // This pattern ensures that in a development environment with hot-reloading,
@@ -45,6 +47,17 @@ if (!global.a_users) {
 if (!global.a_modules) {
   global.a_modules = JSON.parse(JSON.stringify(mockModules), (key, value) => {
     if (key === 'createdAt' && typeof value === 'string') {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        return date;
+      }
+    }
+    return value;
+  });
+}
+if (!global.a_project_submissions) {
+  global.a_project_submissions = JSON.parse(JSON.stringify(mockProjectSubmissions), (key, value) => {
+    if (key === 'submissionDate' && typeof value === 'string') {
       const date = new Date(value);
       if (!isNaN(date.getTime())) {
         return date;
@@ -501,4 +514,53 @@ export function filterModulesForUser(allModules: Module[], currentUser: User): M
   })
   // 4. Finally, remove modules that have become empty (no tracks)
   .filter(module => module.tracks.length > 0);
+}
+
+// --- Project Submission Functions ---
+
+export async function getProjectSubmissions(): Promise<ProjectSubmission[]> {
+    return Promise.resolve(global.a_project_submissions);
+}
+
+export async function createProjectSubmission(
+    userId: string,
+    userName: string,
+    userEmail: string,
+    projectName: string
+): Promise<ProjectSubmission> {
+    const existingSubmission = global.a_project_submissions.find(
+        (sub) => sub.userId === userId && sub.status !== 'Reprovado'
+    );
+    if (existingSubmission) {
+        throw new Error('Você já possui uma candidatura de projeto pendente ou aprovada.');
+    }
+
+    const newSubmission: ProjectSubmission = {
+        id: `proj-${Date.now()}`,
+        userId,
+        userName,
+        userEmail,
+        projectName,
+        submissionDate: new Date(),
+        status: 'Pendente',
+    };
+    global.a_project_submissions.push(newSubmission);
+    return Promise.resolve(newSubmission);
+}
+
+export async function updateProjectSubmissionStatus(
+    submissionId: string,
+    status: SubmissionStatus
+): Promise<ProjectSubmission> {
+    const submissionIndex = global.a_project_submissions.findIndex((sub) => sub.id === submissionId);
+    if (submissionIndex === -1) {
+        throw new Error('Candidatura de projeto não encontrada.');
+    }
+    global.a_project_submissions[submissionIndex].status = status;
+    return Promise.resolve(global.a_project_submissions[submissionIndex]);
+}
+
+export async function findProjectSubmissionByUserId(userId: string): Promise<ProjectSubmission | null> {
+    const submission = global.a_project_submissions.find(sub => sub.userId === userId);
+    return Promise.resolve(submission || null);
 }

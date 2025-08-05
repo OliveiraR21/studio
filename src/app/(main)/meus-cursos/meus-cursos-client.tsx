@@ -26,6 +26,7 @@ import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ModuleFinalActions } from "@/components/course/module-final-actions";
 import { GeneralCertificateCard } from "@/components/course/general-certificate-card";
+import { ProjectSubmissionCard } from "@/components/course/project-submission-card";
 
 const moduleIcons: Record<string, React.ElementType> = {
     'module-integration': ClipboardList,
@@ -106,10 +107,16 @@ export function MyCoursesPageContent({ learningModules, currentUser, nextCourse 
                 isModuleCompleted={allTracksInModuleCompleted}
               />
               {isLastModule && (
-                <GeneralCertificateCard
-                  allModules={learningModules}
-                  currentUser={currentUser}
-                />
+                <>
+                  <GeneralCertificateCard
+                    allModules={learningModules}
+                    currentUser={currentUser}
+                  />
+                  <ProjectSubmissionCard 
+                     allModules={learningModules}
+                     currentUser={currentUser}
+                  />
+                </>
               )}
             </TabsContent>
           )
