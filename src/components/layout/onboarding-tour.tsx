@@ -151,7 +151,7 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
          <div {...tooltipProps} className="w-full max-w-sm rounded-xl bg-card text-card-foreground shadow-2xl overflow-hidden">
             <header className="relative h-20 bg-gradient-to-br from-primary/20 via-primary/10 to-background">
               <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                <Avatar className="h-28 w-28 border-4 border-background animate-pulse">
+                <Avatar className="h-28 w-28 border-4 border-background">
                     <AvatarImage src="/supply-avatar.png" alt="Avatar Supply" data-ai-hint="mascot avatar" />
                     <AvatarFallback>S</AvatarFallback>
                 </Avatar>
