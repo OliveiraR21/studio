@@ -7,6 +7,7 @@ import type { User } from '@/lib/types';
 import { useTour } from '@/hooks/use-tour';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
+import { cn } from '@/lib/utils';
 
 
 interface OnboardingTourProps {
@@ -147,29 +148,35 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
         primaryProps,
         tooltipProps,
       }) => (
-        <div {...tooltipProps} className="p-4 rounded-lg bg-card text-card-foreground shadow-lg max-w-xs flex gap-4">
-          <div className="flex-shrink-0 w-28 h-28">
-             <Avatar className="h-full w-full">
-                <AvatarImage src="/supply-avatar.png" alt="Avatar Supply" data-ai-hint="mascot avatar" />
-                <AvatarFallback>S</AvatarFallback>
-            </Avatar>
-          </div>
-          <div className="flex-grow">
-            <div className="text-sm">{step.content}</div>
-            <div className="flex justify-between items-center mt-4">
-                <span className="text-xs text-muted-foreground">{index + 1} de {steps.length}</span>
-                <div className="flex items-center gap-2">
-                  {index > 0 && (
-                    <Button {...backProps} variant="ghost" size="sm">
-                      Voltar
-                    </Button>
-                  )}
-                  <Button {...primaryProps} size="sm" className="joyride-next-button">
-                      {continuous ? 'Avançar' : 'Finalizar'}
-                  </Button>
-                </div>
+         <div {...tooltipProps} className="w-full max-w-sm rounded-xl bg-card text-card-foreground shadow-2xl overflow-hidden">
+            <header className="relative h-20 bg-gradient-to-br from-primary/20 via-primary/10 to-background">
+              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
+                <Avatar className="h-28 w-28 border-4 border-background animate-pulse">
+                    <AvatarImage src="/supply-avatar.png" alt="Avatar Supply" data-ai-hint="mascot avatar" />
+                    <AvatarFallback>S</AvatarFallback>
+                </Avatar>
+              </div>
+            </header>
+            
+            <div className="p-6 pt-16 text-center">
+              <div className="text-sm">{step.content}</div>
             </div>
-          </div>
+
+            <footer className="flex justify-between items-center bg-muted/50 p-3">
+              <span className="text-xs text-muted-foreground font-semibold">
+                  {index + 1} de {steps.length}
+              </span>
+              <div className="flex items-center gap-2">
+                {index > 0 && (
+                  <Button {...backProps} variant="ghost" size="sm">
+                    Voltar
+                  </Button>
+                )}
+                <Button {...primaryProps} size="sm" className="joyride-next-button">
+                    {continuous ? 'Avançar' : 'Finalizar'}
+                </Button>
+              </div>
+            </footer>
         </div>
       )}
     />
