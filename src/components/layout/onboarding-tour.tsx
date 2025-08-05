@@ -17,7 +17,7 @@ interface OnboardingTourProps {
 const TourAvatar = () => {
   return (
     <div className="relative h-28 w-28">
-      <Avatar className="h-28 w-28 border-4 border-background">
+      <Avatar className="h-28 w-28">
         <AvatarImage src="/supply-avatar.png" alt="Avatar Supply" data-ai-hint="mascot avatar" />
         <AvatarFallback>S</AvatarFallback>
       </Avatar>
