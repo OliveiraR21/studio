@@ -1,6 +1,6 @@
 
 
-import { getLearningModules, findCourseById, findNextCourseForUser, getUsers } from "@/lib/data-access";
+import { getLearningModules, findCourseById, findNextCourseForUser, getUsers, findProjectSubmissionByUserId } from "@/lib/data-access";
 import { 
   Card, 
   CardContent, 
@@ -10,14 +10,15 @@ import {
   CardFooter
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trophy, GaugeCircle, AlertTriangle, BookCheck, Play, Info } from "lucide-react";
+import { Trophy, GaugeCircle, AlertTriangle, BookCheck, Play, Info, Presentation, Clock, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
-import type { Track, Course } from "@/lib/types";
+import type { Track, Course, ProjectSubmission } from "@/lib/types";
 import { ProgressChart } from "@/components/dashboard/progress-chart";
 import { Separator } from "@/components/ui/separator";
 import { UserNotFound } from "@/components/layout/user-not-found";
 import { getCurrentUser } from "@/lib/auth";
 import { userHasCourseAccess } from "@/lib/access-control";
+import { cn } from "@/lib/utils";
 
 const PASSING_SCORE = 90;
 
@@ -33,13 +34,102 @@ const formatDuration = (totalSeconds: number) => {
     return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 };
 
+const ProjectStatusCard = ({ submission }: { submission: ProjectSubmission }) => {
+    const statusConfig = {
+        Pendente: {
+            icon: Clock,
+            title: "Candidatura em Análise",
+            description: `Sua candidatura para o projeto "${submission.projectName}" foi enviada e está aguardando avaliação da banca.`,
+            color: "text-blue-500",
+            bgColor: "bg-blue-500/10",
+            borderColor: "border-blue-500/20",
+        },
+        Aprovado: {
+            icon: CheckCircle,
+            title: "Projeto Aprovado!",
+            description: `Parabéns! Seu projeto "${submission.projectName}" foi aprovado. Você ganhou 2.000 XP!`,
+            color: "text-green-500",
+            bgColor: "bg-green-500/10",
+            borderColor: "border-green-500/20",
+        },
+        Reprovado: {
+            icon: XCircle,
+            title: "Projeto Reprovado",
+            description: `Seu projeto "${submission.projectName}" foi reprovado. Entre em contato com seu gestor para mais detalhes.`,
+            color: "text-destructive",
+            bgColor: "bg-destructive/10",
+            borderColor: "border-destructive/20",
+        },
+    };
+
+    const config = statusConfig[submission.status];
+    const Icon = config.icon;
+
+    return (
+        <Card className={cn(config.bgColor, config.borderColor)}>
+            <CardHeader className="flex flex-row items-center gap-4 space-y-0">
+                <Icon className={cn("h-8 w-8", config.color)} />
+                <div>
+                    <CardTitle>{config.title}</CardTitle>
+                    <CardDescription className={cn("pt-1", config.color)}>{config.description}</CardDescription>
+                </div>
+            </CardHeader>
+        </Card>
+    );
+};
+
+
 export default async function DashboardPage() {
   const currentUser = await getCurrentUser();
-  const allModules = await getLearningModules();
-
+  
   if (!currentUser) {
     return <UserNotFound />
   }
+
+  // Fetch all data in parallel
+  const [
+    allModules, 
+    coursesToRetakeResult, 
+    trackPerformanceResult, 
+    nextCourse, 
+    projectSubmission
+  ] = await Promise.all([
+    getLearningModules(),
+    Promise.all(
+        (currentUser.courseScores ?? [])
+        .filter(scoreInfo => scoreInfo.score < PASSING_SCORE)
+        .map(async scoreInfo => {
+            const courseDetails = await findCourseById(scoreInfo.courseId);
+            if (!courseDetails) return null;
+            const { course } = courseDetails;
+            if (userHasCourseAccess(currentUser, course)) {
+                return { ...course, score: scoreInfo.score };
+            }
+            return null;
+        })
+    ),
+    Promise.all(
+        (currentUser.trackScores ?? [])
+        .map(async scoreInfo => {
+            const modules = await getLearningModules(); // Fetch inside map if not available outside
+            let trackDetails: Track | null = null;
+            for (const module of modules) {
+                const foundTrack = module.tracks.find(t => t.id === scoreInfo.trackId);
+                if (foundTrack) {
+                    trackDetails = foundTrack;
+                    break;
+                }
+            }
+            return trackDetails ? { ...trackDetails, score: scoreInfo.score } : null;
+        })
+    ),
+    findNextCourseForUser(currentUser),
+    findProjectSubmissionByUserId(currentUser.id)
+  ]);
+  
+  // Filter out null results after Promise.all resolves
+  const coursesToRetake = coursesToRetakeResult.filter((course): course is Course & { score: number } => course !== null);
+  const trackPerformance = trackPerformanceResult.filter((track): track is Track & { score: number } => track !== null).reverse();
   
   // Filter all courses based on user's access rights using the new hierarchical logic
   const accessibleCourses = allModules.flatMap(module => module.tracks.flatMap(track => track.courses))
@@ -62,40 +152,6 @@ export default async function DashboardPage() {
       return track.courses.length > 0 || (track.quiz && track.quiz.questions.length > 0);
   });
   const completedTracksCount = validCompletedTracks.length;
-
-  const coursesToRetakePromises = (currentUser.courseScores ?? [])
-    .filter(scoreInfo => scoreInfo.score < PASSING_SCORE)
-    .map(async scoreInfo => {
-        const courseDetails = await findCourseById(scoreInfo.courseId);
-        if (!courseDetails) return null;
-
-        const { course } = courseDetails;
-        // Check access for the course to retake
-        if (userHasCourseAccess(currentUser, course)) {
-            return { ...course, score: scoreInfo.score };
-        }
-        return null;
-    });
-
-  const coursesToRetake = (await Promise.all(coursesToRetakePromises))
-    .filter((course): course is Course & { score: number } => course !== null);
-
-  const trackPerformance = (currentUser.trackScores ?? [])
-    .map(scoreInfo => {
-      let trackDetails: Track | null = null;
-      for (const module of allModules) {
-        const foundTrack = module.tracks.find(t => t.id === scoreInfo.trackId);
-        if (foundTrack) {
-          trackDetails = foundTrack;
-          break;
-        }
-      }
-      return trackDetails ? { ...trackDetails, score: scoreInfo.score } : null;
-    })
-    .filter((track): track is Track & { score: number } => track !== null)
-    .reverse(); // Newest first
-
-  const nextCourse = await findNextCourseForUser(currentUser);
 
   // Calculate training hours based on accessible courses
   const totalDuration = accessibleCourses.reduce((acc, course) => {
@@ -121,6 +177,11 @@ export default async function DashboardPage() {
                 Um resumo do seu progresso e desempenho na plataforma.
             </p>
         </div>
+
+        {projectSubmission && (
+          <ProjectStatusCard submission={projectSubmission} />
+        )}
+
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <ProgressChart completed={completedCoursesCount} total={totalCourses} />
 

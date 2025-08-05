@@ -52,7 +52,8 @@ export async function submitProjectProposal(
     });
 
     revalidatePath('/meus-cursos');
-    return { success: true, message: 'Sua candidatura foi enviada com sucesso! Acompanhe o status por e-mail.' };
+    revalidatePath('/dashboard'); // Revalidate dashboard to show the new status card
+    return { success: true, message: 'Sua candidatura foi enviada com sucesso! Acompanhe o status por e-mail e no seu painel.' };
   } catch (e) {
     return { success: false, message: e instanceof Error ? e.message : 'Ocorreu um erro desconhecido.' };
   }
@@ -95,6 +96,7 @@ export async function updateSubmissionStatus(submissionId: string, status: Submi
 
     revalidatePath('/admin/projects'); // Revalidate the admin page
     revalidatePath('/gamification'); // Revalidate gamification page for XP update
+    revalidatePath('/dashboard'); // Revalidate dashboard to update the status card
     revalidatePath('/(main)/layout'); // Revalidate layout for level indicator
     
     return { success: true, message: `Status da candidatura atualizado para "${status}".` };
