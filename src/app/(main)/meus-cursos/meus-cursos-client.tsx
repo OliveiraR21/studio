@@ -76,7 +76,7 @@ export function MyCoursesPageContent({ learningModules, currentUser, nextCourse 
           </p>
       </div>
       <Tabs defaultValue={defaultOpenModuleId}>
-        <TabsList className="flex flex-col md:flex-row h-auto w-full gap-2 mb-4">
+        <TabsList className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 h-auto w-full gap-2 mb-4">
           {learningModules.map(module => {
             const Icon = moduleIcons[module.id] || ClipboardList; // Fallback icon
             return (
@@ -84,7 +84,7 @@ export function MyCoursesPageContent({ learningModules, currentUser, nextCourse 
                   <div className="flex items-start gap-3 w-full">
                     <Icon className="h-5 w-5 mt-1 flex-shrink-0" />
                     <div className="flex-grow">
-                      <p className="font-bold text-lg leading-tight">{module.title}</p>
+                      <p className="font-bold text-lg leading-tight whitespace-normal">{module.title}</p>
                       <p className="text-xs text-muted-foreground whitespace-normal mt-2">{module.description}</p>
                     </div>
                   </div>
