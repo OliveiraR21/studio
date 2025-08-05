@@ -1,4 +1,5 @@
 
+
 // In-memory data store
 import type { User, Module, Track, Course, UserRole, Notification, AnalyticsData, Question, QuestionProficiency, EngagementStats, ManagerPerformance, InactiveUsersReport, ProjectSubmission, SubmissionStatus } from './types';
 import { learningModules as mockModules, users as mockUsers, projectSubmissions as mockProjectSubmissions } from './mock-data';
@@ -26,6 +27,8 @@ declare global {
   var a_modules: Module[];
   // eslint-disable-next-line no-var
   var a_project_submissions: ProjectSubmission[];
+  // eslint-disable-next-line no-var
+  var a_notifications: Notification[];
 }
 
 // This pattern ensures that in a development environment with hot-reloading,
@@ -65,6 +68,9 @@ if (!global.a_project_submissions) {
     }
     return value;
   });
+}
+if (!global.a_notifications) {
+  global.a_notifications = [];
 }
 
 
@@ -289,8 +295,20 @@ export async function updateUser(userId: string, userData: Partial<Omit<User, 'i
 
 // --- Notification Functions ---
 
+export async function createNotification(notification: Omit<Notification, 'id' | 'createdAt' | 'read'>): Promise<Notification> {
+    const newNotification: Notification = {
+        ...notification,
+        id: `notif-${Date.now()}`,
+        createdAt: new Date(),
+        read: false,
+    };
+    global.a_notifications.push(newNotification);
+    return newNotification;
+}
+
 export async function getNotificationsForUser(user: User): Promise<Notification[]> {
-    const notifications: Notification[] = [];
+    // 1. Get dynamically generated notifications
+    const dynamicNotifications: Notification[] = [];
     const allModules = await getLearningModules();
     const today = new Date();
     
@@ -302,8 +320,9 @@ export async function getNotificationsForUser(user: User): Promise<Notification[
             if (userHasCourseAccess(user, course)) {
                  const details = await findCourseByIdWithTrack(course.id);
                  if (details) {
-                    notifications.push({
+                    dynamicNotifications.push({
                         id: `notif-new-${course.id}`,
+                        userId: user.id,
                         title: 'Novo curso disponível!',
                         description: `O curso "${course.title}" foi adicionado à trilha "${details.track.title}".`,
                         createdAt: course.createdAt,
@@ -323,8 +342,9 @@ export async function getNotificationsForUser(user: User): Promise<Notification[
     for (const scoreInfo of coursesToRetake) {
          const courseDetails = await findCourseById(scoreInfo.courseId);
          if (courseDetails && userHasCourseAccess(user, courseDetails.course)) {
-             notifications.push({
+             dynamicNotifications.push({
                 id: `notif-retake-${scoreInfo.courseId}`,
+                userId: user.id,
                 title: 'Lembrete de estudo',
                 description: `Você ainda não atingiu a nota mínima no curso "${courseDetails.course.title}".`,
                 createdAt: new Date(), // Use current date for retake reminders
@@ -333,9 +353,30 @@ export async function getNotificationsForUser(user: User): Promise<Notification[
              });
          }
     }
+    
+    // 2. Get stored notifications from our "database"
+    const storedNotifications = global.a_notifications.filter(n => n.userId === user.id && !n.read);
 
+    // 3. Combine and sort
+    const allUserNotifications = [...dynamicNotifications, ...storedNotifications];
+    
     // Sort notifications by date, newest first
-    return notifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return allUserNotifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+}
+
+// Marks notifications as read. If no notificationId is provided, marks all for the user.
+export async function markNotificationsAsRead(userId: string, notificationId?: string): Promise<void> {
+    global.a_notifications.forEach(n => {
+        if (n.userId === userId) {
+            if (notificationId && n.id === notificationId) {
+                n.read = true;
+            } else if (!notificationId) {
+                // Mark all as read if no specific ID is given
+                n.read = true;
+            }
+        }
+    });
+    return Promise.resolve();
 }
 
 

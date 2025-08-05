@@ -1,4 +1,5 @@
 
+
 import type { User, LevelInfo, Module } from './types';
 
 // --- Configuration ---
@@ -13,6 +14,7 @@ const XP_CONFIG = {
     QUIZ_IMPROVEMENT_BONUS: 40, // Retaking a passed quiz and scoring higher
     QUIZ_EXCELLENCE_BONUS: 75, // For score 95-99%
     QUIZ_PERFECTION_BONUS: 150, // For score 100%
+    PROJECT_APPROVED: 2000, // XP for getting the Extra Classe project approved
 };
 
 
@@ -27,7 +29,7 @@ const LEVEL_THRESHOLDS: Record<number, number> = {
     6: 4900,    // Diamante
     7: 6000,    // Grão-Mestre
     8: 8000,    // Mestre
-    9: 10000,    // Extra Classe
+    9: 10000,   // Extra Classe
 };
 
 // Define names for each level number.
@@ -113,8 +115,10 @@ export async function calculateUserLevel(user: User, allModules: Module[]): Prom
         }
     });
 
-    // NOTE: Daily login and streak XP would require a persistent database with login tracking.
-    // This part is omitted from the calculation as it's not feasible with the current mock data structure.
+    // 4. Project Approval XP
+    if (user.hasCompletedProject) {
+        totalXp += XP_CONFIG.PROJECT_APPROVED;
+    }
 
     const currentXp = totalXp;
 

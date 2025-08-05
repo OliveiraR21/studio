@@ -79,16 +79,20 @@ export interface User {
 
   // Flag to check if user has completed the onboarding tour.
   hasCompletedOnboarding?: boolean;
+  // Flag to indicate completion of the final project for gamification
+  hasCompletedProject?: boolean;
 }
 
 
 export interface Notification {
     id: string;
+    userId: string; // Notifications are now user-specific
     title: string;
     description: string;
     createdAt: Date;
     read: boolean;
     href?: string;
+    isProjectNotification?: boolean; // Differentiates project notifications
 }
 
 export interface QuestionProficiency {

@@ -2,24 +2,38 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Bell, Check, Info } from 'lucide-react';
+import { Bell, Check, Info, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { getNotifications } from '@/actions/notification-actions';
+import { getNotifications, markNotificationsAsRead } from '@/actions/notification-actions';
 import type { Notification } from '@/lib/types';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import Link from 'next/link';
 import { Skeleton } from '../ui/skeleton';
+import { getCurrentUser } from '@/lib/auth'; // Not a server action, safe to call
+import { getSimulatedUserId } from '@/lib/auth';
 
 export function NotificationBell() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
+    const [userId, setUserId] = useState<string | null>(null);
 
     useEffect(() => {
+        async function loadInitialData() {
+            const id = await getSimulatedUserId();
+            setUserId(id);
+        }
+        loadInitialData();
+    }, []);
+    
+    useEffect(() => {
+        if (!userId) return;
+
         async function fetchNotifications() {
+            setIsLoading(true);
             try {
                 const fetchedNotifications = await getNotifications();
                 setNotifications(fetchedNotifications);
@@ -30,13 +44,19 @@ export function NotificationBell() {
             }
         }
         fetchNotifications();
-    }, []);
+    }, [userId]);
 
-    const handleMarkAllAsRead = () => {
-        // In a real app, this would be a server action to update the DB.
-        // For this prototype, we just clear the local state.
-        setNotifications([]);
+    const handleMarkAllAsRead = async () => {
+        if (!userId) return;
+        setNotifications([]); // Optimistically update UI
+        await markNotificationsAsRead(userId);
         setIsOpen(false);
+    };
+
+     const handleMarkOneAsRead = async (notificationId: string) => {
+        if (!userId) return;
+        setNotifications(prev => prev.filter(n => n.id !== notificationId)); // Optimistically update UI
+        await markNotificationsAsRead(userId, notificationId);
     };
     
     const unreadCount = notifications.length;
@@ -73,22 +93,25 @@ export function NotificationBell() {
                         </div>
                     ) : unreadCount > 0 ? (
                         <div className="divide-y">
-                            {notifications.map((notification) => (
-                                <Link key={notification.id} href={notification.href || '#'} className="block hover:bg-muted/50" onClick={() => setIsOpen(false)}>
-                                    <div className="flex items-start gap-3 p-4">
-                                        <div className="flex-shrink-0 pt-1">
-                                            <Info className="h-5 w-5 text-primary" />
+                            {notifications.map((notification) => {
+                                const Icon = notification.isProjectNotification ? Award : Info;
+                                return (
+                                    <Link key={notification.id} href={notification.href || '#'} className="block hover:bg-muted/50" onClick={() => handleMarkOneAsRead(notification.id)}>
+                                        <div className="flex items-start gap-3 p-4">
+                                            <div className="flex-shrink-0 pt-1">
+                                                <Icon className="h-5 w-5 text-primary" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-semibold text-sm">{notification.title}</p>
+                                                <p className="text-sm text-muted-foreground">{notification.description}</p>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    {formatDistanceToNow(notification.createdAt, { addSuffix: true, locale: ptBR })}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="flex-1">
-                                            <p className="font-semibold text-sm">{notification.title}</p>
-                                            <p className="text-sm text-muted-foreground">{notification.description}</p>
-                                            <p className="text-xs text-muted-foreground mt-1">
-                                                {formatDistanceToNow(notification.createdAt, { addSuffix: true, locale: ptBR })}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
+                                    </Link>
+                                )
+                            })}
                         </div>
                     ) : (
                         <div className="p-8 text-center text-sm text-muted-foreground">
