@@ -14,6 +14,18 @@ interface OnboardingTourProps {
   user: User;
 }
 
+const TourAvatar = () => {
+  return (
+    <div className="relative h-28 w-28">
+      <Avatar className="absolute -top-14 left-1/2 -translate-x-1/2 h-28 w-28 border-4 border-background">
+        <AvatarImage src="/supply-avatar.png" alt="Avatar Supply" data-ai-hint="mascot avatar" />
+        <AvatarFallback>S</AvatarFallback>
+      </Avatar>
+    </div>
+  )
+}
+
+
 export function OnboardingTour({ user }: OnboardingTourProps) {
   const [isMounted, setIsMounted] = useState(false);
   const { run, stopTour } = useTour();
@@ -148,21 +160,15 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
         primaryProps,
         tooltipProps,
       }) => (
-         <div {...tooltipProps} className="w-full max-w-sm rounded-xl bg-card text-card-foreground shadow-2xl overflow-hidden">
-            <header className="relative h-20 bg-gradient-to-br from-primary/20 via-primary/10 to-background">
-              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
-                <Avatar className="h-28 w-28 border-4 border-background">
-                    <AvatarImage src="/supply-avatar.png" alt="Avatar Supply" data-ai-hint="mascot avatar" />
-                    <AvatarFallback>S</AvatarFallback>
-                </Avatar>
-              </div>
-            </header>
+         <div {...tooltipProps} className="w-full max-w-sm rounded-xl bg-card text-card-foreground shadow-2xl overflow-visible">
+
+            <TourAvatar />
             
-            <div className="p-6 pt-16 text-center">
-              <div className="text-sm">{step.content}</div>
+            <div className="p-6 pt-2 text-center">
+              <div className="mt-4 text-sm">{step.content}</div>
             </div>
 
-            <footer className="flex justify-between items-center bg-muted/50 p-3">
+            <footer className="flex justify-between items-center bg-muted/50 p-3 rounded-b-xl">
               <span className="text-xs text-muted-foreground font-semibold">
                   {index + 1} de {steps.length}
               </span>
