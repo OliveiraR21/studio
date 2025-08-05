@@ -184,7 +184,7 @@ export const learningModules: Module[] = [
   {
     id: 'module-hs',
     title: 'Competências Técnicas',
-    description: 'Hard Skills',
+    description: 'Hard Skills - Aprimore suas habilidades técnicas e conhecimento de processos.',
     tracks: [
       {
         id: 'track-hs-pe',
@@ -287,7 +287,7 @@ export const learningModules: Module[] = [
   {
     id: 'module-ss',
     title: 'Competências Comportamentais',
-    description: 'Soft Skills',
+    description: 'Soft Skills - Desenvolva habilidades interpessoais e de liderança.',
     tracks: [
       {
         id: 'track-ss-lid',
