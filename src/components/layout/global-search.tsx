@@ -20,6 +20,7 @@ import { Skeleton } from '../ui/skeleton';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 const iconMap: Record<IconName, React.ElementType> = {
   Home,
@@ -102,11 +103,18 @@ export function GlobalSearch() {
         </kbd>
       </Button>
       <CommandDialog open={isOpen} onOpenChange={setIsOpen}>
-        <CommandInput
-          placeholder="Pesquisar por cursos, páginas e mais..."
-          value={query}
-          onValueChange={setQuery}
-        />
+        <div className="flex items-center gap-2 border-b bg-muted/50 px-3">
+            <Avatar className="h-10 w-10">
+                <AvatarImage src="/supply-avatar-face.png" alt="Supply Avatar" data-ai-hint="mascot avatar" />
+                <AvatarFallback>S</AvatarFallback>
+            </Avatar>
+            <CommandInput
+            placeholder="Pesquisar por cursos, páginas e mais..."
+            value={query}
+            onValueChange={setQuery}
+            className="border-0 bg-transparent h-12 focus-visible:ring-0"
+            />
+        </div>
         <CommandList>
           {isLoading && (
             <div className="p-2 space-y-2">
