@@ -1,4 +1,6 @@
 
+'use server';
+
 import * as fs from 'fs/promises';
 import path from 'path';
 import { animateAvatar } from '@/ai/flows/animate-avatar-flow';
