@@ -148,7 +148,7 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
       }) => (
         <div {...tooltipProps} className="p-4 rounded-lg bg-card text-card-foreground shadow-lg max-w-xs flex gap-4">
           <div className="flex-shrink-0">
-             <Avatar className="h-20 w-20">
+             <Avatar className="h-28 w-28 animate-bounce">
                 <AvatarImage src="/supply-avatar.png" alt="Avatar Supply" data-ai-hint="mascot avatar" />
                 <AvatarFallback>S</AvatarFallback>
              </Avatar>
