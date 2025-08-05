@@ -13,6 +13,16 @@ interface OnboardingTourProps {
   user: User;
 }
 
+// Create a separate component to isolate the Suspense boundary
+function TourAvatar() {
+  return (
+    <Suspense fallback={<Skeleton className="w-28 h-28 rounded-full" />}>
+      <AnimatedSupply />
+    </Suspense>
+  );
+}
+
+
 export function OnboardingTour({ user }: OnboardingTourProps) {
   const [isMounted, setIsMounted] = useState(false);
   const { run, stopTour } = useTour();
@@ -149,9 +159,7 @@ export function OnboardingTour({ user }: OnboardingTourProps) {
       }) => (
         <div {...tooltipProps} className="p-4 rounded-lg bg-card text-card-foreground shadow-lg max-w-xs flex gap-4">
           <div className="flex-shrink-0 w-28 h-28">
-             <Suspense fallback={<Skeleton className="w-28 h-28 rounded-full" />}>
-                <AnimatedSupply />
-            </Suspense>
+            <TourAvatar />
           </div>
           <div className="flex-grow">
             <div className="text-sm">{step.content}</div>
