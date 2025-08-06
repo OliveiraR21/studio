@@ -25,6 +25,7 @@ interface QuizGeneratorProps {
   transcript?: string;
   onQuizSaved?: () => void;
   onGenerateClick?: () => void;
+  onQuizGenerated?: () => void; // New callback
 }
 
 export interface QuizGeneratorHandles {
@@ -43,7 +44,7 @@ const difficultyBadgeColor: Record<QuestionDifficulty, string> = {
 };
 
 export const QuizGenerator = forwardRef<QuizGeneratorHandles, QuizGeneratorProps>(
-  ({ courseId, title, description, hasExistingQuiz, transcript: initialTranscript, onQuizSaved, onGenerateClick }, ref) => {
+  ({ courseId, title, description, hasExistingQuiz, transcript: initialTranscript, onQuizSaved, onGenerateClick, onQuizGenerated }, ref) => {
     const { toast } = useToast();
     const router = useRouter();
     const [isGenerating, startGenerating] = useTransition();
@@ -70,6 +71,7 @@ export const QuizGenerator = forwardRef<QuizGeneratorHandles, QuizGeneratorProps
             title: 'Questionário gerado!',
             description: 'Revise as perguntas e salve se estiverem de acordo.',
           });
+          if (onQuizGenerated) onQuizGenerated(); // Notify parent
         } else {
           console.error('AI quiz generation failed:', result.message);
           toast({

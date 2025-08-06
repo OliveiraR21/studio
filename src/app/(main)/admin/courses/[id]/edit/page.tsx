@@ -7,10 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2, RefreshCw, Save, Wand2 } from "lucide-react";
-import { QuizGenerator, type QuizGeneratorHandles } from "@/components/admin/quiz-generator";
 import { QuizViewer } from "@/components/admin/quiz-viewer";
 import type { Course, Module, User } from "@/lib/types";
-import { useRef } from "react";
 import { QuizGeneratorSection } from "./quiz-generator-section";
 
 // This is now a Server Component, which is more robust for data fetching.

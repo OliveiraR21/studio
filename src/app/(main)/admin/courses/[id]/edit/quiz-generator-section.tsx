@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { Course } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,6 +14,8 @@ interface QuizGeneratorSectionProps {
 
 export function QuizGeneratorSection({ course }: QuizGeneratorSectionProps) {
   const quizGeneratorRef = useRef<QuizGeneratorHandles>(null);
+  // We need a state to force a re-render when the quiz is generated
+  const [hasGeneratedQuiz, setHasGeneratedQuiz] = useState(false);
 
   const handleGenerateClick = () => {
     quizGeneratorRef.current?.generate();
@@ -29,7 +31,6 @@ export function QuizGeneratorSection({ course }: QuizGeneratorSectionProps) {
 
   const isGenerating = quizGeneratorRef.current?.isGenerating;
   const isSaving = quizGeneratorRef.current?.isSaving;
-  const hasGeneratedQuiz = quizGeneratorRef.current?.hasGeneratedQuiz;
 
   return (
     <Card>
@@ -53,6 +54,7 @@ export function QuizGeneratorSection({ course }: QuizGeneratorSectionProps) {
             hasExistingQuiz={!!course.quiz}
             transcript={course.transcript}
             onGenerateClick={handleGenerateClick}
+            onQuizGenerated={() => setHasGeneratedQuiz(true)}
         />
       </CardContent>
        {hasGeneratedQuiz && (
@@ -60,14 +62,14 @@ export function QuizGeneratorSection({ course }: QuizGeneratorSectionProps) {
             <Button 
                 variant="ghost" 
                 onClick={handleRegenerateClick}
-                disabled={isGenerating || !hasGeneratedQuiz}
+                disabled={isGenerating}
             >
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Gerar Novamente
             </Button>
             <Button 
                 onClick={handleSaveClick} 
-                disabled={isSaving || !hasGeneratedQuiz}
+                disabled={isSaving}
             >
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                 {isSaving ? 'Salvando...' : 'Salvar Questionário'}
