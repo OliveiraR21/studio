@@ -1,14 +1,17 @@
 
+
 import { findCourseById, getLearningModules, getUsers } from "@/lib/data-access";
 import { CourseForm } from "@/components/admin/course-form";
 import { notFound } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { QuizGenerator } from "@/components/admin/quiz-generator";
+import { ArrowLeft, Loader2, RefreshCw, Save, Wand2 } from "lucide-react";
+import { QuizGenerator, type QuizGeneratorHandles } from "@/components/admin/quiz-generator";
 import { QuizViewer } from "@/components/admin/quiz-viewer";
 import type { Course, Module, User } from "@/lib/types";
+import { useRef } from "react";
+import { QuizGeneratorSection } from "./quiz-generator-section";
 
 // This is now a Server Component, which is more robust for data fetching.
 export default async function EditCoursePage({ params }: { params: { id: string } }) {
@@ -67,13 +70,7 @@ export default async function EditCoursePage({ params }: { params: { id: string 
       )}
 
       {!isNew && course && (
-        <QuizGenerator 
-            courseId={course.id}
-            title={course.title}
-            description={course.description}
-            hasExistingQuiz={!!course.quiz}
-            transcript={course.transcript}
-        />
+        <QuizGeneratorSection course={course} />
       )}
     </div>
   );

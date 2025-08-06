@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect, useImperativeHandle, forwardRef, useTransition } from 'react';
@@ -23,10 +24,12 @@ interface QuizGeneratorProps {
   hasExistingQuiz: boolean;
   transcript?: string;
   onQuizSaved?: () => void;
+  onGenerateClick?: () => void;
 }
 
 export interface QuizGeneratorHandles {
   save: () => void;
+  generate: () => void;
   regenerate: () => void;
   isSaving: boolean;
   isGenerating: boolean;
@@ -40,7 +43,7 @@ const difficultyBadgeColor: Record<QuestionDifficulty, string> = {
 };
 
 export const QuizGenerator = forwardRef<QuizGeneratorHandles, QuizGeneratorProps>(
-  ({ courseId, title, description, hasExistingQuiz, transcript: initialTranscript, onQuizSaved }, ref) => {
+  ({ courseId, title, description, hasExistingQuiz, transcript: initialTranscript, onQuizSaved, onGenerateClick }, ref) => {
     const { toast } = useToast();
     const router = useRouter();
     const [isGenerating, startGenerating] = useTransition();
@@ -77,6 +80,9 @@ export const QuizGenerator = forwardRef<QuizGeneratorHandles, QuizGeneratorProps
         }
       });
     };
+    
+    // Allow external trigger for generation (from the new parent component)
+    const triggerGenerate = onGenerateClick || handleGenerate;
 
     const handleSave = async () => {
       if (!generatedQuiz) return;
@@ -112,6 +118,7 @@ export const QuizGenerator = forwardRef<QuizGeneratorHandles, QuizGeneratorProps
 
     useImperativeHandle(ref, () => ({
       save: handleSave,
+      generate: handleGenerate,
       regenerate: handleGenerate,
       isSaving: isSaving,
       isGenerating: isGenerating,
@@ -142,7 +149,7 @@ export const QuizGenerator = forwardRef<QuizGeneratorHandles, QuizGeneratorProps
                   />
                   <p className="text-xs text-muted-foreground">Se este campo for deixado em branco, a IA usará apenas o título e a descrição do curso.</p>
                 </div>
-                <Button onClick={handleGenerate} className="mt-4">
+                <Button onClick={triggerGenerate} className="mt-4">
                     <Wand2 className="mr-2 h-4 w-4" />
                     {hasExistingQuiz ? 'Gerar Novo Questionário' : 'Gerar Questionário'}
                 </Button>
@@ -157,7 +164,7 @@ export const QuizGenerator = forwardRef<QuizGeneratorHandles, QuizGeneratorProps
                 Verifique se as perguntas e respostas estão corretas antes de salvar. Você pode gerar novamente se não estiver satisfeito.
               </AlertDescription>
             </Alert>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2">
               {generatedQuiz.questions.map((q, index) => (
                 <div key={index} className="space-y-2 rounded-lg border bg-background p-4">
                   <div className="flex justify-between items-start">
