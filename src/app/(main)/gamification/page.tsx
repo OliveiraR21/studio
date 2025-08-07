@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Trophy } from 'lucide-react';
+import { Trophy, CheckCircle, BrainCircuit, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
@@ -27,6 +27,20 @@ const levelInfoMap: Record<number, { name: string; color: string; bgColor: strin
   8: { name: 'Mestre', color: 'text-fuchsia-500', bgColor: 'bg-fuchsia-500/10', xp: '8.000 XP' },
   9: { name: 'Extra Classe', color: 'text-red-500', bgColor: 'bg-red-500/10', xp: '10.000+ XP', description: 'Apresentar um projeto e ser aprovado por uma banca' },
 };
+
+const xpLogic = [
+    { points: 30, description: 'Completar o tour de boas-vindas' },
+    { points: 10, description: 'Por cada curso concluído' },
+    { points: 50, description: 'Por cada trilha concluída' },
+    { points: 500, description: 'Bônus por concluir um módulo inteiro' },
+    { points: 25, description: 'Por responder um questionário na primeira tentativa' },
+    { points: 30, description: 'Por passar em um questionário (nota >= 90%)' },
+    { points: 40, description: 'Bônus por melhorar a nota em um questionário já aprovado' },
+    { points: 75, description: 'Bônus de excelência por nota entre 95-99%' },
+    { points: 150, description: 'Bônus de perfeição por nota 100%' },
+    { points: 2000, description: 'Por ter um projeto Extra Classe aprovado' },
+];
+
 
 export default async function GamificationPage() {
   const currentUser = await getCurrentUser();
@@ -92,30 +106,53 @@ export default async function GamificationPage() {
         </CardContent>
       </Card>
 
-      {/* How it Works Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Como Funcionam os Níveis?</CardTitle>
-          <CardDescription>
-            Seu nível é calculado com base nos Pontos de Experiência (XP) que você acumula.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.values(levelInfoMap).map((levelStyle, index) => (
-                     <div key={index} className={cn("flex items-center gap-4 p-3 rounded-lg bg-muted/50", levelStyle.color.replace('text-', 'border-')/30 )}>
-                        <div className="pt-1">
-                            <Trophy className={cn("h-6 w-6", levelStyle.color)} />
-                        </div>
-                        <div>
-                            <h4 className={cn("font-semibold", levelStyle.color)}>{levelStyle.name} <span className="text-xs font-normal text-muted-foreground">({levelStyle.xp})</span></h4>
-                            {levelStyle.description && <p className="text-xs text-muted-foreground italic">{levelStyle.description}</p>}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Level List Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Como Funcionam os Níveis?</CardTitle>
+            <CardDescription>
+              Seu nível é definido pela quantidade de XP que você acumula.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.values(levelInfoMap).map((levelStyle, index) => (
+                      <div key={index} className={cn("flex items-center gap-4 p-3 rounded-lg bg-muted/50", levelStyle.color.replace('text-', 'border-')/30 )}>
+                          <div className="pt-1">
+                              <Trophy className={cn("h-6 w-6", levelStyle.color)} />
+                          </div>
+                          <div>
+                              <h4 className={cn("font-semibold", levelStyle.color)}>{levelStyle.name} <span className="text-xs font-normal text-muted-foreground">({levelStyle.xp})</span></h4>
+                              {levelStyle.description && <p className="text-xs text-muted-foreground italic">{levelStyle.description}</p>}
+                          </div>
+                      </div>
+                  ))}
+              </div>
+          </CardContent>
+        </Card>
+
+        {/* XP Logic Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Como o XP é Calculado?</CardTitle>
+            <CardDescription>
+              Cada ação na plataforma contribui para o seu progresso.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ul className="space-y-3">
+              {xpLogic.map((item, index) => (
+                <li key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                  <span className="text-sm text-muted-foreground">{item.description}</span>
+                  <Badge variant="secondary" className="font-bold text-base shrink-0">+{item.points} XP</Badge>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+
     </div>
   );
 }
