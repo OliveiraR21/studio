@@ -5,16 +5,16 @@ import type { User, LevelInfo, Module } from './types';
 // --- Configuration ---
 
 const XP_CONFIG = {
-    INITIAL_TOUR: 30,
-    COMPLETE_COURSE: 10,
-    COMPLETE_TRACK: 50,
-    COMPLETE_MODULE: 500, // Major bonus
-    QUIZ_FIRST_ATTEMPT: 25,
-    QUIZ_PASS: 30, // For score >= 90%
-    QUIZ_IMPROVEMENT_BONUS: 40, // Retaking a passed quiz and scoring higher
-    QUIZ_EXCELLENCE_BONUS: 75, // For score 95-99%
-    QUIZ_PERFECTION_BONUS: 150, // For score 100%
-    PROJECT_APPROVED: 2000, // XP for getting the Extra Classe project approved
+    INITIAL_TOUR: 25,
+    COMPLETE_COURSE: 15,
+    COMPLETE_TRACK: 75,
+    COMPLETE_MODULE: 400,
+    QUIZ_FIRST_ATTEMPT: 5,
+    QUIZ_PASS: 20, // For score >= 90%
+    QUIZ_IMPROVEMENT_BONUS: 10,
+    QUIZ_EXCELLENCE_BONUS: 15, // For score 95-99%
+    QUIZ_PERFECTION_BONUS: 30, // For score 100%
+    PROJECT_APPROVED: 2000,
 };
 
 

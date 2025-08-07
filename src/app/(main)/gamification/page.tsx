@@ -29,15 +29,15 @@ const levelInfoMap: Record<number, { name: string; color: string; bgColor: strin
 };
 
 const xpLogic = [
-    { points: 30, description: 'Completar o tour de boas-vindas' },
-    { points: 10, description: 'Por cada curso concluído' },
-    { points: 50, description: 'Por cada trilha concluída' },
-    { points: 500, description: 'Bônus por concluir um módulo inteiro' },
-    { points: 25, description: 'Por responder um questionário na primeira tentativa' },
-    { points: 30, description: 'Por passar em um questionário (nota >= 90%)' },
-    { points: 40, description: 'Bônus por melhorar a nota em um questionário já aprovado' },
-    { points: 75, description: 'Bônus de excelência por nota entre 95-99%' },
-    { points: 150, description: 'Bônus de perfeição por nota 100%' },
+    { points: 25, description: 'Completar o tour de boas-vindas' },
+    { points: 15, description: 'Por cada curso concluído' },
+    { points: 75, description: 'Por cada trilha concluída' },
+    { points: 400, description: 'Bônus por concluir um módulo inteiro' },
+    { points: 5, description: 'Por responder um questionário na primeira tentativa' },
+    { points: 20, description: 'Por passar em um questionário (nota >= 90%)' },
+    { points: 10, description: 'Bônus por melhorar a nota em um questionário já aprovado' },
+    { points: 15, description: 'Bônus de excelência por nota entre 95-99%' },
+    { points: 30, description: 'Bônus de perfeição por nota 100%' },
     { points: 2000, description: 'Por ter um projeto Extra Classe aprovado' },
 ];
 
